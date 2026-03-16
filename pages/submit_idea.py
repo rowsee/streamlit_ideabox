@@ -156,48 +156,6 @@ st.markdown("""
         margin: 32px 0;
     }
     
-    /* Guidelines section */
-    .guidelines-section {
-        background: #F9FAFB;
-        border-radius: 12px;
-        padding: 24px;
-        margin-top: 32px;
-    }
-    
-    .guidelines-section h3 {
-        font-size: 16px;
-        font-weight: 600;
-        color: #111827;
-        margin-bottom: 16px;
-    }
-    
-    .guideline-item {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-    
-    .guideline-item .num {
-        background: #FF6B35;
-        color: white;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 600;
-        flex-shrink: 0;
-    }
-    
-    .guideline-item p {
-        font-size: 13px;
-        color: #4B5563;
-        margin: 0;
-        line-height: 1.5;
-    }
-    
     /* Helper text */
     .helper-text {
         font-size: 12px;
@@ -282,7 +240,7 @@ def render():
     st.markdown("""
     <div class="form-section">
         <div class="section-title">
-            <span class="number">1</span>
+            <span class="number"></span>
             Project Details
         </div>
     </div>
@@ -575,24 +533,25 @@ def render():
     st.session_state.idea_form["hours_saved"] = hours_saved if 'hours_saved' in locals() else 0
     st.session_state.idea_form["planned_use"] = planned_use if 'planned_use' in locals() else ""
     
-    # Guidelines section
-    st.markdown("""
-    <div class="guidelines-section">
-        <h3>📝 Guidelines for a Great Idea Submission</h3>
-        
-        <div class="guideline-item">
-            <span class="num">1</span>
-            <p><strong>Be Specific</strong> - Clear title that summarizes the idea, detailed description of what you're proposing, specific use cases or scenarios</p>
-        </div>
-        
-        <div class="guideline-item">
-            <span class="num">2</span>
-            <p><strong>Focus on Value</strong> - Explain the problem you're solving, quantify potential benefits, consider impact on different stakeholders</p>
-        </div>
-        
-        <div class="guideline-item">
-            <span class="num">3</span>
-            <p><strong>Be Practical</strong> - Consider implementation feasibility, think about resources needed, note any potential challenges</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Guidelines section - Using Streamlit native components
+    st.markdown("### 📝 Guidelines for a Great Idea Submission")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("**1. Be Specific**")
+        st.markdown("- Clear title that summarizes the idea")
+        st.markdown("- Detailed description of what you're proposing")
+        st.markdown("- Specific use cases or scenarios")
+    
+    with col2:
+        st.markdown("**2. Focus on Value**")
+        st.markdown("- Explain the problem you're solving")
+        st.markdown("- Quantify potential benefits")
+        st.markdown("- Consider impact on different stakeholders")
+    
+    with col3:
+        st.markdown("**3. Be Practical**")
+        st.markdown("- Consider implementation feasibility")
+        st.markdown("- Think about resources needed")
+        st.markdown("- Note any potential challenges")

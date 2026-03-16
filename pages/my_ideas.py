@@ -1,6 +1,8 @@
 import streamlit as st
 import json
-from database import get_user_ideas, update_idea, delete_idea
+import io
+import pandas as pd
+from database import get_user_ideas, update_idea, delete_idea, ideas_to_dataframe
 
 st.markdown("""
 <style>
@@ -121,6 +123,21 @@ def render():
         with col3:
             avg_votes = total_votes / len(ideas) if ideas else 0
             st.metric("Avg Votes", f"{avg_votes:.1f}")
+        
+        # Export button
+        col_export, _ = st.columns([1, 4])
+        with col_export:
+            df = ideas_to_dataframe(ideas)
+            buffer = io.BytesIO()
+            df.to_excel(buffer, index=False, engine='openpyxl')
+            buffer.seek(0)
+            st.download_button(
+                label="📥 Export My Ideas to Excel",
+                data=buffer,
+                file_name="my_ideabox_ideas.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
         
         st.markdown("---")
         

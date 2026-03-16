@@ -10,8 +10,35 @@ st.set_page_config(
     page_title="Procurement Idea Hub",
     page_icon="💡",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items=None
 )
+
+# Force light mode - hide dark mode toggle
+st.markdown("""
+<style>
+    /* Hide the default theme toggle in Streamlit */
+    [data-testid="stThemeSelector"] {
+        display: none !important;
+    }
+    
+    /* Force light theme colors */
+    .stApp {
+        background: #F9FAFB !important;
+        color: #111827 !important;
+    }
+    
+    /* Force light colors on all elements */
+    html, body, div, span, p, label {
+        background-color: transparent !important;
+    }
+    
+    /* Remove dark backgrounds anywhere they might appear */
+    [class*="dark"], [style*="dark"], [style*="#1E1E1E"], [style*="#262626"] {
+        background: #FFFFFF !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <style>
