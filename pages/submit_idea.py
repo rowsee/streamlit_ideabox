@@ -540,10 +540,10 @@ def render():
     st.markdown("</div>", unsafe_allow_html=True)
     
     # Toggle Section
-    is_implemented = st.toggle(
+    is_implemented = st.checkbox(
         "Is this already implemented?", 
         value=st.session_state.idea_form["is_implemented"],
-        key="toggle_is_implemented"
+        key="checkbox_is_implemented"
     )
     
     st.session_state.idea_form["is_implemented"] = is_implemented
