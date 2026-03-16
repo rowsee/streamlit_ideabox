@@ -1,0 +1,28 @@
+# Database
+*.db
+
+# Uploads
+uploads/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+
+# OpenCode
+.opencode/
+
+# Temp files
+nul
+*.log

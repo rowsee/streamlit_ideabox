@@ -55,6 +55,14 @@ st.markdown("""
     .status-pending { background: #FEF3C7; color: #D97706; }
     .status-reviewed { background: #DBEAFE; color: #2563EB; }
     .status-implemented { background: #DCFCE7; color: #16A34A; }
+    .implemented-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .implemented-yes { background: #DCFCE7; color: #16A34A; }
+    .implemented-no { background: #F3F4F6; color: #6B7280; }
     .detail-label {
         font-weight: 600;
         color: #1E3A5F;
@@ -115,7 +123,7 @@ REGION_OPTIONS = ["All", "EMEA", "NA", "AP", "Global"]
 
 def render():
     st.markdown("## 📋 Browse All Ideas")
-    st.markdown("Explore ideas from across the organization and vote for your favorites.")
+    st.markdown("Explore ideas from across the organization and like your favorites.")
     
     ideas = get_all_ideas()
     
@@ -134,7 +142,7 @@ def render():
         implemented_filter = st.selectbox("Implemented", ["All", "Yes", "No"])
     
     with col5:
-        sort_by = st.selectbox("Sort by", ["Newest", "Most Voted", "Oldest"])
+        sort_by = st.selectbox("Sort by", ["Newest", "Most Liked", "Oldest"])
     
     if ideas:
         filtered_ideas = ideas
@@ -157,7 +165,7 @@ def render():
         if implemented_filter != "All":
             filtered_ideas = [i for i in filtered_ideas if i["is_implemented"] == implemented_filter]
         
-        if sort_by == "Most Voted":
+        if sort_by == "Most Liked":
             filtered_ideas = sorted(filtered_ideas, key=lambda x: x["votes"], reverse=True)
         elif sort_by == "Oldest":
             filtered_ideas = sorted(filtered_ideas, key=lambda x: x["submitted_at"])
@@ -184,7 +192,7 @@ def render():
         for idea in filtered_ideas:
             voted = has_voted(idea["id"], st.session_state.user_id)
             
-            status_class = f"status-{idea['status'].lower()}" if idea["status"] else "status-pending"
+            implemented_class = "implemented-yes" if idea["is_implemented"] == "Yes" else "implemented-no"
             type_class = f"type-{idea['project_type'].lower()}" if idea["project_type"] else ""
             
             with st.container():
@@ -197,7 +205,7 @@ def render():
                         <span class="meta-item">🏢 {idea["bu_cl_site"] or "N/A"}</span>
                         <span class="meta-item">👤 {idea["full_name"] or idea["username"]}</span>
                         <span class="meta-item">📅 {idea["submitted_at"][:10]}</span>
-                        <span class="status-badge {status_class}">{idea["status"] or "Pending"}</span>
+                        <span class="implemented-badge {implemented_class}">{'✅ Implemented' if idea['is_implemented'] == 'Yes' else '⏳ Not Implemented'}</span>
                     </div>
                 """, unsafe_allow_html=True)
             
@@ -212,11 +220,26 @@ def render():
                         st.markdown(f"**Effective Date:** {idea['effective_date']}")
                 
                 with col2:
-                    st.markdown(f"**Votes:** {idea['votes']}")
+                    st.markdown(f"**Likes:** {idea['votes']}")
                     if idea['hours_saved']:
                         st.markdown(f"**Hours Saved Annually:** {idea['hours_saved']}")
                     if idea['impact_group']:
                         st.markdown(f"**Impact Group:** {idea['impact_group']}")
+                
+                st.markdown("---")
+                
+                # Submitter and Leader info
+                col1, col2 = st.columns(2)
+                with col1:
+                    submitter_name = idea["full_name"] if idea["full_name"] else (idea["username"] if idea["username"] else "Unknown")
+                    st.markdown(f"**Submitted By:** {submitter_name}")
+                    if idea["email"]:
+                        st.markdown(f"**Submitter Email:** {idea['email']}")
+                with col2:
+                    if idea["site_leader"]:
+                        st.markdown(f"**Site Leader:** {idea['site_leader']}")
+                    if idea["teoa_leader"]:
+                        st.markdown(f"**TEOA Functional Leader:** {idea['teoa_leader']}")
                 
                 st.markdown("---")
                 st.markdown(f"**Project Description:**")
@@ -265,7 +288,7 @@ def render():
                 if voted:
                     st.markdown(f"👍 {idea['votes']}")
                 else:
-                    if st.button(f"👍 Vote", key=f"vote_{idea['id']}"):
+                    if st.button(f"👍 Like", key=f"vote_{idea['id']}"):
                         vote_idea(idea["id"], st.session_state.user_id)
                         st.rerun()
             

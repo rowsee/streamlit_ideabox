@@ -343,41 +343,47 @@ st.markdown("""
         font-size: 13px !important;
     }
     
-    /* Toggle Switch - More visible */
+    /* Toggle Switch - Orange when ON, Grey when OFF */
     .stToggle {
         background: transparent !important;
     }
     
     .stToggle > label {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
     }
     
-    .stToggle[role="switch"] {
+    /* Toggle track - grey when OFF */
+    .stToggle [data-testid="stToggleSwitch"] {
         width: 48px !important;
         height: 26px !important;
-        background: #D1D5DB !important;
+        background: #9CA3AF !important;
         border-radius: 13px !important;
         border: none !important;
         padding: 2px !important;
+        flex-shrink: 0 !important;
     }
     
-    .stToggle[role="switch"][aria-checked="true"] {
+    /* Toggle track - orange when ON */
+    .stToggle [data-testid="stToggleSwitch"][aria-checked="true"] {
         background: #FF6B35 !important;
     }
     
-    .stToggle[role="switch"]::before {
-        content: '';
+    /* Toggle knob */
+    .stToggle [data-testid="stToggleSwitch"]::before {
+        content: '' !important;
         width: 22px !important;
         height: 22px !important;
         background: white !important;
         border-radius: 50% !important;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
         transition: transform 0.2s ease !important;
+        display: block !important;
+        visibility: visible !important;
     }
     
-    .stToggle[role="switch"][aria-checked="true"]::before {
+    .stToggle [data-testid="stToggleSwitch"][aria-checked="true"]::before {
         transform: translateX(22px) !important;
     }
     

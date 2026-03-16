@@ -1,5 +1,7 @@
 import streamlit as st
 from database import add_idea
+from assignment_matrix import get_assignment
+from notifications import send_idea_submission_notification
 
 st.markdown("""
 <style>
@@ -167,8 +169,133 @@ st.markdown("""
     .required {
         color: #EF4444;
     }
-</style>
+    
+    /* Toggle visibility fix */
+    .toggle-visibility-fix {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .toggle-visibility-fix .stToggle {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    div[data-testid="stToggle"] {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+    }
+    
+    div[data-testid="stToggle"] > label {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Leader fields styling */
+    .leader-field {
+        background: #F3F4F6 !important;
+        padding: 10px 14px !important;
+        border-radius: 8px !important;
+        border: 1px solid #E5E7EB !important;
+        color: #6B7280 !important;
+        font-size: 13px !important;
+    }
+ </style>
 """, unsafe_allow_html=True)
+
+def clear_all_form_fields():
+    """Clear all form fields and widget session state"""
+    # Clear form data
+    st.session_state.idea_form = {
+        "title": "",
+        "description": "",
+        "project_lead": "",
+        "region": "",
+        "bu_cl_site": "",
+        "project_type": "",
+        "problem_statements": "",
+        "benefits": "",
+        "is_implemented": False,
+        "effective_date": None,
+        "impact_group": "",
+        "drivers": [],
+        "drivers_other": "",
+        "hours_saved": 0,
+        "planned_use": "",
+        "site_leader": "",
+        "teoa_leader": "",
+    }
+    
+    # Clear all widget session state keys
+    widget_keys = [
+        "title_input", "desc_input", "lead_input",
+        "region_select", "site_select", "project_type_select",
+        "problem_input", "benefits_input", "toggle_is_implemented",
+        "effective_date_input", "impact_select", "drivers_multiselect",
+        "drivers_other_input", "hours_input", "planned_use_input",
+        "capacity_file_input", "email_approval_input"
+    ]
+    for key in widget_keys:
+        if key in st.session_state:
+            del st.session_state[key]
+    
+    st.session_state.form_just_cleared = True
+    st.session_state.show_success_popup = False
+    st.session_state.success_message = ""
+
+def show_success_popup(message):
+    """Show success modal popup with action buttons"""
+    if "show_success_popup" not in st.session_state:
+        st.session_state.show_success_popup = False
+        st.session_state.success_message = ""
+    
+    if st.session_state.show_success_popup:
+        # Custom CSS for the success message
+        st.markdown("""
+        <style>
+        .success-box {
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .success-message {
+            font-size: 16px;
+            font-weight: 500;
+            color: #065F46;
+            margin-bottom: 8px;
+        }
+        </style>
+        <div class="success-box">
+            <div class="success-icon">✅</div>
+            <div class="success-message">""" + message + """</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Action buttons
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Submit Another", use_container_width=True, key="btn_submit_another"):
+                st.session_state.show_success_popup = False
+                st.session_state.success_message = ""
+                st.rerun()
+        
+        with col2:
+            if st.button("View My Submitted Ideas", use_container_width=True, key="btn_view_ideas"):
+                st.session_state.current_page = "my_ideas"
+                st.rerun()
+        
+        # Stop further rendering
+        st.stop()
 
 REGION_OPTIONS = ["", "EMEA", "NA", "AP", "Global"]
 
@@ -208,6 +335,9 @@ IMPACT_GROUP_OPTIONS = ["", "Within the site", "Cross Function", "Both"]
 PROJECT_TYPE_OPTIONS = ["", "Low", "Medium", "High"]
 
 def render():
+    # Check and show success popup if triggered
+    show_success_popup(st.session_state.get("success_message", ""))
+    
     # Page header
     st.markdown("""
     <div class="page-header">
@@ -234,13 +364,38 @@ def render():
             "drivers_other": "",
             "hours_saved": 0,
             "planned_use": "",
+            "site_leader": "",
+            "teoa_leader": "",
         }
+    
+    # Check if form was just cleared (after submission) - reinitialize to ensure fresh state
+    if st.session_state.get("form_just_cleared"):
+        st.session_state.idea_form = {
+            "title": "",
+            "description": "",
+            "project_lead": "",
+            "region": "",
+            "bu_cl_site": "",
+            "project_type": "",
+            "problem_statements": "",
+            "benefits": "",
+            "is_implemented": False,
+            "effective_date": None,
+            "impact_group": "",
+            "drivers": [],
+            "drivers_other": "",
+            "hours_saved": 0,
+            "planned_use": "",
+            "site_leader": "",
+            "teoa_leader": "",
+        }
+        st.session_state.form_just_cleared = False
     
     # Section 1: Basic Information
     st.markdown("""
     <div class="form-section">
         <div class="section-title">
-            <span class="number"></span>
+            <span class="number">1</span>
             Project Details
         </div>
     </div>
@@ -299,6 +454,70 @@ def render():
         placeholder="Select",
         key="site_select"
     )
+    
+    # Get assignment based on Region + BU
+    selected_region = region if region else ""
+    selected_bu = bu_cl_site if bu_cl_site else ""
+    
+    site_leader = ""
+    teoa_leader = ""
+    assignment_emails = []
+    mapping_warning = ""
+    
+    if selected_region and selected_bu:
+        assignment = get_assignment(selected_region, selected_bu)
+        
+        site_leader = assignment.get("site_leader_str", "")
+        teoa_leader = assignment.get("teoa_leader_str", "")
+        assignment_emails = assignment.get("emails", [])
+        
+        if site_leader == "No mapping found" or teoa_leader == "No mapping found":
+            mapping_warning = f"⚠️ No mapping found for Region: {selected_region}, BU: {selected_bu}"
+            site_leader = ""
+            teoa_leader = ""
+    
+    # Store in session state for use in submission
+    st.session_state.idea_form["site_leader"] = site_leader
+    st.session_state.idea_form["teoa_leader"] = teoa_leader
+    
+    # Row 5: Site Leader + TEOA Functional Leader (read-only, auto-populated)
+    if mapping_warning:
+        st.warning(mapping_warning)
+    
+    # Use html div for read-only display to ensure it renders properly
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**Site Leader**")
+        site_leader_display = site_leader if site_leader and site_leader != "No mapping found" else "-"
+        st.markdown(f"""
+        <div style="
+            background: #F3F4F6;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            font-size: 14px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+        ">{site_leader_display}</div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown("**TEOA Functional Leader**")
+        teoa_leader_display = teoa_leader if teoa_leader and teoa_leader != "No mapping found" else "-"
+        st.markdown(f"""
+        <div style="
+            background: #F3F4F6;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            color: #374151;
+            font-size: 14px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+        ">{teoa_leader_display}</div>
+        """, unsafe_allow_html=True)
     
     st.markdown("</div>", unsafe_allow_html=True)
     
@@ -468,6 +687,10 @@ def render():
                 final_drivers.remove("Other")
                 final_drivers.append(f"Other: {drivers_other}")
             
+            # Get the site leader and teoa leader values (use session state as fallback)
+            final_site_leader = site_leader if site_leader else st.session_state.idea_form.get("site_leader", "")
+            final_teoa_leader = teoa_leader if teoa_leader else st.session_state.idea_form.get("teoa_leader", "")
+            
             add_idea(
                 title=title,
                 description=description,
@@ -485,36 +708,52 @@ def render():
                 capacity_file=capacity_file if is_implemented else None,
                 planned_use=planned_use if is_implemented else None,
                 email_approval=email_approval if is_implemented else None,
-                submitted_by=st.session_state.user_id
+                submitted_by=st.session_state.user_id,
+                site_leader=final_site_leader,
+                teoa_leader=final_teoa_leader
             )
             
-            # Clear form after successful submission
-            st.session_state.idea_form = {
-                "title": "",
-                "description": "",
-                "project_lead": "",
-                "region": "",
-                "bu_cl_site": "",
-                "project_type": "",
-                "problem_statements": "",
-                "benefits": "",
-                "is_implemented": False,
-                "effective_date": None,
-                "impact_group": "",
-                "drivers": [],
-                "drivers_other": "",
-                "hours_saved": 0,
-                "planned_use": "",
+            # Send notification
+            user_name = st.session_state.get("full_name") or st.session_state.get("username", "Unknown")
+            
+            site_leaders_list = site_leader.split(", ") if site_leader else []
+            teoa_leaders_list = teoa_leader.split(", ") if teoa_leader else []
+            
+            notification_data = {
+                "title": title,
+                "description": description,
+                "region": region,
+                "bu_cl_site": bu_cl_site,
+                "project_lead": project_lead,
+                "submitted_by_name": user_name,
+                "emails": assignment_emails
             }
             
-            st.markdown("""
-            <div class="success-box">
-                <span class="icon">✅</span>
-                <div>
-                    <strong>Success!</strong> Your idea has been submitted successfully. Thank you for contributing!
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            # Send notification (wrap in try-except to not block success message)
+            try:
+                send_idea_submission_notification(
+                    notification_data,
+                    site_leaders_list,
+                    teoa_leaders_list,
+                    is_implemented
+                )
+            except Exception as e:
+                st.error(f"Email notification failed: {e}")
+            
+            # Set success message based on implementation status
+            if is_implemented:
+                success_message = "Thanks! Your implemented improvement has been submitted. We greatly appreciate your commitment to improvement - it means a lot!"
+            else:
+                success_message = "Thanks! Your idea is logged. Your idea has been submitted to your TEOA site leader and your manager. Please check back and update your status when the idea is implemented."
+            
+            # Clear all form fields before showing popup
+            clear_all_form_fields()
+            
+            # Store message and show popup
+            st.session_state.success_message = success_message
+            st.session_state.show_success_popup = True
+            
+            st.rerun()
     
     # Update session state
     st.session_state.idea_form["title"] = title if 'title' in locals() else ""
@@ -532,6 +771,8 @@ def render():
     st.session_state.idea_form["drivers_other"] = drivers_other if 'drivers_other' in locals() else ""
     st.session_state.idea_form["hours_saved"] = hours_saved if 'hours_saved' in locals() else 0
     st.session_state.idea_form["planned_use"] = planned_use if 'planned_use' in locals() else ""
+    st.session_state.idea_form["site_leader"] = site_leader if 'site_leader' in locals() else ""
+    st.session_state.idea_form["teoa_leader"] = teoa_leader if 'teoa_leader' in locals() else ""
     
     # Guidelines section - Using Streamlit native components
     st.markdown("### 📝 Guidelines for a Great Idea Submission")

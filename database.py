@@ -51,6 +51,8 @@ def init_db():
                 capacity_file TEXT,
                 planned_use TEXT,
                 email_approval TEXT,
+                site_leader TEXT,
+                teoa_leader TEXT,
                 submitted_by INTEGER NOT NULL,
                 submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 status TEXT DEFAULT 'Pending',
@@ -64,6 +66,31 @@ def init_db():
             cursor.execute("ALTER TABLE ideas ADD COLUMN project_lead TEXT")
         except sqlite3.OperationalError:
             pass  # Column already exists
+        
+        # Migration: Add site_leader column if it doesn't exist
+        try:
+            cursor.execute("ALTER TABLE ideas ADD COLUMN site_leader TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        
+        # Migration: Add teoa_leader column if it doesn't exist
+        try:
+            cursor.execute("ALTER TABLE ideas ADD COLUMN teoa_leader TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        
+        # Create audit log table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS idea_audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                idea_id INTEGER NOT NULL,
+                field_name TEXT NOT NULL,
+                old_value TEXT,
+                new_value TEXT,
+                changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (idea_id) REFERENCES ideas (id)
+            )
+        """)
         
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS votes (
@@ -112,7 +139,7 @@ def add_idea(
     title, description, project_lead, region, bu_cl_site, project_type,
     problem_statements, benefits, is_implemented, effective_date,
     drivers, impact_group, hours_saved, capacity_file, planned_use,
-    email_approval, submitted_by
+    email_approval, submitted_by, site_leader="", teoa_leader=""
 ):
     drivers_json = json.dumps(drivers) if drivers else None
     capacity_path = save_uploaded_file(capacity_file, "capacity") if capacity_file else None
@@ -125,13 +152,13 @@ def add_idea(
                 title, description, project_lead, region, bu_cl_site, project_type,
                 problem_statements, benefits, is_implemented, effective_date,
                 drivers, impact_group, hours_saved, capacity_file, planned_use,
-                email_approval, submitted_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                email_approval, submitted_by, site_leader, teoa_leader
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 title, description, project_lead, region, bu_cl_site, project_type,
                 problem_statements, benefits, is_implemented, effective_date,
                 drivers_json, impact_group, hours_saved, capacity_path, planned_use,
-                email_path, submitted_by
+                email_path, submitted_by, site_leader, teoa_leader
             )
         )
         conn.commit()
@@ -152,9 +179,11 @@ def get_user_ideas(user_id):
     with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT * FROM ideas
-            WHERE submitted_by = ?
-            ORDER BY submitted_at DESC
+            SELECT i.*, u.username, u.full_name, u.email
+            FROM ideas i
+            JOIN users u ON i.submitted_by = u.id
+            WHERE i.submitted_by = ?
+            ORDER BY i.submitted_at DESC
         """, (user_id,))
         return cursor.fetchall()
 
@@ -285,7 +314,8 @@ def ideas_to_dataframe(ideas):
             "Project Title": idea["title"],
             "Project Description": idea["description"],
             "Project Lead": idea["project_lead"],
-            "Submitter": idea["full_name"] or idea["username"],
+            "Submitter": idea["full_name"] if idea["full_name"] else (idea["username"] if idea["username"] else "Unknown"),
+            "Submitter Email": idea["email"] if idea["email"] else "",
             "Region": idea["region"],
             "BU/CL Site": idea["bu_cl_site"],
             "Project Type": idea["project_type"],
@@ -297,9 +327,47 @@ def ideas_to_dataframe(ideas):
             "Impact Group": idea["impact_group"],
             "Hours Saved Annually": idea["hours_saved"],
             "Planned Use": idea["planned_use"],
-            "Status": idea["status"],
-            "Votes": idea["votes"],
+            "Site Leader": idea["site_leader"] if idea["site_leader"] else "",
+            "TEOA Functional Leader": idea["teoa_leader"] if idea["teoa_leader"] else "",
+            "Likes": idea["votes"],
             "Submitted Date": idea["submitted_at"]
         })
     
     return pd.DataFrame(data)
+
+def add_audit_log(idea_id, field_name, old_value, new_value):
+    """Add an audit log entry for a field change"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """INSERT INTO idea_audit_log (idea_id, field_name, old_value, new_value) VALUES (?, ?, ?, ?)""",
+            (idea_id, field_name, old_value, new_value)
+        )
+        conn.commit()
+
+def get_audit_log(idea_id):
+    """Get all audit log entries for an idea"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """SELECT * FROM idea_audit_log WHERE idea_id = ? ORDER BY changed_at DESC""",
+            (idea_id,)
+        )
+        return cursor.fetchall()
+
+def log_idea_changes(idea_id, old_idea, new_data):
+    """Compare old and new idea data and log all changes"""
+    tracked_fields = [
+        "title", "description", "project_lead", "bu_cl_site", "project_type",
+        "problem_statements", "benefits", "is_implemented", "effective_date",
+        "drivers", "impact_group", "hours_saved", "planned_use"
+    ]
+    
+    for field in tracked_fields:
+        old_value = old_idea.get(field, "")
+        new_value = new_data.get(field, "")
+        
+        if old_value != new_value:
+            old_str = str(old_value) if old_value else ""
+            new_str = str(new_value) if new_value else ""
+            add_audit_log(idea_id, field, old_str, new_str)
