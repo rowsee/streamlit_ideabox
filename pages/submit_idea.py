@@ -170,20 +170,16 @@ st.markdown("""
         color: #EF4444;
     }
     
-    /* Toggle visibility fix */
-    .stToggle {
-        visibility: visible !important;
-        opacity: 1 !important;
-        display: flex !important;
+    /* Fix Streamlit Toggle Visibility */
+    div[data-testid="stToggle"] label {
+        color: #1E3A5F !important;
     }
 
-    /* Grey when OFF */
-    .stToggle [data-testid="stToggleSwitch"] {
-        background-color: #9CA3AF !important;
+    div[data-testid="stToggle"] div[role="switch"] {
+        background-color: #CBD5E1 !important;
     }
 
-    /* Orange when ON */
-    .stToggle [data-testid="stToggleSwitch"][aria-checked="true"] {
+    div[data-testid="stToggle"] div[role="switch"][aria-checked="true"] {
         background-color: #FF6B35 !important;
     }
     
