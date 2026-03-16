@@ -170,27 +170,26 @@ st.markdown("""
         color: #EF4444;
     }
     
-    /* Toggle visibility fix */
-    .toggle-visibility-fix {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    
-    .toggle-visibility-fix .stToggle {
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    
+    /* Toggle visibility and color styling */
     div[data-testid="stToggle"] {
         visibility: visible !important;
         opacity: 1 !important;
         display: flex !important;
     }
     
-    div[data-testid="stToggle"] > label {
-        visibility: visible !important;
-        opacity: 1 !important;
+    /* Track base color - grey when OFF */
+    div[data-testid="stToggle"] > label > div > div {
+        background-color: #9CA3AF !important;
+    }
+    
+    /* Track color when ON - orange */
+    div[data-testid="stToggle"] > label > div > div[aria-checked="true"] {
+        background-color: #FF6B35 !important;
+    }
+    
+    /* Thumb color */
+    div[data-testid="stToggle"] > label > div > div[aria-checked="true"] > div {
+        background-color: white !important;
     }
     
     /* Leader fields styling */
