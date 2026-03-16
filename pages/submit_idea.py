@@ -170,13 +170,13 @@ st.markdown("""
         color: #EF4444;
     }
     
-    /* Fix Streamlit Toggle Visibility */
+    /* Fix Streamlit Toggle Visibility - Orange when ON, Black when OFF */
     div[data-testid="stToggle"] label {
         color: #1E3A5F !important;
     }
 
     div[data-testid="stToggle"] div[role="switch"] {
-        background-color: #CBD5E1 !important;
+        background-color: #000000 !important;
     }
 
     div[data-testid="stToggle"] div[role="switch"][aria-checked="true"] {
@@ -540,10 +540,10 @@ def render():
     st.markdown("</div>", unsafe_allow_html=True)
     
     # Toggle Section
-    is_implemented = st.checkbox(
+    is_implemented = st.toggle(
         "Is this already implemented?", 
         value=st.session_state.idea_form["is_implemented"],
-        key="checkbox_is_implemented"
+        key="toggle_is_implemented"
     )
     
     st.session_state.idea_form["is_implemented"] = is_implemented
