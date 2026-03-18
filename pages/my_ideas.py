@@ -122,7 +122,12 @@ st.markdown("""
         font-size: 11px;
         margin-top: 4px;
     }
-</style>
+    
+    /* Make checkbox check mark black */
+    div[data-testid="stCheckbox"] svg path {
+        fill: #000000 !important;
+    }
+ </style>
 """, unsafe_allow_html=True)
 
 DRIVERS_OPTIONS = [
@@ -213,9 +218,10 @@ def render_edit_form(idea):
             height=80
         )
         
-        new_is_implemented = st.toggle(
+        new_is_implemented = st.checkbox(
             "Is this already implemented?",
-            value=idea["is_implemented"] == "Yes"
+            value=idea["is_implemented"] == "Yes",
+            key="edit_is_implemented"
         )
         
         new_effective_date = None
@@ -284,11 +290,11 @@ def render_edit_form(idea):
                     height=60
                 )
         
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            submitted = st.form_submit_button("Save Changes", type="primary")
-        with col2:
+        col_cancel, col_save = st.columns([1, 3])
+        with col_cancel:
             cancel = st.form_submit_button("Cancel")
+        with col_save:
+            submitted = st.form_submit_button("Save Changes", type="primary")
         
         if submitted:
             effective_date_str = new_effective_date.isoformat() if new_effective_date else None
@@ -348,6 +354,7 @@ def render_edit_form(idea):
             st.rerun()
     
     if st.button("← Back to My Ideas"):
+        st.session_state.edit_idea_id = None
         st.rerun()
 
 def render():

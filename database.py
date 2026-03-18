@@ -364,7 +364,7 @@ def log_idea_changes(idea_id, old_idea, new_data):
     ]
     
     for field in tracked_fields:
-        old_value = old_idea.get(field, "")
+        old_value = old_idea[field] if field in old_idea else ""
         new_value = new_data.get(field, "")
         
         if old_value != new_value:
