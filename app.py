@@ -5,6 +5,7 @@ import pages.submit_idea as submit_idea
 import pages.browse_ideas as browse_ideas
 import pages.my_ideas as my_ideas
 import pages.about as about
+import pages.dashboard as dashboard
 
 st.set_page_config(
     page_title="Procurement Idea Hub",
@@ -940,6 +941,7 @@ def render_sidebar():
             # Navigation buttons
             nav_items = [
                 ("Home", "🏠", "home"),
+                ("Dashboard", "📊", "dashboard"),
                 ("Submit Idea", "💡", "submit_idea"),
                 ("Browse Ideas", "📋", "browse_ideas"),
                 ("My Ideas", "👤", "my_ideas"),
@@ -981,6 +983,8 @@ def main():
         current = st.session_state.current_page
         if current == "home":
             home.render()
+        elif current == "dashboard":
+            dashboard.render()
         elif current == "submit_idea":
             submit_idea.render()
         elif current == "browse_ideas":
