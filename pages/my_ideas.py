@@ -224,43 +224,32 @@ def render_edit_form(idea):
             key="edit_is_implemented"
         )
         
-        new_effective_date = None
-        new_impact_group = None
-        new_drivers = []
-        new_drivers_other = ""
-        new_hours_saved = 0
-        new_planned_use = ""
+        # Initialize with current values or defaults
+        current_drivers = []
+        if idea["drivers"]:
+            try:
+                current_drivers = json.loads(idea["drivers"])
+            except:
+                current_drivers = [idea["drivers"]] if idea["drivers"] else []
         
-        if new_is_implemented:
-            st.markdown("#### Implementation Details")
-            
+        current_effective_date = None
+        if idea["effective_date"]:
+            try:
+                from datetime import datetime
+                current_effective_date = datetime.strptime(str(idea["effective_date"]), "%Y-%m-%d").date()
+            except:
+                current_effective_date = None
+        
+        with st.expander("📋 Implementation Details", expanded=new_is_implemented):
             col1, col2 = st.columns(2)
             with col1:
-                if idea["effective_date"]:
-                    effective_date_obj = idea["effective_date"].split("-")
-                    new_effective_date = st.date_input(
-                        "Effective Date",
-                        value=(
-                            int(effective_date_obj[0]),
-                            int(effective_date_obj[1]),
-                            int(effective_date_obj[2])
-                        ) if len(effective_date_obj) == 3 else None
-                    )
-                else:
-                    new_effective_date = st.date_input("Effective Date", value=None)
+                new_effective_date = st.date_input("Effective Date", value=current_effective_date)
             with col2:
                 new_impact_group = st.selectbox(
                     "Impact Group",
                     IMPACT_GROUP_OPTIONS,
                     index=IMPACT_GROUP_OPTIONS.index(idea["impact_group"]) if idea["impact_group"] in IMPACT_GROUP_OPTIONS else 0
                 )
-            
-            current_drivers = []
-            if idea["drivers"]:
-                try:
-                    current_drivers = json.loads(idea["drivers"])
-                except:
-                    current_drivers = [idea["drivers"]] if idea["drivers"] else []
             
             new_drivers = st.multiselect(
                 "Drivers for Capacity Creation",
