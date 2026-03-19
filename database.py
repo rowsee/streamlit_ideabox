@@ -382,7 +382,14 @@ def get_stats():
         )
         this_month = cursor.fetchone()[0]
 
-        return {"total": total_ideas, "this_month": this_month}
+        current_year = datetime.now().year
+        cursor.execute(
+            "SELECT COUNT(*) FROM ideas WHERE strftime('%Y', submitted_at) = ?",
+            (str(current_year),),
+        )
+        this_year = cursor.fetchone()[0]
+
+        return {"total": total_ideas, "this_month": this_month, "this_year": this_year}
 
 
 def get_top_contributors_per_bu():
