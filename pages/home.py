@@ -95,35 +95,43 @@ st.markdown(
     }
 
     .highlight-label {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         text-transform: uppercase;
-        opacity: 0.95;
-        margin-bottom: 12px;
+        opacity: 0.9;
+        margin-bottom: 16px;
     }
 
     .highlight-icon {
-        font-size: 28px;
-        margin-bottom: 8px;
+        font-size: 32px;
+        margin-bottom: 12px;
     }
 
     .highlight-name {
-        font-size: 22px;
+        font-size: 28px;
         font-weight: 800;
-        margin-bottom: 8px;
+        margin-bottom: 16px;
+        background: rgba(255, 255, 255, 0.25);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
     }
 
     .highlight-count {
-        font-size: 56px;
+        font-size: 72px;
         font-weight: 800;
         line-height: 1;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
     }
 
     .highlight-text {
-        font-size: 13px;
+        font-size: 14px;
         opacity: 0.9;
-        margin-top: 6px;
+        margin-top: 8px;
+        font-weight: 600;
     }
 
     .kpi-card {
