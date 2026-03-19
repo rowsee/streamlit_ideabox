@@ -1,541 +1,242 @@
 import streamlit as st
 from database import get_stats, get_user_ideas, get_top_contributors_per_bu
 
+# Page config
+st.set_page_config(layout="wide")
+
+# Custom CSS for card styling (NOT layout)
 st.markdown(
     """
 <style>
-    /* ============================================
-       HOME PAGE CONTAINER
-       ============================================ */
-    .home-page {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px 15px;
-    }
-    
-    /* ============================================
-       GLASS CARD BASE CLASS
-       With fallbacks for unsupported browsers
-       ============================================ */
-    .home-glass {
-        background: rgba(255, 255, 255, 0.85);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-    
-    @supports not (backdrop-filter: blur(10px)) {
-        .home-glass {
-            background: rgba(255, 255, 255, 0.98);
-        }
-    }
-    
-    /* ============================================
-       HEADER SECTION
-       ============================================ */
-    .home-tag {
+    /* Header styling */
+    .header-tag {
         background: linear-gradient(135deg, #FFD700, #FFA500);
         color: #1a1a2e;
-        padding: 8px 18px;
-        border-radius: 25px;
-        font-size: 14px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
         font-weight: 700;
         display: inline-block;
-        margin-bottom: 20px;
         letter-spacing: 1px;
         text-transform: uppercase;
     }
     
-    .home-header-title {
-        font-size: 36px;
+    .header-title {
+        font-size: 32px;
         font-weight: 800;
-        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #667eea);
-        background-size: 300% 300%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin-bottom: 12px;
+        margin: 10px 0 5px 0;
         line-height: 1.3;
-        animation: home-gradient 8s ease infinite;
     }
     
-    @keyframes home-gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    .home-header-subtitle {
-        font-size: 20px;
+    .header-subtitle {
+        font-size: 18px;
         color: #64748b;
-        font-weight: 500;
-        margin-bottom: 25px;
+        margin: 0;
     }
     
-    .home-header-name {
+    .header-name {
         color: #667eea;
-        font-weight: 700;
+        font-weight: 600;
     }
     
-    /* ============================================
-       CTA CARD (Glassmorphism)
-       ============================================ */
-    .home-cta-card {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        padding: 30px 40px;
-        border-radius: 20px;
-        color: white;
-        text-align: center;
-        margin: 25px auto;
-        max-width: 800px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(102, 126, 234, 0.2),
-            0 20px 40px rgba(102, 126, 234, 0.15);
-    }
-    
-    .home-cta-title {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 10px;
-    }
-    
-    .home-cta-text {
-        font-size: 16px;
-        line-height: 1.6;
-        opacity: 0.95;
-    }
-    
-    /* ============================================
-       KPI SECTION
-       ============================================ */
-    .home-kpi-section {
-        display: flex;
-        justify-content: center;
-        gap: 18px;
-        margin: 30px auto;
-        flex-wrap: wrap;
-        max-width: 900px;
-    }
-    
-    .home-kpi-card {
-        flex: 1;
-        min-width: 160px;
-        max-width: 210px;
-        padding: 25px 15px;
+    /* Card styling */
+    .card {
+        background: white;
         border-radius: 16px;
-        color: white;
-        text-align: center;
-        position: relative;
-        transition: all 0.3s ease;
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        height: 100%;
     }
     
-    .home-kpi-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .home-kpi-card.purple {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(102, 126, 234, 0.3);
-    }
-    
-    .home-kpi-card.purple:hover {
-        box-shadow: 
-            0 8px 15px rgba(0, 0, 0, 0.1),
-            0 20px 40px rgba(102, 126, 234, 0.4);
-    }
-    
-    .home-kpi-card.green {
-        background: linear-gradient(135deg, #11998e, #38ef7d);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(17, 153, 142, 0.3);
-    }
-    
-    .home-kpi-card.green:hover {
-        box-shadow: 
-            0 8px 15px rgba(0, 0, 0, 0.1),
-            0 20px 40px rgba(17, 153, 142, 0.4);
-    }
-    
-    .home-kpi-card.orange {
-        background: linear-gradient(135deg, #f97316, #fbbf24);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(249, 115, 22, 0.3);
-    }
-    
-    .home-kpi-card.orange:hover {
-        box-shadow: 
-            0 8px 15px rgba(0, 0, 0, 0.1),
-            0 20px 40px rgba(249, 115, 22, 0.4);
-    }
-    
-    .home-kpi-card.pink {
-        background: linear-gradient(135deg, #ec008c, #fc6767);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(236, 0, 140, 0.3);
-    }
-    
-    .home-kpi-card.pink:hover {
-        box-shadow: 
-            0 8px 15px rgba(0, 0, 0, 0.1),
-            0 20px 40px rgba(236, 0, 140, 0.4);
-    }
-    
-    .home-kpi-number {
-        font-size: 48px;
-        font-weight: 800;
-        line-height: 1;
-        margin-bottom: 8px;
-        text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
-    }
-    
-    .home-kpi-label {
-        font-size: 14px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    
-    .home-kpi-sub {
-        font-size: 12px;
-        opacity: 0.85;
-    }
-    
-    /* ============================================
-       TOP BU SECTION
-       ============================================ */
-    .home-topbu-section {
-        margin: 40px auto;
-    }
-    
-    .home-topbu-card {
+    .card-highlight {
         background: linear-gradient(135deg, #FF6B35, #FFA07A, #FF8C00);
-        padding: 35px 50px;
-        border-radius: 24px;
-        color: white;
-        text-align: center;
-        max-width: 500px;
-        margin: 0 auto;
-        border: 2px solid rgba(255, 255, 255, 0.4);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 15px 30px rgba(255, 107, 53, 0.3),
-            0 30px 60px rgba(255, 107, 53, 0.2);
-        animation: home-glow 3s ease-in-out infinite;
+        border: none;
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
     }
     
-    @keyframes home-glow {
-        0%, 100% { 
-            box-shadow: 
-                0 4px 6px rgba(0, 0, 0, 0.05),
-                0 15px 30px rgba(255, 107, 53, 0.3),
-                0 30px 60px rgba(255, 107, 53, 0.2);
-        }
-        50% { 
-            box-shadow: 
-                0 4px 6px rgba(0, 0, 0, 0.05),
-                0 20px 40px rgba(255, 107, 53, 0.4),
-                0 40px 80px rgba(255, 107, 53, 0.3);
-        }
-    }
-    
-    .home-topbu-label {
-        font-size: 14px;
+    .card-title {
+        font-size: 18px;
         font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        opacity: 0.9;
+        color: #2d3436;
         margin-bottom: 15px;
     }
     
-    .home-topbu-name {
+    .card-highlight .card-title {
+        color: white;
+    }
+    
+    /* KPI styling */
+    .kpi-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        text-align: center;
+    }
+    
+    .kpi-number {
         font-size: 42px;
         font-weight: 800;
-        margin-bottom: 10px;
-        text-shadow: 2px 3px 6px rgba(0, 0, 0, 0.2);
+        line-height: 1;
+        margin-bottom: 5px;
     }
     
-    .home-topbu-number {
-        font-size: 56px;
+    .kpi-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+    }
+    
+    .kpi-sub {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 3px;
+    }
+    
+    /* Top BU styling */
+    .topbu-label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        opacity: 0.9;
+        margin-bottom: 10px;
+    }
+    
+    .topbu-name {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+    
+    .topbu-count {
+        font-size: 48px;
         font-weight: 800;
         line-height: 1;
-        text-shadow: 2px 3px 6px rgba(0, 0, 0, 0.2);
     }
     
-    .home-topbu-text {
-        font-size: 18px;
-        font-weight: 500;
-        margin-top: 5px;
-        opacity: 0.95;
-    }
-    
-    /* ============================================
-       MOTIVATION BANNER (Glassmorphism)
-       ============================================ */
-    .home-motivation-banner {
-        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9), rgba(59, 130, 246, 0.9), rgba(99, 102, 241, 0.9));
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        padding: 22px 30px;
-        border-radius: 16px;
-        color: white;
-        text-align: center;
-        margin: 35px auto;
-        max-width: 700px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(59, 130, 246, 0.2);
-    }
-    
-    @supports not (backdrop-filter: blur(10px)) {
-        .home-motivation-banner {
-            background: linear-gradient(135deg, #1e3a5f, #3b82f6, #6366f1);
-        }
-    }
-    
-    .home-motivation-banner p {
-        font-size: 18px;
-        margin: 0;
-        font-weight: 500;
-        line-height: 1.5;
-    }
-    
-    /* ============================================
-       WHY SHARE CARD (Glassmorphism)
-       ============================================ */
-    .home-whyshare-card {
-        background: rgba(255, 255, 255, 0.85);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        padding: 30px;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        margin: 30px auto;
-        max-width: 900px;
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 30px rgba(0, 0, 0, 0.08);
-    }
-    
-    @supports not (backdrop-filter: blur(10px)) {
-        .home-whyshare-card {
-            background: rgba(255, 255, 255, 0.98);
-        }
-    }
-    
-    .home-whyshare-title {
-        font-size: 26px;
-        font-weight: 700;
-        color: #2d3436;
-        margin-bottom: 25px;
-        text-align: center;
-    }
-    
-    .home-whyshare-cards {
-        display: flex;
-        justify-content: center;
-        gap: 18px;
-        flex-wrap: wrap;
-    }
-    
-    .home-why-card {
-        flex: 1;
-        min-width: 180px;
-        max-width: 250px;
-        padding: 28px 18px;
-        border-radius: 16px;
-        color: white;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .home-why-card:hover {
-        transform: translateY(-8px);
-    }
-    
-    .home-why-card.blue {
-        background: linear-gradient(135deg, #3b82f6, #60a5fa);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(59, 130, 246, 0.3);
-    }
-    
-    .home-why-card.blue:hover {
-        box-shadow: 
-            0 8px 15px rgba(0, 0, 0, 0.1),
-            0 20px 40px rgba(59, 130, 246, 0.4);
-    }
-    
-    .home-why-card.red {
-        background: linear-gradient(135deg, #ef4444, #f87171);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(239, 68, 68, 0.3);
-    }
-    
-    .home-why-card.red:hover {
-        box-shadow: 
-            0 8px 15px rgba(0, 0, 0, 0.1),
-            0 20px 40px rgba(239, 68, 68, 0.4);
-    }
-    
-    .home-why-card.green {
-        background: linear-gradient(135deg, #22c55e, #4ade80);
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 20px rgba(34, 197, 94, 0.3);
-    }
-    
-    .home-why-card.green:hover {
-        box-shadow: 
-            0 8px 15px rgba(0, 0, 0, 0.1),
-            0 20px 40px rgba(34, 197, 94, 0.4);
-    }
-    
-    .home-why-icon {
-        font-size: 45px;
-        margin-bottom: 12px;
-        animation: home-bounce 2s ease-in-out infinite;
-    }
-    
-    @keyframes home-bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-    }
-    
-    .home-why-card:nth-child(2) .home-why-icon { animation-delay: 0.2s; }
-    .home-why-card:nth-child(3) .home-why-icon { animation-delay: 0.4s; }
-    
-    .home-why-card-title {
-        font-size: 17px;
-        font-weight: 700;
-        margin-bottom: 6px;
-    }
-    
-    .home-why-card-desc {
-        font-size: 13px;
+    .topbu-text {
+        font-size: 14px;
         opacity: 0.9;
-        line-height: 1.5;
     }
     
-    /* ============================================
-       BENEFITS CARD (Glassmorphism)
-       ============================================ */
-    .home-benefits-card {
-        background: rgba(255, 255, 255, 0.85);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        padding: 28px;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        margin: 30px auto;
-        max-width: 550px;
-        box-shadow: 
-            0 4px 6px rgba(0, 0, 0, 0.05),
-            0 10px 30px rgba(0, 0, 0, 0.08);
-    }
-    
-    @supports not (backdrop-filter: blur(10px)) {
-        .home-benefits-card {
-            background: rgba(255, 255, 255, 0.98);
-        }
-    }
-    
-    .home-benefits-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #2d3436;
-        margin-bottom: 18px;
-        text-align: center;
-    }
-    
-    .home-benefit-item {
+    /* Why share items */
+    .why-item {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
         padding: 12px 0;
-        border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+        border-bottom: 1px solid #f1f5f9;
     }
     
-    .home-benefit-item:last-child {
+    .why-item:last-child {
         border-bottom: none;
     }
     
-    .home-benefit-check {
-        color: #10b981;
-        font-size: 22px;
-        font-weight: 800;
+    .why-icon {
+        font-size: 24px;
     }
     
-    .home-benefit-text {
+    .why-text {
         font-size: 15px;
         color: #475569;
     }
     
-    /* ============================================
-       DIVIDER
-       ============================================ */
-    .home-divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.6), transparent);
-        margin: 30px auto;
-        max-width: 800px;
+    /* CTA styling */
+    .cta-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 16px;
+        padding: 25px;
+        color: white;
+        text-align: center;
+        margin-top: 15px;
     }
     
-    /* ============================================
-       RESPONSIVE
-       ============================================ */
+    .cta-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    
+    .cta-text {
+        font-size: 14px;
+        opacity: 0.95;
+        line-height: 1.5;
+    }
+    
+    /* Benefits styling */
+    .benefits-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+    }
+    
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+    }
+    
+    .benefit-check {
+        color: #10b981;
+        font-size: 18px;
+        font-weight: 700;
+    }
+    
+    .benefit-text {
+        font-size: 14px;
+        color: #475569;
+    }
+    
+    /* Motivation banner */
+    .motivation-banner {
+        background: linear-gradient(135deg, #1e3a5f, #3b82f6);
+        border-radius: 12px;
+        padding: 18px 25px;
+        color: white;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .motivation-text {
+        font-size: 16px;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    /* Section title */
+    .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 15px;
+    }
+    
+    /* Responsive */
     @media (max-width: 768px) {
-        .home-header-title {
-            font-size: 28px;
+        .header-title {
+            font-size: 24px;
         }
         
-        .home-kpi-section {
-            gap: 12px;
-        }
-        
-        .home-kpi-card {
-            min-width: 140px;
-            padding: 18px 10px;
-        }
-        
-        .home-kpi-number {
-            font-size: 38px;
-        }
-        
-        .home-topbu-card {
-            padding: 25px 30px;
-        }
-        
-        .home-topbu-name {
+        .kpi-number {
             font-size: 32px;
         }
         
-        .home-topbu-number {
-            font-size: 44px;
+        .topbu-name {
+            font-size: 22px;
         }
         
-        .home-why-card {
-            min-width: 100%;
-        }
-        
-        /* Reduce blur on mobile for performance */
-        .home-glass,
-        .home-whyshare-card,
-        .home-benefits-card {
-            -webkit-backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
+        .topbu-count {
+            font-size: 38px;
         }
     }
 </style>
@@ -545,166 +246,240 @@ st.markdown(
 
 
 def render():
+    # Get data
     stats = get_stats()
     user_ideas = get_user_ideas(st.session_state.user_id)
     user_idea_count = len(user_ideas) if user_ideas else 0
     top_bu = get_top_contributors_per_bu()
 
-    # Main Container
-    st.markdown('<div class="home-page">', unsafe_allow_html=True)
-
-    # Header Section
-    st.markdown(
-        '<div class="home-tag">✨ TEOA Initiative</div>', unsafe_allow_html=True
-    )
-    st.markdown(
-        f"""
-        <h1 class="home-header-title">Welcome to TEOA Procurement Idea Hub</h1>
-        <p class="home-header-subtitle">
-            Hello <span class="home-header-name">{st.session_state.full_name or st.session_state.username}</span> 👋
-        </p>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # CTA Card
-    st.markdown(
-        """
-        <div class="home-cta-card">
-            <div class="home-cta-title">💬 Have an idea?</div>
-            <div class="home-cta-text">This is the place to share it. Great ideas can come from anywhere — and so can you!</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # KPI Section - 4 Stats
-    st.markdown('<div class="home-kpi-section">', unsafe_allow_html=True)
-
-    st.markdown(
-        f"""
-        <div class="home-kpi-card purple">
-            <div class="home-kpi-number">{stats["total"]}</div>
-            <div class="home-kpi-label">📊 Total Ideas</div>
-            <div class="home-kpi-sub">All time</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div class="home-kpi-card green">
-            <div class="home-kpi-number">{stats["this_month"]}</div>
-            <div class="home-kpi-label">📅 This Month</div>
-            <div class="home-kpi-sub">Keep it up!</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div class="home-kpi-card orange">
-            <div class="home-kpi-number">{stats["this_year"]}</div>
-            <div class="home-kpi-label">📆 This Year</div>
-            <div class="home-kpi-sub">Happy year!</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div class="home-kpi-card pink">
-            <div class="home-kpi-number">{user_idea_count}</div>
-            <div class="home-kpi-label">🏆 Your Ideas</div>
-            <div class="home-kpi-sub">Great job!</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Top BU Section
-    if top_bu:
-        st.markdown('<div class="home-topbu-section">', unsafe_allow_html=True)
+    # ============================================
+    # HEADER SECTION
+    # ============================================
+    with st.container():
         st.markdown(
-            f"""
-            <div class="home-topbu-card">
-                <div class="home-topbu-label">🏆 TOP BU THIS MONTH</div>
-                <div class="home-topbu-name">🥇 {top_bu["bu_cl_site"]}</div>
-                <div class="home-topbu-number">{top_bu["count"]}</div>
-                <div class="home-topbu-text">ideas submitted</div>
-            </div>
-            """,
+            '<div class="header-tag">✨ TEOA Initiative</div>', unsafe_allow_html=True
+        )
+        st.markdown(
+            f'<h1 class="header-title">Welcome to TEOA Procurement Idea Hub</h1>',
             unsafe_allow_html=True,
         )
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(
+            f'<p class="header-subtitle">Hello <span class="header-name">{st.session_state.full_name or st.session_state.username}</span> 👋</p>',
+            unsafe_allow_html=True,
+        )
 
-    st.markdown('<div class="home-divider"></div>', unsafe_allow_html=True)
+    st.divider()
 
-    # Motivation Banner
-    st.markdown(
-        """
-        <div class="home-motivation-banner">
-            <p>⭐ Your ideas are reviewed weekly — your thoughts matter and are valued!</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # ============================================
+    # KPI SECTION - 4 cards in a row
+    # ============================================
+    with st.container():
+        cols = st.columns(4)
 
-    st.markdown('<div class="home-divider"></div>', unsafe_allow_html=True)
+        with cols[0]:
+            st.markdown('<div class="kpi-card">', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="kpi-number" style="color: #667eea;">{stats.get("total", 0)}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="kpi-label">📊 Total Ideas</div>', unsafe_allow_html=True
+            )
+            st.markdown('<div class="kpi-sub">All time</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    # Why Share Card
-    st.markdown(
-        """
-        <div class="home-whyshare-card">
-            <div class="home-whyshare-title">Why Share Your Ideas?</div>
-            <div class="home-whyshare-cards">
-                <div class="home-why-card blue">
-                    <div class="home-why-icon">💡</div>
-                    <div class="home-why-card-title">Share Your Ideas</div>
-                    <div class="home-why-card-desc">Every idea matters and can make a real difference.</div>
+        with cols[1]:
+            st.markdown('<div class="kpi-card">', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="kpi-number" style="color: #11998e;">{stats.get("this_month", 0)}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="kpi-label">📅 This Month</div>', unsafe_allow_html=True
+            )
+            st.markdown(
+                '<div class="kpi-sub">Keep it up!</div>', unsafe_allow_html=True
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with cols[2]:
+            st.markdown('<div class="kpi-card">', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="kpi-number" style="color: #f97316;">{stats.get("this_year", 0)}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="kpi-label">📆 This Year</div>', unsafe_allow_html=True
+            )
+            st.markdown(
+                '<div class="kpi-sub">Happy year!</div>', unsafe_allow_html=True
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with cols[3]:
+            st.markdown('<div class="kpi-card">', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="kpi-number" style="color: #ec008c;">{user_idea_count}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="kpi-label">🏆 Your Ideas</div>', unsafe_allow_html=True
+            )
+            st.markdown('<div class="kpi-sub">Great job!</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    st.divider()
+
+    # ============================================
+    # MAIN CONTENT - 2 columns
+    # ============================================
+    with st.container():
+        left_col, right_col = st.columns([1, 1], gap="medium")
+
+        # LEFT COLUMN - Why Share + CTA
+        with left_col:
+            # Why Share Card
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="card-title">💡 Why Share Your Ideas?</div>',
+                unsafe_allow_html=True,
+            )
+
+            st.markdown(
+                """
+                <div class="why-item">
+                    <span class="why-icon">🚀</span>
+                    <span class="why-text">Drive operational excellence</span>
                 </div>
-                <div class="home-why-card red">
-                    <div class="home-why-icon">🚀</div>
-                    <div class="home-why-card-title">Drive Excellence</div>
-                    <div class="home-why-card-desc">Help enhance operations through your perspective.</div>
+                <div class="why-item">
+                    <span class="why-icon">🎯</span>
+                    <span class="why-text">Make meaningful impact</span>
                 </div>
-                <div class="home-why-card green">
-                    <div class="home-why-icon">🎯</div>
-                    <div class="home-why-card-title">Make Impact</div>
-                    <div class="home-why-card-desc">See your ideas come to life and create change.</div>
+                <div class="why-item">
+                    <span class="why-icon">🤝</span>
+                    <span class="why-text">Collaborate with teams</span>
                 </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+                <div class="why-item">
+                    <span class="why-icon">💡</span>
+                    <span class="why-text">Every idea matters</span>
+                </div>
+            """,
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    # Benefits Card
-    st.markdown(
-        """
-        <div class="home-benefits-card">
-            <div class="home-benefits-title">✨ Benefits</div>
-            <div class="home-benefit-item">
-                <span class="home-benefit-check">✓</span>
-                <span class="home-benefit-text">Quick and easy submission process</span>
-            </div>
-            <div class="home-benefit-item">
-                <span class="home-benefit-check">✓</span>
-                <span class="home-benefit-text">Track your idea's progress</span>
-            </div>
-            <div class="home-benefit-item">
-                <span class="home-benefit-check">✓</span>
-                <span class="home-benefit-text">Collaborate and engage with teams</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            # CTA Card
+            st.markdown(
+                """
+                <div class="cta-card">
+                    <div class="cta-title">💬 Have an idea?</div>
+                    <div class="cta-text">This is the place to share it. Great ideas can come from anywhere — and so can you!</div>
+                </div>
+            """,
+                unsafe_allow_html=True,
+            )
 
-    # Close Container
-    st.markdown("</div>", unsafe_allow_html=True)
+        # RIGHT COLUMN - Top BU (Highlighted)
+        with right_col:
+            if top_bu:
+                st.markdown('<div class="card card-highlight">', unsafe_allow_html=True)
+                st.markdown(
+                    '<div class="topbu-label">🏆 TOP BU THIS MONTH</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    f'<div class="topbu-name">🥇 {top_bu.get("bu_cl_site", "N/A")}</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    f'<div class="topbu-count">{top_bu.get("count", 0)}</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    '<div class="topbu-text">ideas submitted</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown("</div>", unsafe_allow_html=True)
+            else:
+                st.markdown('<div class="card card-highlight">', unsafe_allow_html=True)
+                st.markdown(
+                    '<div class="topbu-label">🏆 TOP BU THIS MONTH</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    '<div class="topbu-name">🥇 No data yet</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    '<div class="topbu-text">Start submitting ideas!</div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown("</div>", unsafe_allow_html=True)
+
+    # ============================================
+    # MOTIVATION BANNER
+    # ============================================
+    with st.container():
+        st.markdown(
+            """
+            <div class="motivation-banner">
+                <p class="motivation-text">⭐ Your ideas are reviewed weekly — your thoughts matter and are valued!</p>
+            </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    st.divider()
+
+    # ============================================
+    # BENEFITS SECTION - 3 columns
+    # ============================================
+    with st.container():
+        st.markdown(
+            '<div class="section-title">✨ Benefits</div>', unsafe_allow_html=True
+        )
+
+        benefit_cols = st.columns(3)
+
+        with benefit_cols[0]:
+            st.markdown('<div class="benefits-card">', unsafe_allow_html=True)
+            st.markdown(
+                """
+                <div class="benefit-item">
+                    <span class="benefit-check">✓</span>
+                    <span class="benefit-text">Quick and easy submission process</span>
+                </div>
+            """,
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with benefit_cols[1]:
+            st.markdown('<div class="benefits-card">', unsafe_allow_html=True)
+            st.markdown(
+                """
+                <div class="benefit-item">
+                    <span class="benefit-check">✓</span>
+                    <span class="benefit-text">Track your idea's progress</span>
+                </div>
+            """,
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        with benefit_cols[2]:
+            st.markdown('<div class="benefits-card">', unsafe_allow_html=True)
+            st.markdown(
+                """
+                <div class="benefit-item">
+                    <span class="benefit-check">✓</span>
+                    <span class="benefit-text">Collaborate and engage with teams</span>
+                </div>
+            """,
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+
+if __name__ == "__main__":
+    render()
