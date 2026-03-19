@@ -389,7 +389,26 @@ def get_stats():
         )
         this_year = cursor.fetchone()[0]
 
-        return {"total": total_ideas, "this_month": this_month, "this_year": this_year}
+        current_week_start = datetime.now().strftime("%Y-%m-%d")
+        cursor.execute(
+            "SELECT COUNT(*) FROM ideas WHERE date(submitted_at) >= date('now', '-7 days')"
+        )
+        this_week = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM ideas WHERE status = 'Pending'")
+        pending = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM ideas WHERE is_implemented = 'Yes'")
+        implemented = cursor.fetchone()[0]
+
+        return {
+            "total": total_ideas,
+            "this_month": this_month,
+            "this_year": this_year,
+            "this_week": this_week,
+            "pending": pending,
+            "implemented": implemented,
+        }
 
 
 def get_top_contributors_per_bu():
