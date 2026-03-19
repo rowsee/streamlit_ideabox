@@ -4,17 +4,24 @@ from database import get_stats, get_user_ideas, get_top_contributors_per_bu
 st.markdown(
     """
 <style>
+    /* Reset and Base Styles */
+    .main .block-container {
+        padding-top: 0rem !important;
+        padding-bottom: 0rem !important;
+        max-width: 100% !important;
+    }
+    
     /* Centered Page Container */
-    .page-container {
+    .page-wrapper {
         max-width: 950px;
         margin: 0 auto;
         padding: 30px 20px;
     }
     
-    /* Futuristic Glow Effect */
+    /* Futuristic Glow Animation */
     @keyframes glow-pulse {
-        0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 53, 0.4), 0 0 40px rgba(255, 107, 53, 0.2); }
-        50% { box-shadow: 0 0 30px rgba(255, 107, 53, 0.6), 0 0 60px rgba(255, 107, 53, 0.3); }
+        0%, 100% { box-shadow: 0 0 25px rgba(255, 107, 53, 0.5), 0 0 50px rgba(255, 107, 53, 0.25); }
+        50% { box-shadow: 0 0 35px rgba(255, 107, 53, 0.7), 0 0 70px rgba(255, 107, 53, 0.35); }
     }
     
     @keyframes float {
@@ -23,8 +30,8 @@ st.markdown(
     }
     
     @keyframes shimmer {
-        0% { background-position: -200% center; }
-        100% { background-position: 200% center; }
+        0% { left: -100%; }
+        100% { left: 100%; }
     }
     
     /* Tag Badge */
@@ -87,14 +94,14 @@ st.markdown(
         overflow: hidden;
     }
     
-    .top-bu-card::before {
+    .top-bu-card::after {
         content: '';
         position: absolute;
         top: 0;
         left: -100%;
         width: 200%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         animation: shimmer 3s infinite;
     }
     
@@ -144,6 +151,17 @@ st.markdown(
         transform: translateY(-5px) scale(1.02);
     }
     
+    .kpi-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        animation: shimmer 4s infinite;
+    }
+    
     .kpi-card.purple {
         background: linear-gradient(135deg, #667eea, #764ba2);
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
@@ -159,35 +177,30 @@ st.markdown(
         box-shadow: 0 10px 30px rgba(236, 0, 140, 0.4);
     }
     
-    .kpi-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 200%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-        animation: shimmer 4s infinite;
-    }
-    
     .kpi-number {
         font-size: 58px;
         font-weight: 800;
         line-height: 1;
         margin-bottom: 12px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+        position: relative;
+        z-index: 1;
     }
     
     .kpi-label {
         font-size: 17px;
         font-weight: 700;
         margin-bottom: 6px;
+        position: relative;
+        z-index: 1;
     }
     
     .kpi-sub {
         font-size: 13px;
         opacity: 0.85;
         font-weight: 500;
+        position: relative;
+        z-index: 1;
     }
     
     /* Info Banner - Centered */
@@ -417,7 +430,7 @@ def render():
     top_bu = get_top_contributors_per_bu()
 
     # Main Container
-    st.markdown('<div class="page-container">', unsafe_allow_html=True)
+    st.markdown('<div class="page-wrapper">', unsafe_allow_html=True)
 
     # Header Section
     st.markdown('<div class="header-section">', unsafe_allow_html=True)
