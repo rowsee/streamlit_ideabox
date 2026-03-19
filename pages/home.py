@@ -15,10 +15,10 @@ st.markdown(
     .page-wrapper {
         max-width: 950px;
         margin: 0 auto;
-        padding: 30px 20px;
+        padding: 20px 20px;
     }
     
-    /* Futuristic Glow Animation */
+    /* Glow Animation */
     @keyframes glow-pulse {
         0%, 100% { box-shadow: 0 0 25px rgba(255, 107, 53, 0.5), 0 0 50px rgba(255, 107, 53, 0.25); }
         50% { box-shadow: 0 0 35px rgba(255, 107, 53, 0.7), 0 0 70px rgba(255, 107, 53, 0.35); }
@@ -43,7 +43,7 @@ st.markdown(
         font-size: 14px;
         font-weight: 700;
         display: inline-block;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         letter-spacing: 1px;
         text-transform: uppercase;
     }
@@ -51,22 +51,22 @@ st.markdown(
     /* Header Section */
     .header-section {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
     
     .header-title {
-        font-size: 38px;
+        font-size: 36px;
         font-weight: 800;
         background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         line-height: 1.2;
     }
     
     .header-subtitle {
-        font-size: 20px;
+        font-size: 18px;
         color: #64748b;
         font-weight: 400;
     }
@@ -76,22 +76,25 @@ st.markdown(
         font-weight: 600;
     }
     
-    /* Top BU Card - Centered */
+    /* Top BU Card - Enhanced */
     .top-bu-wrapper {
         display: flex;
         justify-content: center;
-        margin: 30px 0;
+        margin: 20px 0;
     }
     
     .top-bu-card {
         background: linear-gradient(135deg, #FF6B35, #FFA07A, #FF8C00);
-        padding: 30px 60px;
+        padding: 30px 50px;
         border-radius: 20px;
         color: white;
         text-align: center;
         animation: glow-pulse 3s ease-in-out infinite;
         position: relative;
         overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
     
     .top-bu-card::after {
@@ -101,30 +104,36 @@ st.markdown(
         left: -100%;
         width: 200%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
         animation: shimmer 3s infinite;
     }
     
     .top-bu-label {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         letter-spacing: 2px;
         text-transform: uppercase;
         opacity: 0.95;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
     
     .top-bu-name {
-        font-size: 44px;
+        font-size: 36px;
         font-weight: 800;
-        margin-bottom: 8px;
-        text-shadow: 2px 3px 6px rgba(0,0,0,0.2);
+        margin-bottom: 5px;
+        text-shadow: 2px 3px 6px rgba(0, 0, 0, 0.2);
     }
     
     .top-bu-count {
         font-size: 18px;
-        font-weight: 600;
+        font-weight: 500;
         opacity: 0.95;
+    }
+    
+    .top-bu-number {
+        font-size: 58px;
+        font-weight: 800;
+        line-height: 1;
     }
     
     /* KPI Cards Section */
@@ -132,13 +141,15 @@ st.markdown(
         display: flex;
         justify-content: center;
         gap: 25px;
-        margin: 35px 0;
+        margin: 25px 0;
+        flex-wrap: wrap;
     }
     
     .kpi-card {
         flex: 1;
+        min-width: 200px;
         max-width: 280px;
-        padding: 35px 25px;
+        padding: 30px 20px;
         border-radius: 20px;
         color: white;
         text-align: center;
@@ -158,7 +169,7 @@ st.markdown(
         left: -100%;
         width: 200%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         animation: shimmer 4s infinite;
     }
     
@@ -181,38 +192,38 @@ st.markdown(
         font-size: 58px;
         font-weight: 800;
         line-height: 1;
-        margin-bottom: 12px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
         position: relative;
         z-index: 1;
     }
     
     .kpi-label {
-        font-size: 17px;
+        font-size: 16px;
         font-weight: 700;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
         position: relative;
         z-index: 1;
     }
     
     .kpi-sub {
-        font-size: 13px;
+        font-size: 12px;
         opacity: 0.85;
         font-weight: 500;
         position: relative;
         z-index: 1;
     }
     
-    /* Info Banner - Centered */
+    /* Info Banner */
     .banner-wrapper {
         display: flex;
         justify-content: center;
-        margin: 30px 0;
+        margin: 25px 0;
     }
     
     .info-banner {
         background: linear-gradient(135deg, #1e3a5f, #3b82f6, #6366f1);
-        padding: 20px 40px;
+        padding: 18px 35px;
         border-radius: 15px;
         color: white;
         text-align: center;
@@ -221,7 +232,7 @@ st.markdown(
     }
     
     .info-banner p {
-        font-size: 18px;
+        font-size: 17px;
         margin: 0;
         font-weight: 500;
     }
@@ -229,23 +240,25 @@ st.markdown(
     /* Why Share Section */
     .why-section-title {
         text-align: center;
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 700;
         color: #2d3436;
-        margin: 40px 0 25px 0;
+        margin: 25px 0 20px 0;
     }
     
     .why-section {
         display: flex;
         justify-content: center;
         gap: 25px;
-        margin-bottom: 40px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
     }
     
     .why-card {
         flex: 1;
+        min-width: 200px;
         max-width: 280px;
-        padding: 40px 25px;
+        padding: 35px 20px;
         border-radius: 20px;
         color: white;
         text-align: center;
@@ -258,35 +271,35 @@ st.markdown(
     }
     
     .why-card.blue {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        box-shadow: 0 10px 35px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        box-shadow: 0 10px 35px rgba(59, 130, 246, 0.4);
     }
     
     .why-card.blue:hover {
-        box-shadow: 0 15px 45px rgba(102, 126, 234, 0.5);
+        box-shadow: 0 15px 45px rgba(59, 130, 246, 0.5);
     }
     
-    .why-card.orange {
-        background: linear-gradient(135deg, #f97316, #fb923c);
-        box-shadow: 0 10px 35px rgba(249, 115, 22, 0.4);
+    .why-card.red {
+        background: linear-gradient(135deg, #ef4444, #f87171);
+        box-shadow: 0 10px 35px rgba(239, 68, 68, 0.4);
     }
     
-    .why-card.orange:hover {
-        box-shadow: 0 15px 45px rgba(249, 115, 22, 0.5);
+    .why-card.red:hover {
+        box-shadow: 0 15px 45px rgba(239, 68, 68, 0.5);
     }
     
-    .why-card.teal {
-        background: linear-gradient(135deg, #14b8a6, #2dd4bf);
-        box-shadow: 0 10px 35px rgba(20, 184, 166, 0.4);
+    .why-card.green {
+        background: linear-gradient(135deg, #22c55e, #4ade80);
+        box-shadow: 0 10px 35px rgba(34, 197, 94, 0.4);
     }
     
-    .why-card.teal:hover {
-        box-shadow: 0 15px 45px rgba(20, 184, 166, 0.5);
+    .why-card.green:hover {
+        box-shadow: 0 15px 45px rgba(34, 197, 94, 0.5);
     }
     
     .why-icon {
-        font-size: 50px;
-        margin-bottom: 18px;
+        font-size: 48px;
+        margin-bottom: 15px;
         animation: float 3s ease-in-out infinite;
     }
     
@@ -294,40 +307,42 @@ st.markdown(
     .why-card:nth-child(3) .why-icon { animation-delay: 0.6s; }
     
     .why-title {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     
     .why-desc {
-        font-size: 14px;
+        font-size: 13px;
         opacity: 0.9;
-        line-height: 1.6;
+        line-height: 1.5;
     }
     
-    /* Bottom Section - Benefits & Encouragement */
+    /* Bottom Section */
     .bottom-section {
         display: flex;
         justify-content: center;
-        gap: 30px;
-        margin: 30px 0;
+        gap: 25px;
+        margin: 25px 0;
+        flex-wrap: wrap;
     }
     
     .benefits-card {
         flex: 1;
+        min-width: 280px;
         max-width: 420px;
         background: white;
-        padding: 30px;
+        padding: 25px;
         border-radius: 20px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         border: 1px solid #f1f5f9;
     }
     
     .benefits-title {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 700;
         color: #2d3436;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -336,8 +351,8 @@ st.markdown(
     .benefit-item {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 14px 0;
+        gap: 12px;
+        padding: 12px 0;
         border-bottom: 1px solid #f1f5f9;
     }
     
@@ -347,20 +362,21 @@ st.markdown(
     
     .benefit-check {
         color: #10b981;
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
     }
     
     .benefit-text {
-        font-size: 16px;
+        font-size: 15px;
         color: #475569;
     }
     
     .encouragement-card {
         flex: 1;
+        min-width: 280px;
         max-width: 420px;
         background: linear-gradient(135deg, #667eea, #764ba2);
-        padding: 30px;
+        padding: 25px;
         border-radius: 20px;
         color: white;
         box-shadow: 0 10px 35px rgba(102, 126, 234, 0.4);
@@ -370,27 +386,28 @@ st.markdown(
     }
     
     .encouragement-icon {
-        font-size: 45px;
-        margin-bottom: 15px;
-    }
-    
-    .encouragement-title {
-        font-size: 24px;
-        font-weight: 700;
+        font-size: 42px;
         margin-bottom: 12px;
     }
     
+    .encouragement-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
     .encouragement-text {
-        font-size: 16px;
-        line-height: 1.7;
+        font-size: 15px;
+        line-height: 1.6;
         opacity: 0.95;
     }
     
-    /* Divider */
+    /* Softer Divider */
     .section-divider {
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-        margin: 40px 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.6), transparent);
+        margin: 25px 0;
+        opacity: 0.6;
     }
     
     /* Responsive */
@@ -410,7 +427,11 @@ st.markdown(
         }
         
         .top-bu-name {
-            font-size: 36px;
+            font-size: 28px;
+        }
+        
+        .top-bu-number {
+            font-size: 48px;
         }
         
         .kpi-number {
@@ -446,15 +467,17 @@ def render():
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Top BU Section - Centered
+    # Top BU Section - Enhanced with BIG number
     if top_bu:
         st.markdown('<div class="top-bu-wrapper">', unsafe_allow_html=True)
         st.markdown(
             f"""
             <div class="top-bu-card">
                 <div class="top-bu-label">🏆 TOP BU THIS MONTH</div>
-                <div class="top-bu-name">{top_bu["bu_cl_site"]}</div>
-                <div class="top-bu-count">{top_bu["count"]} ideas submitted</div>
+                <div class="top-bu-name">🥇 {top_bu["bu_cl_site"]}</div>
+                <div class="top-bu-count">
+                    <span class="top-bu-number">{top_bu["count"]}</span> ideas
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -463,7 +486,7 @@ def render():
 
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
-    # KPI Cards - Centered
+    # KPI Cards
     st.markdown('<div class="kpi-section">', unsafe_allow_html=True)
 
     st.markdown(
@@ -501,7 +524,7 @@ def render():
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Info Banner - Centered
+    # Info Banner
     st.markdown('<div class="banner-wrapper">', unsafe_allow_html=True)
     st.markdown(
         """
@@ -515,7 +538,7 @@ def render():
 
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
-    # Why Share Your Ideas - Centered
+    # Why Share Your Ideas - Blue, Red, Green
     st.markdown(
         '<div class="why-section-title">Why Share Your Ideas?</div>',
         unsafe_allow_html=True,
@@ -536,7 +559,7 @@ def render():
 
     st.markdown(
         """
-        <div class="why-card orange">
+        <div class="why-card red">
             <div class="why-icon">🚀</div>
             <div class="why-title">Drive Excellence</div>
             <div class="why-desc">Help enhance operational excellence through your unique perspective.</div>
@@ -547,7 +570,7 @@ def render():
 
     st.markdown(
         """
-        <div class="why-card teal">
+        <div class="why-card green">
             <div class="why-icon">🎯</div>
             <div class="why-title">Make Impact</div>
             <div class="why-desc">See your ideas come to life and create meaningful change for everyone.</div>
@@ -560,7 +583,7 @@ def render():
 
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
-    # Bottom Section - Centered
+    # Bottom Section
     st.markdown('<div class="bottom-section">', unsafe_allow_html=True)
 
     # Benefits
