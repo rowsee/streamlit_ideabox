@@ -4,18 +4,28 @@ from database import get_stats, get_user_ideas, get_top_contributors_per_bu
 st.markdown(
     """
 <style>
-    /* Reset and Base Styles */
-    .main .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
-        max-width: 100% !important;
+    /* Override Streamlit main container to center content */
+    .stApp > div[data-testid="stMainBlockContainer"] {
+        max-width: 950px !important;
+        margin: 0 auto !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
     }
     
     /* Centered Page Container */
     .page-wrapper {
+        width: 100%;
         max-width: 950px;
-        margin: 0 auto;
-        padding: 20px 20px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+        text-align: center;
+    }
+    
+    /* Force center all direct children */
+    .page-wrapper > * {
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
     
     /* Glow Animation */
@@ -80,7 +90,8 @@ st.markdown(
     .top-bu-wrapper {
         display: flex;
         justify-content: center;
-        margin: 20px 0;
+        margin: 20px auto;
+        width: 100%;
     }
     
     .top-bu-card {
