@@ -12,11 +12,12 @@ st.set_page_config(
     page_icon="💡",
     layout="wide",
     initial_sidebar_state="expanded",
-    menu_items=None
+    menu_items=None,
 )
 
 # Force light mode - hide dark mode toggle
-st.markdown("""
+st.markdown(
+    """
 <style>
     /* Hide the default theme toggle in Streamlit */
     [data-testid="stThemeSelector"] {
@@ -39,9 +40,12 @@ st.markdown("""
         background: #FFFFFF !important;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
-st.markdown("""
+st.markdown(
+    """
 <style>
     /* Modern Clean Theme - Like Stripe/Notion/Linear */
     
@@ -871,7 +875,10 @@ st.markdown("""
         background: #FFFFFF !important;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
+
 
 def init_session():
     if "user_id" not in st.session_state:
@@ -885,22 +892,28 @@ def init_session():
     if "current_page" not in st.session_state:
         st.session_state.current_page = "Home"
 
+
 def login_user():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown("""
+        st.markdown(
+            """
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="font-size: 60px; margin-bottom: 20px;">💡</div>
             <h1 style="color: #1E3A5F; margin-bottom: 10px;">Procurement Idea Hub</h1>
             <p style="color: #64748B; font-size: 18px;">Share your ideas, drive excellence</p>
         </div>
-        """, unsafe_allow_html=True)
-        
+        """,
+            unsafe_allow_html=True,
+        )
+
         with st.form("login_form"):
             email = st.text_input("Email Address", placeholder="Enter your email")
-            full_name = st.text_input("Full Name (optional)", placeholder="Enter your name")
+            full_name = st.text_input(
+                "Full Name (optional)", placeholder="Enter your name"
+            )
             submitted = st.form_submit_button("Continue", use_container_width=True)
-            
+
             if submitted and email:
                 user = get_user_by_email(email)
                 if user:
@@ -918,46 +931,58 @@ def login_user():
                 st.session_state.current_page = "home"
                 st.rerun()
 
+
 def render_sidebar():
     with st.sidebar:
         # Branding
-        st.markdown("""
+        st.markdown(
+            """
         <div class="sidebar-brand">
             <div class="logo">💡</div>
             <div class="brand-name">Procurement</div>
             <div class="brand-tagline">Idea Hub</div>
         </div>
-        """, unsafe_allow_html=True)
-        
+        """,
+            unsafe_allow_html=True,
+        )
+
         if st.session_state.user_id:
             # Welcome message
-            st.markdown(f"""
+            st.markdown(
+                f"""
             <div class="welcome-msg">
                 <p class="greeting">Welcome back!</p>
                 <p class="user-name">{st.session_state.full_name or st.session_state.username}</p>
             </div>
-            """, unsafe_allow_html=True)
-            
+            """,
+                unsafe_allow_html=True,
+            )
+
             # Navigation buttons
             nav_items = [
                 ("Home", "🏠", "home"),
-                ("Dashboard", "📊", "dashboard"),
-                ("Submit Idea", "💡", "submit_idea"),
-                ("Browse Ideas", "📋", "browse_ideas"),
+                ("Submit Ideas", "💡", "submit_idea"),
                 ("My Ideas", "👤", "my_ideas"),
-                ("About", "ℹ️", "about")
+                ("Browse Ideas", "📋", "browse_ideas"),
+                ("Dashboard", "📊", "dashboard"),
+                ("About", "ℹ️", "about"),
             ]
-            
+
             for label, icon, page_key in nav_items:
                 is_active = st.session_state.current_page == page_key
                 btn_class = "nav-button active" if is_active else "nav-button"
-                
-                if st.button(f"{icon} {label}", key=f"nav_{page_key}", use_container_width=True):
+
+                if st.button(
+                    f"{icon} {label}", key=f"nav_{page_key}", use_container_width=True
+                ):
                     st.session_state.current_page = page_key
                     st.rerun()
-            
-            st.markdown("<div style='margin-top: auto; padding-top: 20px;'>", unsafe_allow_html=True)
-            
+
+            st.markdown(
+                "<div style='margin-top: auto; padding-top: 20px;'>",
+                unsafe_allow_html=True,
+            )
+
             # Logout button
             if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
                 st.session_state.user_id = None
@@ -966,33 +991,35 @@ def render_sidebar():
                 st.session_state.full_name = ""
                 st.session_state.current_page = "Home"
                 st.rerun()
-            
+
             st.markdown("</div>", unsafe_allow_html=True)
-        
+
         return None
+
 
 def main():
     init_db()
     init_session()
-    
+
     selected_page = render_sidebar()
-    
+
     if not st.session_state.user_id:
         login_user()
     else:
         current = st.session_state.current_page
         if current == "home":
             home.render()
-        elif current == "dashboard":
-            dashboard.render()
         elif current == "submit_idea":
             submit_idea.render()
-        elif current == "browse_ideas":
-            browse_ideas.render()
         elif current == "my_ideas":
             my_ideas.render()
+        elif current == "browse_ideas":
+            browse_ideas.render()
+        elif current == "dashboard":
+            dashboard.render()
         elif current == "about":
             about.render()
+
 
 if __name__ == "__main__":
     main()
