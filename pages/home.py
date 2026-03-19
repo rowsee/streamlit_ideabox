@@ -4,23 +4,36 @@ from database import get_stats, get_user_ideas, get_top_contributors_per_bu
 st.markdown(
     """
 <style>
-    /* Override Streamlit main container to center content */
-    .stApp > div[data-testid="stMainBlockContainer"] {
-        max-width: 1000px !important;
-        margin: 0 auto !important;
-        padding: 20px 20px !important;
-    }
-    
-    /* Page wrapper */
-    .page-wrapper {
-        width: 100%;
+    /* ============================================
+       HOME PAGE CONTAINER
+       ============================================ */
+    .home-page {
         max-width: 1000px;
         margin: 0 auto;
-        text-align: center;
+        padding: 20px 15px;
     }
     
-    /* Header Section */
-    .tag {
+    /* ============================================
+       GLASS CARD BASE CLASS
+       With fallbacks for unsupported browsers
+       ============================================ */
+    .home-glass {
+        background: rgba(255, 255, 255, 0.85);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    @supports not (backdrop-filter: blur(10px)) {
+        .home-glass {
+            background: rgba(255, 255, 255, 0.98);
+        }
+    }
+    
+    /* ============================================
+       HEADER SECTION
+       ============================================ */
+    .home-tag {
         background: linear-gradient(135deg, #FFD700, #FFA500);
         color: #1a1a2e;
         padding: 8px 18px;
@@ -33,124 +46,179 @@ st.markdown(
         text-transform: uppercase;
     }
     
-    .header-title {
+    .home-header-title {
         font-size: 36px;
         font-weight: 800;
-        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+        background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #667eea);
+        background-size: 300% 300%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         line-height: 1.3;
+        animation: home-gradient 8s ease infinite;
     }
     
-    .header-subtitle {
+    @keyframes home-gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .home-header-subtitle {
         font-size: 20px;
-        color: #475569;
+        color: #64748b;
         font-weight: 500;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
     }
     
-    .header-name {
+    .home-header-name {
         color: #667eea;
         font-weight: 700;
     }
     
-    /* CTA Card */
-    .cta-card {
-        background: linear-gradient(135deg, #667eea, #764ba2);
+    /* ============================================
+       CTA CARD (Glassmorphism)
+       ============================================ */
+    .home-cta-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
         padding: 30px 40px;
         border-radius: 20px;
         color: white;
         text-align: center;
         margin: 25px auto;
         max-width: 800px;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(102, 126, 234, 0.2),
+            0 20px 40px rgba(102, 126, 234, 0.15);
     }
     
-    .cta-title {
+    .home-cta-title {
         font-size: 24px;
         font-weight: 700;
         margin-bottom: 10px;
     }
     
-    .cta-text {
+    .home-cta-text {
         font-size: 16px;
         line-height: 1.6;
         opacity: 0.95;
     }
     
-    /* KPI Section */
-    .kpi-section {
+    /* ============================================
+       KPI SECTION
+       ============================================ */
+    .home-kpi-section {
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: 18px;
         margin: 30px auto;
         flex-wrap: wrap;
         max-width: 900px;
     }
     
-    .kpi-card {
+    .home-kpi-card {
         flex: 1;
-        min-width: 180px;
-        max-width: 220px;
+        min-width: 160px;
+        max-width: 210px;
         padding: 25px 15px;
         border-radius: 16px;
         color: white;
         text-align: center;
         position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.3s ease;
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(0, 0, 0, 0.1);
     }
     
-    .kpi-card:hover {
+    .home-kpi-card:hover {
         transform: translateY(-5px);
     }
     
-    .kpi-card.purple {
+    .home-kpi-card.purple {
         background: linear-gradient(135deg, #667eea, #764ba2);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(102, 126, 234, 0.3);
     }
     
-    .kpi-card.green {
+    .home-kpi-card.purple:hover {
+        box-shadow: 
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            0 20px 40px rgba(102, 126, 234, 0.4);
+    }
+    
+    .home-kpi-card.green {
         background: linear-gradient(135deg, #11998e, #38ef7d);
-        box-shadow: 0 8px 25px rgba(17, 153, 142, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(17, 153, 142, 0.3);
     }
     
-    .kpi-card.orange {
+    .home-kpi-card.green:hover {
+        box-shadow: 
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            0 20px 40px rgba(17, 153, 142, 0.4);
+    }
+    
+    .home-kpi-card.orange {
         background: linear-gradient(135deg, #f97316, #fbbf24);
-        box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(249, 115, 22, 0.3);
     }
     
-    .kpi-card.pink {
+    .home-kpi-card.orange:hover {
+        box-shadow: 
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            0 20px 40px rgba(249, 115, 22, 0.4);
+    }
+    
+    .home-kpi-card.pink {
         background: linear-gradient(135deg, #ec008c, #fc6767);
-        box-shadow: 0 8px 25px rgba(236, 0, 140, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(236, 0, 140, 0.3);
     }
     
-    .kpi-number {
+    .home-kpi-card.pink:hover {
+        box-shadow: 
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            0 20px 40px rgba(236, 0, 140, 0.4);
+    }
+    
+    .home-kpi-number {
         font-size: 48px;
         font-weight: 800;
         line-height: 1;
         margin-bottom: 8px;
+        text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
     }
     
-    .kpi-label {
+    .home-kpi-label {
         font-size: 14px;
         font-weight: 700;
         margin-bottom: 4px;
     }
     
-    .kpi-sub {
+    .home-kpi-sub {
         font-size: 12px;
         opacity: 0.85;
     }
     
-    /* Top BU Section */
-    .top-bu-section {
+    /* ============================================
+       TOP BU SECTION
+       ============================================ */
+    .home-topbu-section {
         margin: 40px auto;
     }
     
-    .top-bu-card {
+    .home-topbu-card {
         background: linear-gradient(135deg, #FF6B35, #FFA07A, #FF8C00);
         padding: 35px 50px;
         border-radius: 24px;
@@ -158,17 +226,30 @@ st.markdown(
         text-align: center;
         max-width: 500px;
         margin: 0 auto;
-        box-shadow: 0 15px 50px rgba(255, 107, 53, 0.4);
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        animation: glow-pulse 3s ease-in-out infinite;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 15px 30px rgba(255, 107, 53, 0.3),
+            0 30px 60px rgba(255, 107, 53, 0.2);
+        animation: home-glow 3s ease-in-out infinite;
     }
     
-    @keyframes glow-pulse {
-        0%, 100% { box-shadow: 0 0 30px rgba(255, 107, 53, 0.5), 0 0 60px rgba(255, 107, 53, 0.25); }
-        50% { box-shadow: 0 0 40px rgba(255, 107, 53, 0.7), 0 0 80px rgba(255, 107, 53, 0.35); }
+    @keyframes home-glow {
+        0%, 100% { 
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.05),
+                0 15px 30px rgba(255, 107, 53, 0.3),
+                0 30px 60px rgba(255, 107, 53, 0.2);
+        }
+        50% { 
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.05),
+                0 20px 40px rgba(255, 107, 53, 0.4),
+                0 40px 80px rgba(255, 107, 53, 0.3);
+        }
     }
     
-    .top-bu-label {
+    .home-topbu-label {
         font-size: 14px;
         font-weight: 700;
         letter-spacing: 2px;
@@ -177,57 +258,83 @@ st.markdown(
         margin-bottom: 15px;
     }
     
-    .top-bu-name {
+    .home-topbu-name {
         font-size: 42px;
         font-weight: 800;
         margin-bottom: 10px;
         text-shadow: 2px 3px 6px rgba(0, 0, 0, 0.2);
     }
     
-    .top-bu-number {
+    .home-topbu-number {
         font-size: 56px;
         font-weight: 800;
         line-height: 1;
+        text-shadow: 2px 3px 6px rgba(0, 0, 0, 0.2);
     }
     
-    .top-bu-text {
+    .home-topbu-text {
         font-size: 18px;
         font-weight: 500;
         margin-top: 5px;
         opacity: 0.95;
     }
     
-    /* Motivation Banner */
-    .motivation-banner {
-        background: linear-gradient(135deg, #1e3a5f, #3b82f6, #6366f1);
+    /* ============================================
+       MOTIVATION BANNER (Glassmorphism)
+       ============================================ */
+    .home-motivation-banner {
+        background: linear-gradient(135deg, rgba(30, 58, 95, 0.9), rgba(59, 130, 246, 0.9), rgba(99, 102, 241, 0.9));
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
         padding: 22px 30px;
         border-radius: 16px;
         color: white;
         text-align: center;
         margin: 35px auto;
         max-width: 700px;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(59, 130, 246, 0.2);
     }
     
-    .motivation-banner p {
+    @supports not (backdrop-filter: blur(10px)) {
+        .home-motivation-banner {
+            background: linear-gradient(135deg, #1e3a5f, #3b82f6, #6366f1);
+        }
+    }
+    
+    .home-motivation-banner p {
         font-size: 18px;
         margin: 0;
         font-weight: 500;
         line-height: 1.5;
     }
     
-    /* Why Share Card */
-    .why-share-card {
-        background: white;
+    /* ============================================
+       WHY SHARE CARD (Glassmorphism)
+       ============================================ */
+    .home-whyshare-card {
+        background: rgba(255, 255, 255, 0.85);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
         padding: 30px;
         border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        border: 1px solid #f1f5f9;
+        border: 1px solid rgba(255, 255, 255, 0.5);
         margin: 30px auto;
         max-width: 900px;
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 30px rgba(0, 0, 0, 0.08);
     }
     
-    .why-share-title {
+    @supports not (backdrop-filter: blur(10px)) {
+        .home-whyshare-card {
+            background: rgba(255, 255, 255, 0.98);
+        }
+    }
+    
+    .home-whyshare-title {
         font-size: 26px;
         font-weight: 700;
         color: #2d3436;
@@ -235,143 +342,200 @@ st.markdown(
         text-align: center;
     }
     
-    .why-cards {
+    .home-whyshare-cards {
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: 18px;
         flex-wrap: wrap;
     }
     
-    .why-card {
+    .home-why-card {
         flex: 1;
-        min-width: 200px;
-        max-width: 260px;
-        padding: 30px 20px;
+        min-width: 180px;
+        max-width: 250px;
+        padding: 28px 18px;
         border-radius: 16px;
         color: white;
         text-align: center;
-        transition: transform 0.3s ease;
+        transition: all 0.3s ease;
     }
     
-    .why-card:hover {
+    .home-why-card:hover {
         transform: translateY(-8px);
     }
     
-    .why-card.blue {
+    .home-why-card.blue {
         background: linear-gradient(135deg, #3b82f6, #60a5fa);
-        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(59, 130, 246, 0.3);
     }
     
-    .why-card.red {
+    .home-why-card.blue:hover {
+        box-shadow: 
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            0 20px 40px rgba(59, 130, 246, 0.4);
+    }
+    
+    .home-why-card.red {
         background: linear-gradient(135deg, #ef4444, #f87171);
-        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(239, 68, 68, 0.3);
     }
     
-    .why-card.green {
+    .home-why-card.red:hover {
+        box-shadow: 
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            0 20px 40px rgba(239, 68, 68, 0.4);
+    }
+    
+    .home-why-card.green {
         background: linear-gradient(135deg, #22c55e, #4ade80);
-        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 20px rgba(34, 197, 94, 0.3);
     }
     
-    .why-icon {
+    .home-why-card.green:hover {
+        box-shadow: 
+            0 8px 15px rgba(0, 0, 0, 0.1),
+            0 20px 40px rgba(34, 197, 94, 0.4);
+    }
+    
+    .home-why-icon {
         font-size: 45px;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
+        animation: home-bounce 2s ease-in-out infinite;
     }
     
-    .why-card-title {
-        font-size: 18px;
+    @keyframes home-bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    .home-why-card:nth-child(2) .home-why-icon { animation-delay: 0.2s; }
+    .home-why-card:nth-child(3) .home-why-icon { animation-delay: 0.4s; }
+    
+    .home-why-card-title {
+        font-size: 17px;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     
-    .why-card-desc {
+    .home-why-card-desc {
         font-size: 13px;
         opacity: 0.9;
         line-height: 1.5;
     }
     
-    /* Benefits Card */
-    .benefits-card {
-        background: white;
-        padding: 30px;
+    /* ============================================
+       BENEFITS CARD (Glassmorphism)
+       ============================================ */
+    .home-benefits-card {
+        background: rgba(255, 255, 255, 0.85);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        padding: 28px;
         border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        border: 1px solid #f1f5f9;
+        border: 1px solid rgba(255, 255, 255, 0.5);
         margin: 30px auto;
-        max-width: 600px;
+        max-width: 550px;
+        box-shadow: 
+            0 4px 6px rgba(0, 0, 0, 0.05),
+            0 10px 30px rgba(0, 0, 0, 0.08);
     }
     
-    .benefits-title {
+    @supports not (backdrop-filter: blur(10px)) {
+        .home-benefits-card {
+            background: rgba(255, 255, 255, 0.98);
+        }
+    }
+    
+    .home-benefits-title {
         font-size: 22px;
         font-weight: 700;
         color: #2d3436;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
         text-align: center;
     }
     
-    .benefit-item {
+    .home-benefit-item {
         display: flex;
         align-items: center;
-        gap: 15px;
-        padding: 14px 0;
-        border-bottom: 1px solid #f1f5f9;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(241, 245, 249, 0.8);
     }
     
-    .benefit-item:last-child {
+    .home-benefit-item:last-child {
         border-bottom: none;
     }
     
-    .benefit-check {
+    .home-benefit-check {
         color: #10b981;
         font-size: 22px;
         font-weight: 800;
     }
     
-    .benefit-text {
+    .home-benefit-text {
         font-size: 15px;
         color: #475569;
     }
     
-    /* Divider */
-    .section-divider {
+    /* ============================================
+       DIVIDER
+       ============================================ */
+    .home-divider {
         height: 1px;
-        background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-        margin: 35px auto;
+        background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.6), transparent);
+        margin: 30px auto;
         max-width: 800px;
     }
     
-    /* Responsive */
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
     @media (max-width: 768px) {
-        .kpi-section {
-            gap: 15px;
-        }
-        
-        .kpi-card {
-            min-width: 140px;
-            padding: 20px 10px;
-        }
-        
-        .kpi-number {
-            font-size: 38px;
-        }
-        
-        .top-bu-card {
-            padding: 25px 30px;
-        }
-        
-        .top-bu-name {
-            font-size: 32px;
-        }
-        
-        .top-bu-number {
-            font-size: 44px;
-        }
-        
-        .header-title {
+        .home-header-title {
             font-size: 28px;
         }
         
-        .why-card {
+        .home-kpi-section {
+            gap: 12px;
+        }
+        
+        .home-kpi-card {
+            min-width: 140px;
+            padding: 18px 10px;
+        }
+        
+        .home-kpi-number {
+            font-size: 38px;
+        }
+        
+        .home-topbu-card {
+            padding: 25px 30px;
+        }
+        
+        .home-topbu-name {
+            font-size: 32px;
+        }
+        
+        .home-topbu-number {
+            font-size: 44px;
+        }
+        
+        .home-why-card {
             min-width: 100%;
+        }
+        
+        /* Reduce blur on mobile for performance */
+        .home-glass,
+        .home-whyshare-card,
+        .home-benefits-card {
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
         }
     }
 </style>
@@ -387,15 +551,17 @@ def render():
     top_bu = get_top_contributors_per_bu()
 
     # Main Container
-    st.markdown('<div class="page-wrapper">', unsafe_allow_html=True)
+    st.markdown('<div class="home-page">', unsafe_allow_html=True)
 
     # Header Section
-    st.markdown('<div class="tag">✨ TEOA Initiative</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="home-tag">✨ TEOA Initiative</div>', unsafe_allow_html=True
+    )
     st.markdown(
         f"""
-        <h1 class="header-title">Welcome to TEOA Procurement Idea Hub</h1>
-        <p class="header-subtitle">
-            Hello <span class="header-name">{st.session_state.full_name or st.session_state.username}</span> 👋👋
+        <h1 class="home-header-title">Welcome to TEOA Procurement Idea Hub</h1>
+        <p class="home-header-subtitle">
+            Hello <span class="home-header-name">{st.session_state.full_name or st.session_state.username}</span> 👋
         </p>
         """,
         unsafe_allow_html=True,
@@ -404,23 +570,23 @@ def render():
     # CTA Card
     st.markdown(
         """
-        <div class="cta-card">
-            <div class="cta-title">💬 Have an idea?</div>
-            <div class="cta-text">This is the place to share it. Great ideas can come from anywhere — and so can you!</div>
+        <div class="home-cta-card">
+            <div class="home-cta-title">💬 Have an idea?</div>
+            <div class="home-cta-text">This is the place to share it. Great ideas can come from anywhere — and so can you!</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
     # KPI Section - 4 Stats
-    st.markdown('<div class="kpi-section">', unsafe_allow_html=True)
+    st.markdown('<div class="home-kpi-section">', unsafe_allow_html=True)
 
     st.markdown(
         f"""
-        <div class="kpi-card purple">
-            <div class="kpi-number">{stats["total"]}</div>
-            <div class="kpi-label">📊 Total Ideas</div>
-            <div class="kpi-sub">All time</div>
+        <div class="home-kpi-card purple">
+            <div class="home-kpi-number">{stats["total"]}</div>
+            <div class="home-kpi-label">📊 Total Ideas</div>
+            <div class="home-kpi-sub">All time</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -428,10 +594,10 @@ def render():
 
     st.markdown(
         f"""
-        <div class="kpi-card green">
-            <div class="kpi-number">{stats["this_month"]}</div>
-            <div class="kpi-label">📅 This Month</div>
-            <div class="kpi-sub">Keep it up!</div>
+        <div class="home-kpi-card green">
+            <div class="home-kpi-number">{stats["this_month"]}</div>
+            <div class="home-kpi-label">📅 This Month</div>
+            <div class="home-kpi-sub">Keep it up!</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -439,10 +605,10 @@ def render():
 
     st.markdown(
         f"""
-        <div class="kpi-card orange">
-            <div class="kpi-number">{stats["this_year"]}</div>
-            <div class="kpi-label">📆 This Year</div>
-            <div class="kpi-sub">Happy year!</div>
+        <div class="home-kpi-card orange">
+            <div class="home-kpi-number">{stats["this_year"]}</div>
+            <div class="home-kpi-label">📆 This Year</div>
+            <div class="home-kpi-sub">Happy year!</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -450,10 +616,10 @@ def render():
 
     st.markdown(
         f"""
-        <div class="kpi-card pink">
-            <div class="kpi-number">{user_idea_count}</div>
-            <div class="kpi-label">🏆 Your Ideas</div>
-            <div class="kpi-sub">Great job!</div>
+        <div class="home-kpi-card pink">
+            <div class="home-kpi-number">{user_idea_count}</div>
+            <div class="home-kpi-label">🏆 Your Ideas</div>
+            <div class="home-kpi-sub">Great job!</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -463,54 +629,54 @@ def render():
 
     # Top BU Section
     if top_bu:
-        st.markdown('<div class="top-bu-section">', unsafe_allow_html=True)
+        st.markdown('<div class="home-topbu-section">', unsafe_allow_html=True)
         st.markdown(
             f"""
-            <div class="top-bu-card">
-                <div class="top-bu-label">🏆 TOP BU THIS MONTH</div>
-                <div class="top-bu-name">🥇 {top_bu["bu_cl_site"]}</div>
-                <div class="top-bu-number">{top_bu["count"]}</div>
-                <div class="top-bu-text">ideas submitted</div>
+            <div class="home-topbu-card">
+                <div class="home-topbu-label">🏆 TOP BU THIS MONTH</div>
+                <div class="home-topbu-name">🥇 {top_bu["bu_cl_site"]}</div>
+                <div class="home-topbu-number">{top_bu["count"]}</div>
+                <div class="home-topbu-text">ideas submitted</div>
             </div>
             """,
             unsafe_allow_html=True,
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="home-divider"></div>', unsafe_allow_html=True)
 
     # Motivation Banner
     st.markdown(
         """
-        <div class="motivation-banner">
+        <div class="home-motivation-banner">
             <p>⭐ Your ideas are reviewed weekly — your thoughts matter and are valued!</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="home-divider"></div>', unsafe_allow_html=True)
 
-    # Why Share Your Ideas Card
+    # Why Share Card
     st.markdown(
         """
-        <div class="why-share-card">
-            <div class="why-share-title">Why Share Your Ideas?</div>
-            <div class="why-cards">
-                <div class="why-card blue">
-                    <div class="why-icon">💡</div>
-                    <div class="why-card-title">Share Your Ideas</div>
-                    <div class="why-card-desc">Every idea matters and can make a real difference.</div>
+        <div class="home-whyshare-card">
+            <div class="home-whyshare-title">Why Share Your Ideas?</div>
+            <div class="home-whyshare-cards">
+                <div class="home-why-card blue">
+                    <div class="home-why-icon">💡</div>
+                    <div class="home-why-card-title">Share Your Ideas</div>
+                    <div class="home-why-card-desc">Every idea matters and can make a real difference.</div>
                 </div>
-                <div class="why-card red">
-                    <div class="why-icon">🚀</div>
-                    <div class="why-card-title">Drive Excellence</div>
-                    <div class="why-card-desc">Help enhance operations through your perspective.</div>
+                <div class="home-why-card red">
+                    <div class="home-why-icon">🚀</div>
+                    <div class="home-why-card-title">Drive Excellence</div>
+                    <div class="home-why-card-desc">Help enhance operations through your perspective.</div>
                 </div>
-                <div class="why-card green">
-                    <div class="why-icon">🎯</div>
-                    <div class="why-card-title">Make Impact</div>
-                    <div class="why-card-desc">See your ideas come to life and create change.</div>
+                <div class="home-why-card green">
+                    <div class="home-why-icon">🎯</div>
+                    <div class="home-why-card-title">Make Impact</div>
+                    <div class="home-why-card-desc">See your ideas come to life and create change.</div>
                 </div>
             </div>
         </div>
@@ -521,19 +687,19 @@ def render():
     # Benefits Card
     st.markdown(
         """
-        <div class="benefits-card">
-            <div class="benefits-title">✨ Benefits</div>
-            <div class="benefit-item">
-                <span class="benefit-check">✓</span>
-                <span class="benefit-text">Quick and easy submission process</span>
+        <div class="home-benefits-card">
+            <div class="home-benefits-title">✨ Benefits</div>
+            <div class="home-benefit-item">
+                <span class="home-benefit-check">✓</span>
+                <span class="home-benefit-text">Quick and easy submission process</span>
             </div>
-            <div class="benefit-item">
-                <span class="benefit-check">✓</span>
-                <span class="benefit-text">Track your idea's progress</span>
+            <div class="home-benefit-item">
+                <span class="home-benefit-check">✓</span>
+                <span class="home-benefit-text">Track your idea's progress</span>
             </div>
-            <div class="benefit-item">
-                <span class="benefit-check">✓</span>
-                <span class="benefit-text">Collaborate and engage with teams</span>
+            <div class="home-benefit-item">
+                <span class="home-benefit-check">✓</span>
+                <span class="home-benefit-text">Collaborate and engage with teams</span>
             </div>
         </div>
         """,
