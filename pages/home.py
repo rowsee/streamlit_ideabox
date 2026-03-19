@@ -32,50 +32,53 @@ st.markdown(
     .header-card {
         background: white;
         border-radius: 16px;
-        padding: 24px 28px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        margin-bottom: 20px;
+        padding: 28px 32px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 24px;
     }
 
     .header-badge {
         background: linear-gradient(135deg, #FFD700, #FFA500);
         color: #1a1a2e;
-        padding: 6px 14px;
+        padding: 8px 16px;
         border-radius: 20px;
         font-size: 11px;
         font-weight: 700;
         display: inline-block;
         letter-spacing: 1px;
         text-transform: uppercase;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
     }
 
     .header-title {
-        font-size: 28px;
-        font-weight: 800;
+        font-size: 32px;
+        font-weight: 900;
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin: 0 0 8px 0;
+        margin: 0 0 10px 0;
         line-height: 1.2;
     }
 
     .header-subtitle {
-        font-size: 15px;
+        font-size: 16px;
         color: #64748b;
         margin: 0;
+        line-height: 1.4;
     }
 
     .header-name {
         color: #6366f1;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .highlight-card {
         background: white;
         border-radius: 16px;
-        padding: 28px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        padding: 32px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
         text-align: center;
         height: 100%;
         display: flex;
@@ -86,12 +89,12 @@ st.markdown(
 
     .highlight-card.orange {
         background: linear-gradient(135deg, #f97316, #fb923c);
-        color: white;
+        border: none;
     }
 
     .highlight-card.purple {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        color: white;
+        border: none;
     }
 
     .highlight-label {
@@ -104,14 +107,14 @@ st.markdown(
     }
 
     .highlight-icon {
-        font-size: 32px;
-        margin-bottom: 12px;
+        font-size: 36px;
+        margin-bottom: 14px;
     }
 
     .highlight-name {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 800;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
         background: rgba(255, 255, 255, 0.25);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -120,7 +123,7 @@ st.markdown(
     }
 
     .highlight-count {
-        font-size: 72px;
+        font-size: 80px;
         font-weight: 800;
         line-height: 1;
         text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -128,25 +131,26 @@ st.markdown(
     }
 
     .highlight-text {
-        font-size: 14px;
+        font-size: 15px;
         opacity: 0.9;
-        margin-top: 8px;
+        margin-top: 10px;
         font-weight: 600;
     }
 
     .kpi-card {
         background: white;
-        border-radius: 12px;
-        padding: 18px 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        border-left: 4px solid;
+        border-radius: 14px;
+        padding: 20px 18px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        border-left: 5px solid;
         height: 100%;
         transition: all 0.3s ease;
     }
 
     .kpi-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.1);
     }
 
     .kpi-card.purple { border-left-color: #8b5cf6; }
@@ -155,61 +159,42 @@ st.markdown(
     .kpi-card.pink { border-left-color: #ec4899; }
 
     .kpi-number {
-        font-size: 38px;
+        font-size: 42px;
         font-weight: 800;
         color: #1e293b;
         line-height: 1;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
 
     .kpi-label {
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 700;
         color: #475569;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
     }
 
     .kpi-sub {
-        font-size: 11px;
+        font-size: 12px;
         color: #94a3b8;
-    }
-
-    .quick-stats {
-        background: #f8fafc;
-        border-radius: 10px;
-        padding: 14px 20px;
-        margin: 20px 0;
-    }
-
-    .quick-stats .stat-value {
-        font-size: 20px;
-        font-weight: 700;
-        color: #1e293b;
-    }
-
-    .quick-stats .stat-label {
-        font-size: 11px;
-        color: #64748b;
-        margin-top: 2px;
     }
 
     .card {
         background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        border: 1px solid #f1f5f9;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid #e2e8f0;
         height: 100%;
     }
 
     .card-title {
-        font-size: 16px;
-        font-weight: 700;
+        font-size: 17px;
+        font-weight: 800;
         color: #1e293b;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
 
     .why-list {
@@ -221,11 +206,12 @@ st.markdown(
     .why-list li {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 0;
+        gap: 12px;
+        padding: 12px 0;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 14px;
+        font-size: 15px;
         color: #475569;
+        line-height: 1.4;
     }
 
     .why-list li:last-child {
@@ -233,54 +219,55 @@ st.markdown(
     }
 
     .why-icon {
-        font-size: 18px;
+        font-size: 20px;
     }
 
     .benefits-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 10px;
-        margin-top: 16px;
+        gap: 12px;
+        margin-top: 18px;
     }
 
     .benefit-item {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 12px;
+        gap: 12px;
+        padding: 10px 14px;
         background: #f8fafc;
-        border-radius: 8px;
-        font-size: 13px;
+        border-radius: 10px;
+        font-size: 14px;
         color: #475569;
+        line-height: 1.4;
     }
 
     .benefit-check {
         color: #10b981;
         font-weight: 700;
-        font-size: 16px;
+        font-size: 18px;
     }
 
     .cta-card {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        border-radius: 14px;
-        padding: 20px;
+        border-radius: 16px;
+        padding: 28px;
         color: white;
         text-align: center;
-        margin-top: 16px;
+        margin-top: 24px;
     }
 
     .cta-title {
-        font-size: 16px;
-        font-weight: 700;
-        margin-bottom: 6px;
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 8px;
     }
 
     .cta-text {
-        font-size: 12px;
+        font-size: 14px;
         opacity: 0.95;
     }
 
-    .stDivider { margin: 20px 0; }
+    .stDivider { margin: 24px 0; }
 </style>
 """,
     unsafe_allow_html=True,
