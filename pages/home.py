@@ -1,5 +1,10 @@
 import streamlit as st
-from database import get_stats, get_user_ideas, get_top_contributors_per_bu
+from database import (
+    get_stats,
+    get_user_ideas,
+    get_top_contributors_per_bu,
+    get_top_contributor,
+)
 
 st.set_page_config(layout="wide", page_icon="💡")
 
@@ -66,6 +71,61 @@ st.markdown(
         font-weight: 600;
     }
 
+    .highlight-card {
+        background: white;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        text-align: center;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .highlight-card.orange {
+        background: linear-gradient(135deg, #f97316, #fb923c);
+        color: white;
+    }
+
+    .highlight-card.purple {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+    }
+
+    .highlight-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        opacity: 0.95;
+        margin-bottom: 12px;
+    }
+
+    .highlight-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .highlight-name {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .highlight-count {
+        font-size: 56px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .highlight-text {
+        font-size: 13px;
+        opacity: 0.9;
+        margin-top: 6px;
+    }
+
     .kpi-card {
         background: white;
         border-radius: 12px;
@@ -111,10 +171,6 @@ st.markdown(
         border-radius: 10px;
         padding: 14px 20px;
         margin: 20px 0;
-    }
-
-    .quick-stats .stat-item {
-        text-align: center;
     }
 
     .quick-stats .stat-value {
@@ -196,47 +252,6 @@ st.markdown(
         font-size: 16px;
     }
 
-    .topbu-card {
-        background: linear-gradient(135deg, #f97316, #fb923c);
-        border-radius: 20px;
-        padding: 32px;
-        color: white;
-        text-align: center;
-        box-shadow: 0 8px 30px rgba(249, 115, 22, 0.25);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .topbu-label {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        opacity: 0.95;
-        margin-bottom: 12px;
-    }
-
-    .topbu-name {
-        font-size: 22px;
-        font-weight: 800;
-        margin-bottom: 8px;
-    }
-
-    .topbu-count {
-        font-size: 60px;
-        font-weight: 800;
-        line-height: 1;
-    }
-
-    .topbu-text {
-        font-size: 13px;
-        opacity: 0.9;
-        margin-top: 6px;
-    }
-
     .cta-card {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         border-radius: 14px;
@@ -267,6 +282,7 @@ st.markdown(
 def render():
     stats = get_stats() or {}
     top_bu = get_top_contributors_per_bu() or {}
+    top_contributor = get_top_contributor() or {}
     user_ideas = get_user_ideas(st.session_state.user_id) or []
     user_idea_count = len(user_ideas)
 
@@ -288,6 +304,87 @@ def render():
         unsafe_allow_html=True,
     )
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # TOP BU + TOP CONTRIBUTOR ROW
+    top_row_cols = st.columns(2, gap="medium")
+
+    with top_row_cols[0]:
+        if top_bu:
+            st.markdown('<div class="highlight-card orange">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">🏆</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP BU THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-name">{top_bu.get("bu_cl_site", "N/A")}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-count">{top_bu.get("count", 0)}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-text">ideas submitted</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="highlight-card orange">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">🏆</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP BU THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-name">No data yet</div>', unsafe_allow_html=True
+            )
+            st.markdown('<div class="highlight-count">—</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-text">Start submitting ideas!</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    with top_row_cols[1]:
+        if top_contributor:
+            st.markdown('<div class="highlight-card purple">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">👤</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP CONTRIBUTOR THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-name">{top_contributor.get("name", "N/A")}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-count">{top_contributor.get("count", 0)}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-text">ideas submitted</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="highlight-card purple">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">👤</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP CONTRIBUTOR THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-name">No data yet</div>', unsafe_allow_html=True
+            )
+            st.markdown('<div class="highlight-count">—</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-text">Be the first to contribute!</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    st.divider()
 
     # KPI CARDS
     kpi_cols = st.columns(4, gap="medium")
@@ -418,41 +515,6 @@ def render():
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right_col:
-        # TOP BU CARD
-        if top_bu:
-            st.markdown('<div class="topbu-card">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="topbu-label">🏆 TOP BU THIS MONTH</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="topbu-name">{top_bu.get("bu_cl_site", "N/A")}</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="topbu-count">{top_bu.get("count", 0)}</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                '<div class="topbu-text">ideas submitted</div>', unsafe_allow_html=True
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="topbu-card">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="topbu-label">🏆 TOP BU THIS MONTH</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                '<div class="topbu-name">No data yet</div>', unsafe_allow_html=True
-            )
-            st.markdown('<div class="topbu-count">—</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="topbu-text">Start submitting ideas!</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
-
         # CTA CARD
         st.markdown(
             """

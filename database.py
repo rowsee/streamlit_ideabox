@@ -435,6 +435,30 @@ def get_top_contributors_per_bu():
         return None
 
 
+def get_top_contributor():
+    """Get the top contributor (user) with the most ideas submitted this month"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+
+        current_month = datetime.now().strftime("%Y-%m")
+        cursor.execute(
+            """SELECT u.full_name, u.username, COUNT(*) as idea_count
+               FROM ideas i
+               JOIN users u ON i.submitted_by = u.id
+               WHERE strftime('%Y-%m', i.submitted_at) = ?
+               GROUP BY i.submitted_by
+               ORDER BY idea_count DESC
+               LIMIT 1""",
+            (current_month,),
+        )
+        result = cursor.fetchone()
+
+        if result:
+            full_name = result[0] if result[0] else result[1]
+            return {"name": full_name, "count": result[2]}
+        return None
+
+
 def ideas_to_dataframe(ideas):
     import pandas as pd
 
