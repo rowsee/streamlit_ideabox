@@ -939,7 +939,7 @@ def render_sidebar():
             """
         <div class="sidebar-brand">
             <div class="logo">💡</div>
-            <div class="brand-name">Procurement</div>
+            <div class="brand-name">TEOA Procurement</div>
             <div class="brand-tagline">Idea Hub</div>
         </div>
         """,

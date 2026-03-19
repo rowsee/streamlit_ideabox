@@ -22,7 +22,7 @@ st.markdown(
     }
     .stat-number {
         font-size: 52px;
-        font-weight: 700;
+        font-weight: 800;
         margin-bottom: 8px;
         line-height: 1;
     }
@@ -38,25 +38,28 @@ st.markdown(
     }
     .top-bu-card {
         background: linear-gradient(135deg, #FF6B35, #FF8F5E);
-        padding: 18px 25px;
-        border-radius: 12px;
+        padding: 20px 30px;
+        border-radius: 14px;
         color: white;
         text-align: center;
         box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25);
+        max-width: 400px;
+        margin: 0 auto;
     }
     .top-bu-label {
-        font-size: 13px;
+        font-size: 14px;
         opacity: 0.9;
-        font-weight: 500;
-        margin-bottom: 5px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
     }
     .top-bu-name {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 3px;
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 5px;
     }
     .top-bu-count {
-        font-size: 14px;
+        font-size: 15px;
         opacity: 0.95;
     }
     .motivation-banner {
@@ -65,12 +68,48 @@ st.markdown(
         border-radius: 10px;
         color: white;
         text-align: center;
-        margin: 15px 0;
+        margin: 20px 0;
     }
     .motivation-banner p {
-        font-size: 16px;
+        font-size: 17px;
         margin: 0;
         font-weight: 500;
+    }
+    .highlight-box {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 20px 25px;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 20px;
+    }
+    .highlight-box p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 0;
+        font-weight: 400;
+    }
+    .check-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #636e72;
+        font-size: 14px;
+        margin: 8px 0;
+    }
+    .check-item span {
+        color: #00b894;
+        font-weight: 700;
+        font-size: 16px;
+    }
+    .tag {
+        background: #FFD700;
+        color: #2d3436;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 15px;
     }
     .feature-card {
         background: #ffffff;
@@ -97,65 +136,6 @@ st.markdown(
         color: #636e72;
         margin: 0;
     }
-    .highlight-box {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        padding: 18px 22px;
-        border-radius: 10px;
-        color: white;
-        margin-bottom: 20px;
-    }
-    .highlight-box p {
-        font-size: 15px;
-        line-height: 1.5;
-        margin: 0;
-        font-weight: 400;
-    }
-    .check-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: #636e72;
-        font-size: 13px;
-    }
-    .check-item span {
-        color: #00b894;
-        font-weight: 700;
-    }
-    .tag {
-        background: #FFD700;
-        color: #2d3436;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        display: inline-block;
-        margin-bottom: 15px;
-    }
-    .small-feature-card {
-        background: #ffffff;
-        padding: 14px 16px;
-        border-radius: 10px;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e8e8e8;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .small-feature-icon {
-        font-size: 24px;
-    }
-    .small-feature-title {
-        font-size: 14px;
-        margin-bottom: 2px;
-        color: #2d3436;
-        font-weight: 600;
-    }
-    .small-feature-desc {
-        font-size: 12px;
-        line-height: 1.3;
-        color: #636e72;
-        margin: 0;
-    }
 </style>
 """,
     unsafe_allow_html=True,
@@ -173,7 +153,7 @@ def render():
     st.markdown(
         f"""
     <h1 style="font-size: 38px; font-weight: 700; margin-bottom: 10px; line-height: 1.2; color: #2d3436;">
-        Welcome to TEOA Ideabox,<br>
+        Welcome to TEOA Procurement Idea Hub,<br>
         <span style="color: #667eea;">{st.session_state.full_name or st.session_state.username} 👋</span>
     </h1>
     """,
@@ -182,7 +162,22 @@ def render():
 
     st.markdown("---")
 
-    # Stats Section - Larger cards
+    # Top BU Section - At the top
+    if top_bu:
+        st.markdown(
+            f"""
+        <div class="top-bu-card">
+            <div class="top-bu-label">🏆 TOP BU THIS MONTH</div>
+            <div class="top-bu-name">{top_bu["bu_cl_site"]}</div>
+            <div class="top-bu-count">{top_bu["count"]} ideas submitted</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("---")
+
+    # Stats Section - Numbers are BOLD
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -221,7 +216,7 @@ def render():
             unsafe_allow_html=True,
         )
 
-    # Motivation Banner - "Ideas reviewed weekly"
+    # Motivation Banner - Below stats
     st.markdown(
         f"""
     <div class="motivation-banner">
@@ -231,28 +226,9 @@ def render():
         unsafe_allow_html=True,
     )
 
-    # Top BU Section
-    if top_bu:
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col1:
-            pass
-        with col2:
-            st.markdown(
-                f"""
-            <div class="top-bu-card">
-                <div class="top-bu-label">🏆 Top BU This Month</div>
-                <div class="top-bu-name">{top_bu["bu_cl_site"]}</div>
-                <div class="top-bu-count">{top_bu["count"]} ideas submitted</div>
-            </div>
-            """,
-                unsafe_allow_html=True,
-            )
-        with col3:
-            pass
-
     st.markdown("---")
 
-    # Why Share Your Ideas - Smaller section at bottom
+    # Why Share Your Ideas - Compact section
     st.markdown("### Why Share Your Ideas?", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
@@ -260,11 +236,11 @@ def render():
     with col1:
         st.markdown(
             """
-        <div class="small-feature-card">
-            <div class="small-feature-icon">💡</div>
+        <div class="feature-card">
+            <div class="feature-icon">💡</div>
             <div>
-                <div class="small-feature-title">Share Your Ideas</div>
-                <div class="small-feature-desc">Every idea matters and can make a difference.</div>
+                <div class="feature-title">Share Your Ideas</div>
+                <div class="feature-desc">Every idea matters and can make a difference.</div>
             </div>
         </div>
         """,
@@ -274,11 +250,11 @@ def render():
     with col2:
         st.markdown(
             """
-        <div class="small-feature-card">
-            <div class="small-feature-icon">🚀</div>
+        <div class="feature-card">
+            <div class="feature-icon">🚀</div>
             <div>
-                <div class="small-feature-title">Drive Excellence</div>
-                <div class="small-feature-desc">Help enhance operations through your perspective.</div>
+                <div class="feature-title">Drive Excellence</div>
+                <div class="feature-desc">Help enhance operations through your perspective.</div>
             </div>
         </div>
         """,
@@ -288,13 +264,43 @@ def render():
     with col3:
         st.markdown(
             """
-        <div class="small-feature-card">
-            <div class="small-feature-icon">🎯</div>
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
             <div>
-                <div class="small-feature-title">Make Impact</div>
-                <div class="small-feature-desc">See your ideas come to life and create change.</div>
+                <div class="feature-title">Make Impact</div>
+                <div class="feature-desc">See your ideas come to life and create change.</div>
             </div>
         </div>
         """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("---")
+
+    # Benefits and Encouragement Section
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        st.markdown(
+            """
+        <div class="highlight-box">
+            <p>💬 Have an idea? This is the place to share it. Great ideas can come from anywhere!</p>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+        st.markdown("### Benefits", unsafe_allow_html=True)
+        st.markdown(
+            '<div class="check-item"><span>✓</span> Quick and easy submission</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="check-item"><span>✓</span> Track your idea progress</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="check-item"><span>✓</span> Collaborate with teams</div>',
             unsafe_allow_html=True,
         )
