@@ -444,49 +444,10 @@ def render():
 
     st.divider()
 
-    # QUICK STATS ROW
-    st.markdown('<div class="quick-stats">', unsafe_allow_html=True)
-    q_cols = st.columns([1, 1, 1], gap="medium")
+    # WHY SHARE + BENEFITS ROW
+    bottom_cols = st.columns(2, gap="medium")
 
-    with q_cols[0]:
-        st.markdown(
-            f"""
-            <div style="text-align:center;">
-                <div class="stat-value">{stats.get("this_week", 0)}</div>
-                <div class="stat-label">📅 This Week</div>
-            </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    with q_cols[1]:
-        st.markdown(
-            f"""
-            <div style="text-align:center;">
-                <div class="stat-value">{stats.get("pending", 0)}</div>
-                <div class="stat-label">⏳ Pending Review</div>
-            </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    with q_cols[2]:
-        st.markdown(
-            f"""
-            <div style="text-align:center;">
-                <div class="stat-value">{stats.get("implemented", 0)}</div>
-                <div class="stat-label">✅ Implemented</div>
-            </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # MAIN CONTENT - 2 columns
-    left_col, right_col = st.columns([1, 1], gap="medium")
-
-    with left_col:
+    with bottom_cols[0]:
         # WHY SHARE CARD
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown(
@@ -505,10 +466,9 @@ def render():
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
+    with bottom_cols[1]:
         # BENEFITS CARD
-        st.markdown(
-            '<div class="card" style="margin-top:16px;">', unsafe_allow_html=True
-        )
+        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<div class="card-title">✨ Benefits</div>', unsafe_allow_html=True)
         st.markdown(
             """
@@ -522,17 +482,18 @@ def render():
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with right_col:
-        # CTA CARD
-        st.markdown(
-            """
-            <div class="cta-card">
-                <div class="cta-title">💬 Have an idea?</div>
-                <div class="cta-text">Submit your idea and shape the future!</div>
-            </div>
-        """,
-            unsafe_allow_html=True,
-        )
+    st.divider()
+
+    # CTA CARD (FULL WIDTH AT BOTTOM)
+    st.markdown(
+        """
+        <div class="cta-card" style="max-width:600px;margin:0 auto;">
+            <div class="cta-title">💬 Have an idea?</div>
+            <div class="cta-text">Submit your idea and shape the future!</div>
+        </div>
+    """,
+        unsafe_allow_html=True,
+    )
 
 
 if __name__ == "__main__":
