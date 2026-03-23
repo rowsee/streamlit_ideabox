@@ -5,6 +5,7 @@ from database import (
     get_top_contributors_per_bu,
     get_top_contributor,
 )
+from streamlit_extras.metric_cards import style_metric_cards
 
 st.set_page_config(layout="wide", page_icon="💡")
 
@@ -386,53 +387,28 @@ def render():
 
     st.divider()
 
-    # KPI CARDS
+    # KPI CARDS (using st.metric with streamlit-extras styling)
     kpi_cols = st.columns(4, gap="medium")
 
     with kpi_cols[0]:
-        st.markdown('<div class="kpi-card purple">', unsafe_allow_html=True)
-        st.markdown(
-            f'<div class="kpi-number">{stats.get("total", 0)}</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<div class="kpi-label">📊 Total Ideas</div>', unsafe_allow_html=True
-        )
-        st.markdown('<div class="kpi-sub">All time</div>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.metric(label="Total Ideas", value=stats.get("total", 0))
 
     with kpi_cols[1]:
-        st.markdown('<div class="kpi-card green">', unsafe_allow_html=True)
-        st.markdown(
-            f'<div class="kpi-number">{stats.get("this_month", 0)}</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<div class="kpi-label">📅 This Month</div>', unsafe_allow_html=True
-        )
-        st.markdown('<div class="kpi-sub">Keep it up!</div>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.metric(label="This Month", value=stats.get("this_month", 0))
 
     with kpi_cols[2]:
-        st.markdown('<div class="kpi-card orange">', unsafe_allow_html=True)
-        st.markdown(
-            f'<div class="kpi-number">{stats.get("this_year", 0)}</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown('<div class="kpi-label">📆 This Year</div>', unsafe_allow_html=True)
-        st.markdown('<div class="kpi-sub">Happy year!</div>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.metric(label="This Year", value=stats.get("this_year", 0))
 
     with kpi_cols[3]:
-        st.markdown('<div class="kpi-card pink">', unsafe_allow_html=True)
-        st.markdown(
-            f'<div class="kpi-number">{user_idea_count}</div>', unsafe_allow_html=True
-        )
-        st.markdown(
-            '<div class="kpi-label">🏆 Your Ideas</div>', unsafe_allow_html=True
-        )
-        st.markdown('<div class="kpi-sub">Great job!</div>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.metric(label="Your Ideas", value=user_idea_count)
+
+    # Apply styling to metric cards
+    style_metric_cards(
+        background_color="#ffffff",
+        border_size_px=1,
+        border_color="#e2e8f0",
+        border_radius_px=14,
+    )
 
     st.divider()
 
