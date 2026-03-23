@@ -64,23 +64,37 @@ def init_db():
             )
         """)
 
-        # Migration: Add project_lead column if it doesn't exist
-        try:
-            cursor.execute("ALTER TABLE ideas ADD COLUMN project_lead TEXT")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
+        # Migration: Add all potentially missing columns
+        columns_to_add = [
+            ("proposed_change", "TEXT"),
+            ("project_lead", "TEXT"),
+            ("region", "TEXT"),
+            ("bu_cl_site", "TEXT"),
+            ("problem_statements", "TEXT"),
+            ("benefits", "TEXT"),
+            ("is_implemented", "TEXT DEFAULT 'No'"),
+            ("solution_implemented", "TEXT"),
+            ("date_implemented", "TEXT"),
+            ("effective_date", "TEXT"),
+            ("drivers", "TEXT"),
+            ("impact_group", "TEXT"),
+            ("hours_saved", "INTEGER"),
+            ("capacity_file", "TEXT"),
+            ("planned_use", "TEXT"),
+            ("email_approval", "TEXT"),
+            ("site_leader", "TEXT"),
+            ("teoa_leader", "TEXT"),
+            ("status", "TEXT DEFAULT 'Pending'"),
+            ("votes", "INTEGER DEFAULT 0"),
+        ]
 
-        # Migration: Add site_leader column if it doesn't exist
-        try:
-            cursor.execute("ALTER TABLE ideas ADD COLUMN site_leader TEXT")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
-
-        # Migration: Add teoa_leader column if it doesn't exist
-        try:
-            cursor.execute("ALTER TABLE ideas ADD COLUMN teoa_leader TEXT")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
+        for column_name, column_type in columns_to_add:
+            try:
+                cursor.execute(
+                    f"ALTER TABLE ideas ADD COLUMN {column_name} {column_type}"
+                )
+            except sqlite3.OperationalError:
+                pass  # Column already exists
 
         # Create audit log table
         cursor.execute("""
