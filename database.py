@@ -464,47 +464,42 @@ def ideas_to_dataframe(ideas):
 
     data = []
     for idea in ideas:
+        if not idea or not isinstance(idea, dict):
+            continue
+
         drivers_list = []
-        if idea["drivers"]:
+        drivers = idea.get("drivers")
+        if drivers:
             try:
-                drivers_list = json.loads(idea["drivers"])
+                drivers_list = json.loads(drivers)
             except:
-                drivers_list = [idea["drivers"]] if idea["drivers"] else []
+                drivers_list = [drivers] if drivers else []
 
         data.append(
             {
-                "ID": idea["id"],
-                "Project Title": idea["title"],
-                "Proposed Change": idea["proposed_change"]
-                if idea["proposed_change"]
-                else "",
-                "Project Lead": idea["project_lead"],
-                "Submitter": idea["full_name"]
-                if idea["full_name"]
-                else (idea["username"] if idea["username"] else "Unknown"),
-                "Submitter Email": idea["email"] if idea["email"] else "",
-                "Region": idea["region"],
-                "BU/CL Site": idea["bu_cl_site"],
-                "Problem Statements": idea["problem_statements"],
-                "Expected Benefits": idea["benefits"],
-                "Is Implemented": idea["is_implemented"],
-                "Solution Implemented": idea["solution_implemented"]
-                if idea["solution_implemented"]
-                else "",
-                "Date Implemented": idea["date_implemented"]
-                if idea["date_implemented"]
-                else "",
-                "Effective Date": idea["effective_date"],
+                "ID": idea.get("id", ""),
+                "Project Title": idea.get("title", ""),
+                "Proposed Change": idea.get("proposed_change", "") or "",
+                "Project Lead": idea.get("project_lead", "") or "",
+                "Submitter": idea.get("full_name")
+                or (idea.get("username") if idea.get("username") else "Unknown"),
+                "Submitter Email": idea.get("email", "") or "",
+                "Region": idea.get("region", "") or "",
+                "BU/CL Site": idea.get("bu_cl_site", "") or "",
+                "Problem Statements": idea.get("problem_statements", "") or "",
+                "Expected Benefits": idea.get("benefits", "") or "",
+                "Is Implemented": idea.get("is_implemented", "") or "",
+                "Solution Implemented": idea.get("solution_implemented", "") or "",
+                "Date Implemented": idea.get("date_implemented", "") or "",
+                "Effective Date": idea.get("effective_date", "") or "",
                 "Drivers": ", ".join(drivers_list) if drivers_list else "",
-                "Impact Group": idea["impact_group"],
-                "Hours Saved Annually": idea["hours_saved"],
-                "Planned Use": idea["planned_use"],
-                "Site Leader": idea["site_leader"] if idea["site_leader"] else "",
-                "TEOA Functional Leader": idea["teoa_leader"]
-                if idea["teoa_leader"]
-                else "",
-                "Likes": idea["votes"],
-                "Submitted Date": idea["submitted_at"],
+                "Impact Group": idea.get("impact_group", "") or "",
+                "Hours Saved Annually": idea.get("hours_saved", "") or "",
+                "Planned Use": idea.get("planned_use", "") or "",
+                "Site Leader": idea.get("site_leader", "") or "",
+                "TEOA Functional Leader": idea.get("teoa_leader", "") or "",
+                "Likes": idea.get("votes", 0),
+                "Submitted Date": idea.get("submitted_at", "") or "",
             }
         )
 

@@ -62,10 +62,15 @@ st.markdown(
     }
 
     .header-subtitle {
-        font-size: 16px;
+        font-size: 18px;
         color: #64748b;
         margin: 0;
         line-height: 1.4;
+    }
+
+    .header-name {
+        color: #f97316;
+        font-weight: 700;
     }
 
     .header-name {
@@ -295,7 +300,7 @@ def render():
         unsafe_allow_html=True,
     )
     st.markdown(
-        f'<p class="header-subtitle">Welcome back, <span class="header-name">{user_name}</span> 👋</p>',
+        f'<p class="header-subtitle">Welcome, <span class="header-name">{user_name}</span> 👋</p>',
         unsafe_allow_html=True,
     )
     st.markdown("</div>", unsafe_allow_html=True)
