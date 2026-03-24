@@ -32,6 +32,58 @@ def force_schema_update():
         # Get current columns
         cursor.execute("PRAGMA table_info(ideas)")
         columns_info = cursor.fetchall()
+        columns = [row["name"] for row in columns_info]
+
+        # Handle backward compatibility: rename old columns to new names
+        column_renames = [
+            ("description", "proposed_change"),  # Old name -> new name
+        ]
+
+        for old_name, new_name in column_renames:
+            if old_name in columns and new_name not in columns:
+                try:
+                    # Rename column using SQLite workaround
+                    cursor.execute(
+                        f"ALTER TABLE ideas RENAME COLUMN {old_name} TO {new_name}"
+                    )
+                except sqlite3.OperationalError:
+                    pass
+
+        # Refresh columns list after potential rename
+        cursor.execute("PRAGMA table_info(ideas)")
+        columns = [row["name"] for row in cursor.fetchall()]
+
+        # Define required columns with types
+        required_columns = [
+            ("proposed_change", "TEXT"),
+            ("solution_implemented", "TEXT"),
+            ("date_implemented", "DATE"),
+            ("effective_date", "DATE"),
+            ("capacity_files", "TEXT"),
+            ("email_approval_files", "TEXT"),
+            ("site_leader", "TEXT"),
+            ("teoa_leader", "TEXT"),
+        ]
+
+        # Add only missing columns (non-destructive)
+        for col_name, col_type in required_columns:
+            if col_name not in columns:
+                try:
+                    cursor.execute(
+                        f"ALTER TABLE ideas ADD COLUMN {col_name} {col_type}"
+                    )
+                except sqlite3.OperationalError:
+                    pass
+
+        conn.commit()
+        return True
+
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+
+        # Get current columns
+        cursor.execute("PRAGMA table_info(ideas)")
+        columns_info = cursor.fetchall()
         columns = [row[1] for row in columns_info]
 
         # Handle backward compatibility: rename old columns to new names
