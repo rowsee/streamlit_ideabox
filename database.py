@@ -79,10 +79,15 @@ def force_schema_update():
         return True
 
 
+def row_to_dict(row):
+    """Convert sqlite3.Row to dictionary"""
+    return dict(row)
+
+
 @contextmanager
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = lambda c, r: dict(zip([col[0] for col in c.description], r))
     try:
         yield conn
     finally:
