@@ -898,21 +898,79 @@ def login_user():
     with col2:
         st.markdown(
             """
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="font-size: 60px; margin-bottom: 20px;">💡</div>
-            <h1 style="color: #1E3A5F; margin-bottom: 10px;">Procurement Idea Hub</h1>
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="font-size: 70px; margin-bottom: 20px;">💡</div>
+            <h1 style="color: #1E3A5F; margin-bottom: 10px; font-weight: 800;">Procurement Idea Hub</h1>
             <p style="color: #64748B; font-size: 18px;">Share your ideas, drive excellence</p>
         </div>
         """,
             unsafe_allow_html=True,
         )
 
+        st.markdown(
+            """
+        <style>
+            /* Style the login form container */
+            .login-form-container {
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                border: 1px solid #e2e8f0;
+            }
+            
+            /* Style form inputs */
+            .login-form-container .stTextInput > div > div > input {
+                background: #f8fafc !important;
+                border: 2px solid #e2e8f0 !important;
+                border-radius: 12px !important;
+                padding: 15px !important;
+                font-size: 16px !important;
+                transition: all 0.3s ease;
+            }
+            
+            .login-form-container .stTextInput > div > div > input:focus {
+                border-color: #6366f1 !important;
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+            }
+            
+            /* Style form button */
+            .login-form-container .stButton > button {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+                border: none !important;
+                border-radius: 12px !important;
+                padding: 15px 30px !important;
+                font-size: 16px !important;
+                font-weight: 600 !important;
+                transition: all 0.3s ease;
+                width: 100%;
+            }
+            
+            .login-form-container .stButton > button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3) !important;
+            }
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
         with st.form("login_form"):
-            email = st.text_input("Email Address", placeholder="Enter your email")
+            st.markdown('<div class="login-form-container">', unsafe_allow_html=True)
+
+            email = st.text_input(
+                "Email Address",
+                placeholder="Enter your email",
+                label_visibility="visible",
+            )
             full_name = st.text_input(
-                "Full Name (optional)", placeholder="Enter your name"
+                "Full Name (optional)",
+                placeholder="Enter your name",
+                label_visibility="visible",
             )
             submitted = st.form_submit_button("Continue", use_container_width=True)
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
             if submitted and email:
                 user = get_user_by_email(email)

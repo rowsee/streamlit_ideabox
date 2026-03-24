@@ -1,203 +1,470 @@
 import streamlit as st
-from database import get_stats, get_user_ideas, get_top_contributors_per_bu
+from database import (
+    get_stats,
+    get_user_ideas,
+    get_top_contributors_per_bu,
+    get_top_contributor,
+)
+from streamlit_extras.metric_cards import style_metric_cards
 
-# -------------------------
-# CONFIG
-# -------------------------
-st.set_page_config(page_title="Idea Hub Dashboard", layout="wide")
+st.set_page_config(layout="wide", page_icon="💡")
 
-
-# -------------------------
-# SAFE HELPERS
-# -------------------------
-def safe_get_session():
-    return {
-        "user_id": st.session_state.get("user_id"),
-        "full_name": st.session_state.get("full_name"),
-        "username": st.session_state.get("username", "User"),
-    }
-
-
-def safe_stats():
-    stats = get_stats() or {}
-    return {
-        "total": stats.get("total", 0),
-        "this_month": stats.get("this_month", 0),
-        "this_year": stats.get("this_year", 0),
-    }
-
-
-def safe_top_bu():
-    top_bu = get_top_contributors_per_bu()
-    if not top_bu:
-        return None
-    return {
-        "name": top_bu.get("bu_cl_site", "N/A"),
-        "count": top_bu.get("count", 0),
-    }
-
-
-# -------------------------
-# PREMIUM STYLES
-# -------------------------
-st.markdown("""
+st.markdown(
+    """
 <style>
+    :root {
+        --bg-white: #ffffff;
+        --bg-light: #f8fafc;
+        --text-primary: #1e293b;
+        --text-muted: #64748b;
+        --border-light: #e2e8f0;
+        --indigo: #6366f1;
+        --orange: #f97316;
+        --green: #10b981;
+        --pink: #ec4899;
+        --purple-start: #6366f1;
+        --purple-end: #8b5cf6;
+        --orange-start: #f97316;
+        --orange-end: #fb923c;
+    }
 
-/* GLOBAL FIX */
-section.main > div {
-    padding-top: 1rem;
-}
+    .stApp { background-color: var(--bg-white); }
 
-/* REMOVE STREAMLIT PADDING */
-.block-container {
-    padding-top: 1rem !important;
-    padding-left: 2rem;
-    padding-right: 2rem;
-}
+    .header-card {
+        background: white;
+        border-radius: 16px;
+        padding: 28px 32px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 24px;
+    }
 
-/* HEADER */
-.header {
-    padding: 30px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #0f172a, #4338ca);
-    color: white;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
+    .header-badge {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        color: #1a1a2e;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-block;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+    }
 
-/* KPI CARDS */
-.kpi-card {
-    padding: 25px;
-    border-radius: 20px;
-    background: linear-gradient(145deg, #ffffff, #f1f5f9);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    text-align: center;
-    transition: all 0.3s ease;
-}
+    .header-title {
+        font-size: 32px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 10px 0;
+        line-height: 1.2;
+    }
 
-.kpi-card:hover {
-    transform: translateY(-6px) scale(1.02);
-}
+    .header-subtitle {
+        font-size: 18px;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.4;
+    }
 
-/* TEXT */
-.kpi-number {
-    font-size: 42px;
-    font-weight: 900;
-    color: #111827;
-}
+    .header-name {
+        color: #f97316;
+        font-weight: 700;
+    }
 
-.kpi-label {
-    font-size: 16px;
-    color: #6b7280;
-}
+    .highlight-card {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        text-align: center;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 
-/* FEATURE */
-.feature-card {
-    padding: 30px;
-    border-radius: 20px;
-    background: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-}
+    .highlight-card.orange {
+        background: linear-gradient(135deg, #f97316, #fb923c);
+        border: none;
+    }
 
-/* TOP BU */
-.top-bu {
-    padding: 30px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #f59e0b, #f97316);
-    color: white;
-    text-align: center;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
+    .highlight-card.purple {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+    }
 
-/* CTA */
-.cta {
-    padding: 30px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #10b981, #22c55e);
-    color: white;
-    text-align: center;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
+    .highlight-label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0.9;
+        margin-bottom: 16px;
+    }
 
+    .highlight-icon {
+        font-size: 36px;
+        margin-bottom: 14px;
+    }
+
+    .highlight-name {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 18px;
+        background: rgba(255, 255, 255, 0.25);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
+    }
+
+    .highlight-count {
+        font-size: 80px;
+        font-weight: 800;
+        line-height: 1;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+    }
+
+    .highlight-text {
+        font-size: 15px;
+        opacity: 0.9;
+        margin-top: 10px;
+        font-weight: 600;
+    }
+
+    .kpi-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px 18px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        border-left: 5px solid;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+
+    .kpi-card.purple { border-left-color: #8b5cf6; }
+    .kpi-card.green { border-left-color: #10b981; }
+    .kpi-card.orange { border-left-color: #f97316; }
+    .kpi-card.pink { border-left-color: #ec4899; }
+
+    .kpi-number {
+        font-size: 42px;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .kpi-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 6px;
+    }
+
+    .kpi-sub {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    .card {
+        background: white;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid #e2e8f0;
+        height: 100%;
+    }
+
+    .card-title {
+        font-size: 17px;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .why-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .why-list li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 15px;
+        color: #475569;
+        line-height: 1.4;
+    }
+
+    .why-list li:last-child {
+        border-bottom: none;
+    }
+
+    .why-icon {
+        font-size: 20px;
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        background: #f8fafc;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.4;
+    }
+
+    .benefit-check {
+        color: #10b981;
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    .cta-card {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 16px;
+        padding: 28px;
+        color: white;
+        text-align: center;
+        margin-top: 24px;
+    }
+
+    .cta-title {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .cta-text {
+        font-size: 14px;
+        opacity: 0.95;
+    }
+
+    .cta-sub {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-top: 10px;
+    }
+
+    .stDivider { margin: 24px 0; }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
-# -------------------------
-# MAIN
-# -------------------------
 def render():
-    session = safe_get_session()
-    stats = safe_stats()
-    top_bu = safe_top_bu()
+    stats = get_stats() or {}
+    top_bu = get_top_contributors_per_bu() or {}
+    top_contributor = get_top_contributor() or {}
+    user_ideas = get_user_ideas(st.session_state.user_id) or []
+    user_idea_count = len(user_ideas)
 
-    user_ideas = get_user_ideas(session["user_id"]) or []
-    user_count = len(user_ideas)
+    user_name = st.session_state.get("full_name") or st.session_state.get(
+        "username", "User"
+    )
 
     # HEADER
-    st.markdown(f"""
-    <div class="header">
-        <h1>🚀 TEOA Procurement Idea Hub</h1>
-        <p>Welcome back, <b>{session['full_name'] or session['username']}</b></p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="header-card">', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="header-badge">✨ TEOA Initiative</div>', unsafe_allow_html=True
+    )
+    st.markdown(
+        '<h1 class="header-title">TEOA Procurement Idea Hub</h1>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<p class="header-subtitle">Welcome, <span class="header-name">{user_name}</span> 👋</p>',
+        unsafe_allow_html=True,
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    # KPI ROW
-    col1, col2, col3, col4 = st.columns(4)
+    # TOP BU + TOP CONTRIBUTOR ROW
+    top_row_cols = st.columns(2, gap="medium")
 
-    def kpi(col, value, label):
-        with col:
-            st.markdown(f"""
-            <div class="kpi-card">
-                <div class="kpi-number">{value}</div>
-                <div class="kpi-label">{label}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    kpi(col1, stats['total'], "Total Ideas")
-    kpi(col2, stats['this_month'], "This Month")
-    kpi(col3, stats['this_year'], "This Year")
-    kpi(col4, user_count, "Your Ideas")
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # SECOND ROW (2-COLUMN LAYOUT)
-    left, right = st.columns([2, 1])
-
-    with left:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>💡 Why Share Ideas?</h3>
-            <ul>
-                <li>Drive operational excellence</li>
-                <li>Make real business impact</li>
-                <li>Collaborate across teams</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="cta">
-            <h2>✨ Have an idea?</h2>
-            <h3>Submit your idea and help shape the future!</h3>
-            <p>Ideas reviewed weekly.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with right:
+    with top_row_cols[0]:
         if top_bu:
-            st.markdown(f"""
-            <div class="top-bu">
-                <h3>🏆 Top BU</h3>
-                <h2>{top_bu['name']}</h2>
-                <h1>{top_bu['count']}</h1>
-                <p>ideas this month</p>
+            st.markdown('<div class="highlight-card orange">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">🏆</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP BU THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-name">{top_bu.get("bu_cl_site", "N/A")}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-count">{top_bu.get("count", 0)}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-text">ideas submitted</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="highlight-card orange">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">🏆</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP BU THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-name">No data yet</div>', unsafe_allow_html=True
+            )
+            st.markdown('<div class="highlight-count">—</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-text">Start submitting ideas!</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    with top_row_cols[1]:
+        if top_contributor:
+            st.markdown('<div class="highlight-card purple">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">👤</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP CONTRIBUTOR THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-name">{top_contributor.get("name", "N/A")}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<div class="highlight-count">{top_contributor.get("count", 0)}</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-text">ideas submitted</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="highlight-card purple">', unsafe_allow_html=True)
+            st.markdown('<div class="highlight-icon">👤</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-label">TOP CONTRIBUTOR THIS MONTH</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="highlight-name">No data yet</div>', unsafe_allow_html=True
+            )
+            st.markdown('<div class="highlight-count">—</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="highlight-text">Be the first to contribute!</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    st.divider()
+
+    # KPI CARDS (using st.metric with streamlit-extras styling)
+    kpi_cols = st.columns(4, gap="medium")
+
+    with kpi_cols[0]:
+        st.metric(label="Total Ideas", value=stats.get("total", 0))
+
+    with kpi_cols[1]:
+        st.metric(label="This Month", value=stats.get("this_month", 0))
+
+    with kpi_cols[2]:
+        st.metric(label="This Year", value=stats.get("this_year", 0))
+
+    with kpi_cols[3]:
+        st.metric(label="Your Ideas", value=user_idea_count)
+
+    # Apply styling to metric cards
+    style_metric_cards(
+        background_color="#ffffff",
+        border_size_px=1,
+        border_color="#e2e8f0",
+        border_radius_px=14,
+    )
+
+    st.divider()
+
+    # WHY SHARE + BENEFITS ROW
+    bottom_cols = st.columns(2, gap="medium")
+
+    with bottom_cols[0]:
+        # WHY SHARE CARD
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="card-title">💡 Why Share Ideas?</div>', unsafe_allow_html=True
+        )
+        st.markdown(
+            """
+            <ul class="why-list">
+                <li><span class="why-icon">🚀</span> Drive operational excellence</li>
+                <li><span class="why-icon">🎯</span> Make meaningful impact</li>
+                <li><span class="why-icon">🤝</span> Collaborate with teams</li>
+                <li><span class="why-icon">💡</span> Every idea matters</li>
+            </ul>
+        """,
+            unsafe_allow_html=True,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with bottom_cols[1]:
+        # BENEFITS CARD
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">✨ Benefits</div>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="benefits-grid">
+                <div class="benefit-item"><span class="benefit-check">✓</span> Quick and easy submission</div>
+                <div class="benefit-item"><span class="benefit-check">✓</span> Track your idea's progress</div>
+                <div class="benefit-item"><span class="benefit-check">✓</span> Collaborate with teams</div>
             </div>
-            """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.divider()
+
+    # CTA CARD (FULL WIDTH AT BOTTOM) WITH "IDEAS REVIEWED WEEKLY"
+    st.markdown(
+        """
+        <div class="cta-card" style="max-width:600px;margin:0 auto;">
+            <div class="cta-title">💬 Have an idea?</div>
+            <div class="cta-text">Submit your idea and shape the future!</div>
+            <div class="cta-sub">📅 Ideas reviewed weekly</div>
+        </div>
+    """,
+        unsafe_allow_html=True,
+    )
 
 
-# -------------------------
-# RUN
-# -------------------------
-render()
+if __name__ == "__main__":
+    render()
