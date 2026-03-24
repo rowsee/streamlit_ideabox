@@ -910,17 +910,8 @@ def login_user():
         st.markdown(
             """
         <style>
-            /* Style the login form container */
-            .login-form-container {
-                background: white;
-                padding: 40px;
-                border-radius: 20px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-                border: 1px solid #e2e8f0;
-            }
-            
             /* Style form inputs */
-            .login-form-container .stTextInput > div > div > input {
+            .stTextInput > div > div > input {
                 background: #f8fafc !important;
                 border: 2px solid #e2e8f0 !important;
                 border-radius: 12px !important;
@@ -929,13 +920,13 @@ def login_user():
                 transition: all 0.3s ease;
             }
             
-            .login-form-container .stTextInput > div > div > input:focus {
+            .stTextInput > div > div > input:focus {
                 border-color: #6366f1 !important;
                 box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
             }
             
             /* Style form button */
-            .login-form-container .stButton > button {
+            .stButton > button {
                 background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
                 border: none !important;
                 border-radius: 12px !important;
@@ -946,9 +937,20 @@ def login_user():
                 width: 100%;
             }
             
-            .login-form-container .stButton > button:hover {
+            .stButton > button:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3) !important;
+            }
+            
+            /* Reduce top padding for login page */
+            .block-container {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+            
+            /* Remove extra space from empty elements */
+            .stMarkdown p:empty {
+                display: none;
             }
         </style>
         """,
@@ -956,8 +958,6 @@ def login_user():
         )
 
         with st.form("login_form"):
-            st.markdown('<div class="login-form-container">', unsafe_allow_html=True)
-
             email = st.text_input(
                 "Email Address",
                 placeholder="Enter your email",
@@ -969,8 +969,6 @@ def login_user():
                 label_visibility="visible",
             )
             submitted = st.form_submit_button("Continue", use_container_width=True)
-
-            st.markdown("</div>", unsafe_allow_html=True)
 
             if submitted and email:
                 user = get_user_by_email(email)

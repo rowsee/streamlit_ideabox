@@ -63,7 +63,7 @@ st.markdown(
     }
 
     .header-subtitle {
-        font-size: 18px;
+        font-size: 22px;
         color: #64748b;
         margin: 0;
         line-height: 1.4;
@@ -72,6 +72,7 @@ st.markdown(
     .header-name {
         color: #f97316;
         font-weight: 700;
+        font-size: 24px;
     }
 
     .highlight-card {
