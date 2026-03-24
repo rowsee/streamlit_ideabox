@@ -463,9 +463,10 @@ def render():
             key="title_input",
         )
     with col2:
-        proposed_change = st.text_input(
+        proposed_change = st.text_area(
             "Proposed Change",
-            placeholder="Brief summary of the change",
+            placeholder="Describe what change you are proposing...",
+            height=100,
             value=st.session_state.idea_form["proposed_change"],
             key="proposed_change_input",
         )
