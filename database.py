@@ -51,9 +51,9 @@ def init_db():
                 drivers TEXT,
                 impact_group TEXT,
                 hours_saved INTEGER,
-                capacity_file TEXT,
+                capacity_files TEXT,
                 planned_use TEXT,
-                email_approval TEXT,
+                email_approval_files TEXT,
                 site_leader TEXT,
                 teoa_leader TEXT,
                 submitted_by INTEGER NOT NULL,
@@ -79,9 +79,9 @@ def init_db():
             ("drivers", "TEXT"),
             ("impact_group", "TEXT"),
             ("hours_saved", "INTEGER"),
-            ("capacity_file", "TEXT"),
+            ("capacity_files", "TEXT"),
             ("planned_use", "TEXT"),
-            ("email_approval", "TEXT"),
+            ("email_approval_files", "TEXT"),
             ("site_leader", "TEXT"),
             ("teoa_leader", "TEXT"),
             ("status", "TEXT DEFAULT 'Pending'"),
@@ -156,6 +156,29 @@ def save_uploaded_file(uploaded_file, prefix="file"):
     return None
 
 
+def save_uploaded_files(uploaded_files, prefix="file"):
+    """Save multiple uploaded files and return JSON array of paths"""
+    if uploaded_files is None or (
+        isinstance(uploaded_files, list) and len(uploaded_files) == 0
+    ):
+        return None
+
+    if not isinstance(uploaded_files, list):
+        uploaded_files = [uploaded_files]
+
+    saved_paths = []
+    for uploaded_file in uploaded_files:
+        if uploaded_file is not None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{prefix}_{timestamp}_{uploaded_file.name}"
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            with open(filepath, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            saved_paths.append(filepath)
+
+    return json.dumps(saved_paths) if saved_paths else None
+
+
 def add_idea(
     title,
     proposed_change,
@@ -169,9 +192,9 @@ def add_idea(
     drivers,
     impact_group,
     hours_saved,
-    capacity_file,
+    capacity_files,
     planned_use,
-    email_approval,
+    email_approval_files,
     submitted_by,
     site_leader="",
     teoa_leader="",
@@ -179,11 +202,13 @@ def add_idea(
     date_implemented=None,
 ):
     drivers_json = json.dumps(drivers) if drivers else None
-    capacity_path = (
-        save_uploaded_file(capacity_file, "capacity") if capacity_file else None
+    capacity_paths = (
+        save_uploaded_files(capacity_files, "capacity") if capacity_files else None
     )
-    email_path = (
-        save_uploaded_file(email_approval, "approval") if email_approval else None
+    email_paths = (
+        save_uploaded_files(email_approval_files, "approval")
+        if email_approval_files
+        else None
     )
 
     with get_db_connection() as conn:
@@ -192,8 +217,8 @@ def add_idea(
             """INSERT INTO ideas (
                 title, proposed_change, project_lead, region, bu_cl_site,
                 problem_statements, benefits, is_implemented, effective_date,
-                drivers, impact_group, hours_saved, capacity_file, planned_use,
-                email_approval, submitted_by, site_leader, teoa_leader,
+                drivers, impact_group, hours_saved, capacity_files, planned_use,
+                email_approval_files, submitted_by, site_leader, teoa_leader,
                 solution_implemented, date_implemented
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
@@ -209,9 +234,9 @@ def add_idea(
                 drivers_json,
                 impact_group,
                 hours_saved,
-                capacity_path,
+                capacity_paths,
                 planned_use,
-                email_path,
+                email_paths,
                 submitted_by,
                 site_leader,
                 teoa_leader,
@@ -279,16 +304,18 @@ def update_idea(
     drivers,
     impact_group,
     hours_saved,
-    capacity_file,
+    capacity_files,
     planned_use,
-    email_approval,
+    email_approval_files,
 ):
     drivers_json = json.dumps(drivers) if drivers else None
-    capacity_path = (
-        save_uploaded_file(capacity_file, "capacity") if capacity_file else None
+    capacity_paths = (
+        save_uploaded_files(capacity_files, "capacity") if capacity_files else None
     )
-    email_path = (
-        save_uploaded_file(email_approval, "approval") if email_approval else None
+    email_paths = (
+        save_uploaded_files(email_approval_files, "approval")
+        if email_approval_files
+        else None
     )
 
     with get_db_connection() as conn:
@@ -323,12 +350,12 @@ def update_idea(
             planned_use,
         ]
 
-        if capacity_path:
-            updates.append("capacity_file = ?")
-            values.append(capacity_path)
-        if email_path:
-            updates.append("email_approval = ?")
-            values.append(email_path)
+        if capacity_paths:
+            updates.append("capacity_files = ?")
+            values.append(capacity_paths)
+        if email_paths:
+            updates.append("email_approval_files = ?")
+            values.append(email_paths)
 
         values.append(idea_id)
 
@@ -342,16 +369,40 @@ def delete_idea(idea_id):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT capacity_file, email_approval FROM ideas WHERE id = ?", (idea_id,)
+            "SELECT capacity_files, email_approval_files FROM ideas WHERE id = ?",
+            (idea_id,),
         )
         files = cursor.fetchone()
+
+        # Parse JSON arrays if they exist
+        capacity_files = []
+        email_files = []
+
         if files:
-            for filepath in [files["capacity_file"], files["email_approval"]]:
-                if filepath and os.path.exists(filepath):
-                    try:
-                        os.remove(filepath)
-                    except:
-                        pass
+            try:
+                capacity_files = (
+                    json.loads(files["capacity_files"])
+                    if files["capacity_files"]
+                    else []
+                )
+            except:
+                pass
+            try:
+                email_files = (
+                    json.loads(files["email_approval_files"])
+                    if files["email_approval_files"]
+                    else []
+                )
+            except:
+                pass
+
+        all_files = capacity_files + email_files
+        for filepath in all_files:
+            if filepath and os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except:
+                    pass
 
         cursor.execute("DELETE FROM votes WHERE idea_id = ?", (idea_id,))
         cursor.execute("DELETE FROM ideas WHERE id = ?", (idea_id,))

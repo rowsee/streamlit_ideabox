@@ -312,9 +312,9 @@ def render_edit_form(idea):
                 drivers=final_drivers,
                 impact_group=new_impact_group if new_is_implemented else None,
                 hours_saved=new_hours_saved if new_is_implemented else None,
-                capacity_file=None,
+                capacity_files=None,
                 planned_use=new_planned_use if new_is_implemented else None,
-                email_approval=None,
+                email_approval_files=None,
             )
 
             new_idea_data = {

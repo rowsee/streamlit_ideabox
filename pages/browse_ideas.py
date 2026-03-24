@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import io
+import json
+import os
 from database import get_all_ideas, vote_idea, has_voted, ideas_to_dataframe
 
 st.markdown(
@@ -281,23 +283,53 @@ def render():
 
                 col1, col2 = st.columns(2)
                 with col1:
-                    if idea["capacity_file"]:
-                        with open(idea["capacity_file"], "rb") as f:
-                            st.download_button(
-                                label="📎 Download Capacity File",
-                                data=f,
-                                file_name=idea["capacity_file"].split("/")[-1],
-                                use_container_width=True,
-                            )
+                    # Handle both single file (old) and multiple files (new)
+                    capacity_files = idea.get("capacity_files")
+                    if capacity_files:
+                        try:
+                            files_list = json.loads(capacity_files)
+                        except:
+                            files_list = [
+                                capacity_files
+                            ]  # Single file (backward compat)
+
+                        for idx, file_path in enumerate(files_list):
+                            if file_path and os.path.exists(file_path):
+                                with open(file_path, "rb") as f:
+                                    file_name = file_path.split("/")[-1]
+                                    label = f"📎 Download Capacity File {idx + 1}"
+                                    if len(files_list) == 1:
+                                        label = "📎 Download Capacity File"
+                                    st.download_button(
+                                        label=label,
+                                        data=f,
+                                        file_name=file_name,
+                                        use_container_width=True,
+                                        key=f"capacity_{idea['id']}_{idx}",
+                                    )
                 with col2:
-                    if idea["email_approval"]:
-                        with open(idea["email_approval"], "rb") as f:
-                            st.download_button(
-                                label="📎 Download Approval Email",
-                                data=f,
-                                file_name=idea["email_approval"].split("/")[-1],
-                                use_container_width=True,
-                            )
+                    # Handle both single file (old) and multiple files (new)
+                    email_files = idea.get("email_approval_files")
+                    if email_files:
+                        try:
+                            files_list = json.loads(email_files)
+                        except:
+                            files_list = [email_files]  # Single file (backward compat)
+
+                        for idx, file_path in enumerate(files_list):
+                            if file_path and os.path.exists(file_path):
+                                with open(file_path, "rb") as f:
+                                    file_name = file_path.split("/")[-1]
+                                    label = f"📎 Download Approval Email {idx + 1}"
+                                    if len(files_list) == 1:
+                                        label = "📎 Download Approval Email"
+                                    st.download_button(
+                                        label=label,
+                                        data=f,
+                                        file_name=file_name,
+                                        use_container_width=True,
+                                        key=f"email_{idea['id']}_{idx}",
+                                    )
 
             col1, col2 = st.columns([6, 1])
 

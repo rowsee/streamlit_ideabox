@@ -715,15 +715,40 @@ def render():
         # Row 4: File uploads
         col1, col2 = st.columns(2)
         with col1:
-            capacity_file = st.file_uploader(
-                "Capacity Calculation File",
-                type=["xlsx", "xls", "pdf", "doc", "docx"],
+            capacity_files = st.file_uploader(
+                "Capacity Calculation File(s)",
+                type=[
+                    "xlsx",
+                    "xls",
+                    "pdf",
+                    "doc",
+                    "docx",
+                    "csv",
+                    "txt",
+                    "png",
+                    "jpg",
+                    "jpeg",
+                ],
+                accept_multiple_files=True,
                 key="capacity_file_input",
             )
         with col2:
-            email_approval = st.file_uploader(
-                "Email Approval Attachment",
-                type=["pdf", "doc", "docx", "eml", "msg"],
+            email_approval_files = st.file_uploader(
+                "Email Approval Attachment(s)",
+                type=[
+                    "pdf",
+                    "doc",
+                    "docx",
+                    "eml",
+                    "msg",
+                    "xlsx",
+                    "xls",
+                    "txt",
+                    "png",
+                    "jpg",
+                    "jpeg",
+                ],
+                accept_multiple_files=True,
                 key="email_approval_input",
             )
 
@@ -735,8 +760,8 @@ def render():
         drivers_other = ""
         hours_saved = 0
         planned_use = None
-        capacity_file = None
-        email_approval = None
+        capacity_files = None
+        email_approval_files = None
         solution_implemented = ""
         date_implemented = None
 
@@ -801,9 +826,9 @@ def render():
                 drivers=final_drivers,
                 impact_group=impact_group if is_implemented else None,
                 hours_saved=hours_saved if is_implemented else None,
-                capacity_file=capacity_file if is_implemented else None,
+                capacity_files=capacity_files if is_implemented else None,
                 planned_use=planned_use if is_implemented else None,
-                email_approval=email_approval if is_implemented else None,
+                email_approval_files=email_approval_files if is_implemented else None,
                 submitted_by=st.session_state.user_id,
                 site_leader=final_site_leader,
                 teoa_leader=final_teoa_leader,
