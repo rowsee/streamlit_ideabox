@@ -259,7 +259,7 @@ def create_user(username, email, full_name=""):
             return cursor.lastrowid
         except sqlite3.IntegrityError:
             cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
-            return cursor.fetchone()[0]
+            return list(cursor.fetchone().values())[0]
 
 
 def get_user_by_email(email):
@@ -510,7 +510,7 @@ def delete_idea(idea_id):
                     else []
                 )
             except:
-                pass
+                capacity_files = []
             try:
                 email_files = (
                     json.loads(files["email_approval_files"])
@@ -518,7 +518,7 @@ def delete_idea(idea_id):
                     else []
                 )
             except:
-                pass
+                email_files = []
 
         all_files = capacity_files + email_files
         for filepath in all_files:
@@ -562,33 +562,33 @@ def get_stats():
         cursor = conn.cursor()
 
         cursor.execute("SELECT COUNT(*) FROM ideas")
-        total_ideas = cursor.fetchone()[0]
+        total_ideas = list(cursor.fetchone().values())[0]
 
         current_month = datetime.now().strftime("%Y-%m")
         cursor.execute(
             "SELECT COUNT(*) FROM ideas WHERE strftime('%Y-%m', submitted_at) = ?",
             (current_month,),
         )
-        this_month = cursor.fetchone()[0]
+        this_month = list(cursor.fetchone().values())[0]
 
         current_year = datetime.now().year
         cursor.execute(
             "SELECT COUNT(*) FROM ideas WHERE strftime('%Y', submitted_at) = ?",
             (str(current_year),),
         )
-        this_year = cursor.fetchone()[0]
+        this_year = list(cursor.fetchone().values())[0]
 
         current_week_start = datetime.now().strftime("%Y-%m-%d")
         cursor.execute(
             "SELECT COUNT(*) FROM ideas WHERE date(submitted_at) >= date('now', '-7 days')"
         )
-        this_week = cursor.fetchone()[0]
+        this_week = list(cursor.fetchone().values())[0]
 
         cursor.execute("SELECT COUNT(*) FROM ideas WHERE status = 'Pending'")
-        pending = cursor.fetchone()[0]
+        pending = list(cursor.fetchone().values())[0]
 
         cursor.execute("SELECT COUNT(*) FROM ideas WHERE is_implemented = 'Yes'")
-        implemented = cursor.fetchone()[0]
+        implemented = list(cursor.fetchone().values())[0]
 
         return {
             "total": total_ideas,
@@ -620,7 +620,7 @@ def get_top_contributors_per_bu():
         result = cursor.fetchone()
 
         if result:
-            return {"bu_cl_site": result[0], "count": result[1]}
+            return {"bu_cl_site": result["bu_cl_site"], "count": result["count"]}
         return None
 
 
@@ -643,8 +643,10 @@ def get_top_contributor():
         result = cursor.fetchone()
 
         if result:
-            full_name = result[0] if result[0] else result[1]
-            return {"name": full_name, "count": result[2]}
+            full_name = (
+                result["full_name"] if result["full_name"] else result["username"]
+            )
+            return {"name": full_name, "count": result["idea_count"]}
         return None
 
 
