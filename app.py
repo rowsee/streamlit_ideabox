@@ -1,5 +1,5 @@
 import streamlit as st
-from database import init_db, get_user_by_email, create_user
+from database import init_db, get_user_by_email, create_user, force_schema_update
 import pages.home as home
 import pages.submit_idea as submit_idea
 import pages.browse_ideas as browse_ideas
@@ -1054,6 +1054,7 @@ def render_sidebar():
 
 
 def main():
+    force_schema_update()
     init_db()
     init_session()
 

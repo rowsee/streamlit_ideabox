@@ -12,6 +12,46 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 
+def reset_database():
+    """Delete and recreate the database with the correct schema"""
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
+    init_db()
+    return True
+
+
+def force_schema_update():
+    """Force update the database schema by recreating tables if needed"""
+    if not os.path.exists(DATABASE):
+        init_db()
+        return True
+
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+
+        # Check if required columns exist
+        cursor.execute("PRAGMA table_info(ideas)")
+        columns = [row[1] for row in cursor.fetchall()]
+
+        required_columns = [
+            "proposed_change",
+            "solution_implemented",
+            "date_implemented",
+            "capacity_files",
+            "email_approval_files",
+        ]
+
+        missing_columns = [col for col in required_columns if col not in columns]
+
+        if missing_columns:
+            # Recreate the database with correct schema
+            conn.close()
+            reset_database()
+            return True
+
+    return False
+
+
 @contextmanager
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
