@@ -3,6 +3,7 @@ import pandas as pd
 import io
 import json
 import os
+from datetime import datetime
 from database import get_all_ideas, vote_idea, has_voted, ideas_to_dataframe
 
 st.markdown(
@@ -173,13 +174,14 @@ def render():
         with col_export:
             if filtered_ideas:
                 df = ideas_to_dataframe(filtered_ideas)
+                export_date = datetime.now().strftime("%Y-%m-%d")
                 buffer = io.BytesIO()
                 df.to_excel(buffer, index=False, engine="openpyxl")
                 buffer.seek(0)
                 st.download_button(
                     label="📥 Export to Excel",
                     data=buffer,
-                    file_name="ideabox_ideas.xlsx",
+                    file_name=f"ideabox_ideas_{export_date}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True,
                 )

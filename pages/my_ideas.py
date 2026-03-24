@@ -1,6 +1,8 @@
 import streamlit as st
 import json
 import io
+import os
+from datetime import datetime
 import pandas as pd
 from database import (
     get_user_ideas,
@@ -377,13 +379,14 @@ def render():
         col_export, _ = st.columns([1, 4])
         with col_export:
             df = ideas_to_dataframe(ideas)
+            export_date = datetime.now().strftime("%Y-%m-%d")
             buffer = io.BytesIO()
             df.to_excel(buffer, index=False, engine="openpyxl")
             buffer.seek(0)
             st.download_button(
                 label="📥 Export My Ideas to Excel",
                 data=buffer,
-                file_name="my_ideabox_ideas.xlsx",
+                file_name=f"my_ideabox_ideas_{export_date}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True,
             )

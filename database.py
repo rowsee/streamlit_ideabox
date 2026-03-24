@@ -21,7 +21,7 @@ def reset_database():
 
 
 def force_schema_update():
-    """Force update the database schema by recreating tables if needed"""
+    """Check and add missing columns without deleting database (non-destructive)"""
     if not os.path.exists(DATABASE):
         init_db()
         return True
@@ -29,27 +29,34 @@ def force_schema_update():
     with get_db_connection() as conn:
         cursor = conn.cursor()
 
-        # Check if required columns exist
+        # Get current columns
         cursor.execute("PRAGMA table_info(ideas)")
         columns = [row[1] for row in cursor.fetchall()]
 
+        # Define required columns with types
         required_columns = [
-            "proposed_change",
-            "solution_implemented",
-            "date_implemented",
-            "capacity_files",
-            "email_approval_files",
+            ("proposed_change", "TEXT"),
+            ("solution_implemented", "TEXT"),
+            ("date_implemented", "DATE"),
+            ("effective_date", "DATE"),
+            ("capacity_files", "TEXT"),
+            ("email_approval_files", "TEXT"),
+            ("site_leader", "TEXT"),
+            ("teoa_leader", "TEXT"),
         ]
 
-        missing_columns = [col for col in required_columns if col not in columns]
+        # Add only missing columns (non-destructive)
+        for col_name, col_type in required_columns:
+            if col_name not in columns:
+                try:
+                    cursor.execute(
+                        f"ALTER TABLE ideas ADD COLUMN {col_name} {col_type}"
+                    )
+                except sqlite3.OperationalError:
+                    pass
 
-        if missing_columns:
-            # Recreate the database with correct schema
-            conn.close()
-            reset_database()
-            return True
-
-    return False
+        conn.commit()
+        return True
 
 
 @contextmanager
@@ -572,6 +579,7 @@ def ideas_to_dataframe(ideas):
         if not idea or not isinstance(idea, dict):
             continue
 
+        # Parse drivers list
         drivers_list = []
         drivers = idea.get("drivers")
         if drivers:
@@ -579,6 +587,28 @@ def ideas_to_dataframe(ideas):
                 drivers_list = json.loads(drivers)
             except:
                 drivers_list = [drivers] if drivers else []
+
+        # Parse capacity files (JSON array -> filenames)
+        capacity_files_str = ""
+        capacity_files = idea.get("capacity_files")
+        if capacity_files:
+            try:
+                files_list = json.loads(capacity_files)
+                capacity_files_str = ", ".join(
+                    [os.path.basename(f) for f in files_list]
+                )
+            except:
+                capacity_files_str = ""
+
+        # Parse email approval files (JSON array -> filenames)
+        email_files_str = ""
+        email_files = idea.get("email_approval_files")
+        if email_files:
+            try:
+                files_list = json.loads(email_files)
+                email_files_str = ", ".join([os.path.basename(f) for f in files_list])
+            except:
+                email_files_str = ""
 
         data.append(
             {
@@ -591,6 +621,8 @@ def ideas_to_dataframe(ideas):
                 "Submitter Email": idea.get("email", "") or "",
                 "Region": idea.get("region", "") or "",
                 "BU/CL Site": idea.get("bu_cl_site", "") or "",
+                "Site Leader": idea.get("site_leader", "") or "",
+                "TEOA Functional Leader": idea.get("teoa_leader", "") or "",
                 "Problem Statements": idea.get("problem_statements", "") or "",
                 "Expected Benefits": idea.get("benefits", "") or "",
                 "Is Implemented": idea.get("is_implemented", "") or "",
@@ -601,9 +633,10 @@ def ideas_to_dataframe(ideas):
                 "Impact Group": idea.get("impact_group", "") or "",
                 "Hours Saved Annually": idea.get("hours_saved", "") or "",
                 "Planned Use": idea.get("planned_use", "") or "",
-                "Site Leader": idea.get("site_leader", "") or "",
-                "TEOA Functional Leader": idea.get("teoa_leader", "") or "",
-                "Likes": idea.get("votes", 0),
+                "Capacity Files": capacity_files_str,
+                "Email Approval Files": email_files_str,
+                "Status": idea.get("status", "") or "",
+                "Votes": idea.get("votes", 0),
                 "Submitted Date": idea.get("submitted_at", "") or "",
             }
         )
