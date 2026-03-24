@@ -6,7 +6,7 @@ import streamlit as st
 SMTP_SERVER = "smtp-mail.outlook.com"
 SMTP_PORT = 587
 SMTP_USERNAME = "noreply@te.com"
-SMTP_PASSWORD = "your-password-here"
+SMTP_PASSWORD = "TEideaboxhub2026"
 FROM_EMAIL = "noreply@te.com"
 
 
