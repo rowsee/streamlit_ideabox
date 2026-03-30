@@ -23,7 +23,7 @@ def send_notification(recipients, subject, body):
         bool: True if successful, False otherwise
     """
     if not recipients:
-        return False
+        return False, "No recipients provided"
 
     try:
         msg = MIMEMultipart("alternative")
@@ -42,10 +42,19 @@ def send_notification(recipients, subject, body):
         server.sendmail(FROM_EMAIL, recipients, msg.as_string())
         server.quit()
 
-        return True
+        return True, "Email sent successfully"
+    except smtplib.SMTPAuthenticationError as e:
+        error_msg = f"SMTP Authentication Error: {e}"
+        print(error_msg)
+        return False, error_msg
+    except smtplib.SMTPException as e:
+        error_msg = f"SMTP Error: {e}"
+        print(error_msg)
+        return False, error_msg
     except Exception as e:
-        print(f"Email send error: {e}")
-        return False
+        error_msg = f"Email send error: {e}"
+        print(error_msg)
+        return False, error_msg
 
 
 def send_idea_submission_notification(
@@ -59,31 +68,63 @@ def send_idea_submission_notification(
         site_leaders: list of site leader names
         teoa_leaders: list of TEOA leader names
         is_implemented: bool indicating if the idea is already implemented
+
+    Returns:
+        tuple: (success: bool, message: str)
     """
+    # Get email addresses from assignment
+    site_leader_emails = idea_data.get("site_leader_emails", [])
+    teoa_leader_emails = idea_data.get("teoa_leader_emails", [])
+
+    # Combine all recipient emails
     all_emails = []
 
-    for entry in idea_data.get("emails", []):
-        if entry and entry not in all_emails:
-            all_emails.append(entry)
+    for email in site_leader_emails:
+        if email and email not in all_emails:
+            all_emails.append(email)
+
+    for email in teoa_leader_emails:
+        if email and email not in all_emails:
+            all_emails.append(email)
 
     if not all_emails:
-        return False
+        return False, "No recipient emails found"
 
+    # Build email content
     if is_implemented:
-        subject = f"New Implemented Improvement Submitted: {idea_data['title']}"
-        body = f"""
-Dear Team,
+        subject = f"✅ New Implemented Improvement: {idea_data.get('title', 'N/A')}"
+        body = f"""Dear Team,
 
 A new implemented improvement has been submitted:
 
-Title: {idea_data["title"]}
-Proposed Change: {idea_data["proposed_change"]}
-Region: {idea_data["region"]}
-BU/CL Site: {idea_data["bu_cl_site"]}
-Project Lead: {idea_data["project_lead"]}
-Submitted By: {idea_data["submitted_by_name"]}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 IDEA DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-We greatly appreciate the commitment to improvement - it means a lot!
+Title: {idea_data.get("title", "N/A")}
+Proposed Change: {idea_data.get("proposed_change", "N/A")}
+
+Problem Statements: {idea_data.get("problem_statements", "N/A")}
+
+Expected Benefits: {idea_data.get("benefits", "N/A")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 LOCATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Region: {idea_data.get("region", "N/A")}
+BU/CL Site: {idea_data.get("bu_cl_site", "N/A")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 SUBMITTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Submitted By: {idea_data.get("submitted_by_name", "N/A")}
+Project Lead: {idea_data.get("project_lead", "N/A")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+We greatly appreciate the commitment to improvement!
 
 Best regards,
 Procurement Idea Hub
@@ -92,21 +133,44 @@ Procurement Idea Hub
         site_leaders_str = ", ".join(site_leaders) if site_leaders else "TBD"
         teoa_leaders_str = ", ".join(teoa_leaders) if teoa_leaders else "TBD"
 
-        subject = f"New Idea Submitted: {idea_data['title']}"
-        body = f"""
-Dear Site Leader and Manager,
+        subject = f"📝 New Idea Submission: {idea_data.get('title', 'N/A')}"
+        body = f"""Dear Site Leader and TEOA Leader,
 
 A new idea has been submitted and requires your attention:
 
-Title: {idea_data["title"]}
-Proposed Change: {idea_data["proposed_change"]}
-Region: {idea_data["region"]}
-BU/CL Site: {idea_data["bu_cl_site"]}
-Project Lead: {idea_data["project_lead"]}
-Submitted By: {idea_data["submitted_by_name"]}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 IDEA DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Title: {idea_data.get("title", "N/A")}
+Proposed Change: {idea_data.get("proposed_change", "N/A")}
+
+Problem Statements: {idea_data.get("problem_statements", "N/A")}
+
+Expected Benefits: {idea_data.get("benefits", "N/A")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 LOCATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Region: {idea_data.get("region", "N/A")}
+BU/CL Site: {idea_data.get("bu_cl_site", "N/A")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 SUBMITTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Submitted By: {idea_data.get("submitted_by_name", "N/A")}
+Project Lead: {idea_data.get("project_lead", "N/A")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👔 LEADERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Site Leader: {site_leaders_str}
 TEOA Functional Leader: {teoa_leaders_str}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Please review and follow up with the submitter.
 
