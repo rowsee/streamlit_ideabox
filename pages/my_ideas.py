@@ -220,6 +220,69 @@ def render_edit_form(idea):
             key="edit_is_implemented",
         )
 
+        # Current Attachments Section
+        st.markdown("---")
+        st.markdown("**📎 Current Attachments**")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.markdown("*Capacity Files:*")
+            existing_capacity = []
+            if idea.get("capacity_files"):
+                try:
+                    existing_capacity = json.loads(idea["capacity_files"])
+                except:
+                    existing_capacity = [idea["capacity_files"]]
+
+            if existing_capacity:
+                for idx, fpath in enumerate(existing_capacity):
+                    col_cb, col_name = st.columns([1, 5])
+                    with col_cb:
+                        st.checkbox("Remove", key=f"rem_cap_{idea['id']}_{idx}")
+                    with col_name:
+                        st.text(f"📄 {os.path.basename(fpath)}")
+            else:
+                st.text("No capacity files attached")
+
+        with col2:
+            st.markdown("*Email Approval Files:*")
+            existing_email = []
+            if idea.get("email_approval_files"):
+                try:
+                    existing_email = json.loads(idea["email_approval_files"])
+                except:
+                    existing_email = [idea["email_approval_files"]]
+
+            if existing_email:
+                for idx, fpath in enumerate(existing_email):
+                    col_cb, col_name = st.columns([1, 5])
+                    with col_cb:
+                        st.checkbox("Remove", key=f"rem_email_{idea['id']}_{idx}")
+                    with col_name:
+                        st.text(f"📄 {os.path.basename(fpath)}")
+            else:
+                st.text("No email approval files attached")
+
+        st.markdown("---")
+        st.markdown("**➕ Add New Attachments**")
+
+        col_upload1, col_upload2 = st.columns(2)
+        with col_upload1:
+            new_capacity_files = st.file_uploader(
+                "Add Capacity Files (optional)",
+                type=["xlsx", "xls", "pdf", "csv"],
+                accept_multiple_files=True,
+                help="Optional: Upload capacity calculation files",
+            )
+        with col_upload2:
+            new_email_files = st.file_uploader(
+                "Add Email Approval Files (optional)",
+                type=["xlsx", "xls", "pdf", "csv"],
+                accept_multiple_files=True,
+                help="Optional: Upload email approval files",
+            )
+
         # Initialize with current values or defaults
         current_drivers = []
         if idea["drivers"]:
@@ -279,9 +342,11 @@ def render_edit_form(idea):
                     height=60,
                 )
 
-        col_cancel, col_save = st.columns([1, 3])
+        col_cancel, col_spacer, col_save = st.columns([1, 4, 1])
         with col_cancel:
             cancel = st.form_submit_button("Cancel")
+        with col_spacer:
+            st.empty()
         with col_save:
             submitted = st.form_submit_button("Save Changes", type="primary")
 
@@ -299,6 +364,51 @@ def render_edit_form(idea):
                 final_drivers = [d for d in final_drivers if d != "Other"]
                 final_drivers.append(f"Other: {new_drivers_other}")
 
+            # Handle file attachments
+            files_to_remove_capacity = []
+            files_to_remove_email = []
+
+            # Build list of files to remove based on checkboxes
+            for idx in range(len(existing_capacity)):
+                if st.session_state.get(f"rem_cap_{idea['id']}_{idx}", False):
+                    files_to_remove_capacity.append(existing_capacity[idx])
+
+            for idx in range(len(existing_email)):
+                if st.session_state.get(f"rem_email_{idea['id']}_{idx}", False):
+                    files_to_remove_email.append(existing_email[idx])
+
+            # Delete removed files from filesystem
+            for fpath in files_to_remove_capacity:
+                if os.path.exists(fpath):
+                    try:
+                        os.remove(fpath)
+                    except:
+                        pass
+
+            for fpath in files_to_remove_email:
+                if os.path.exists(fpath):
+                    try:
+                        os.remove(fpath)
+                    except:
+                        pass
+
+            # Build final file lists (remove checked + add new)
+            final_capacity = [
+                f for f in existing_capacity if f not in files_to_remove_capacity
+            ]
+            final_email = [f for f in existing_email if f not in files_to_remove_email]
+
+            # Combine with new uploads
+            combined_capacity = final_capacity.copy()
+            if new_capacity_files:
+                for uploaded_file in new_capacity_files:
+                    combined_capacity.append(uploaded_file)
+
+            combined_email = final_email.copy()
+            if new_email_files:
+                for uploaded_file in new_email_files:
+                    combined_email.append(uploaded_file)
+
             old_idea = get_idea_by_id(idea["id"])
 
             update_idea(
@@ -314,9 +424,9 @@ def render_edit_form(idea):
                 drivers=final_drivers,
                 impact_group=new_impact_group if new_is_implemented else None,
                 hours_saved=new_hours_saved if new_is_implemented else None,
-                capacity_files=None,
+                capacity_files=combined_capacity if combined_capacity else None,
                 planned_use=new_planned_use if new_is_implemented else None,
-                email_approval_files=None,
+                email_approval_files=combined_email if combined_email else None,
             )
 
             new_idea_data = {
