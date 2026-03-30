@@ -431,6 +431,8 @@ def update_idea(
     capacity_files,
     planned_use,
     email_approval_files,
+    solution_implemented=None,
+    date_implemented=None,
 ):
     drivers_json = json.dumps(drivers) if drivers else None
     capacity_paths = (
@@ -458,6 +460,8 @@ def update_idea(
             "impact_group = ?",
             "hours_saved = ?",
             "planned_use = ?",
+            "solution_implemented = ?",
+            "date_implemented = ?",
         ]
         values = [
             title,
@@ -472,6 +476,8 @@ def update_idea(
             impact_group,
             hours_saved,
             planned_use,
+            solution_implemented,
+            date_implemented,
         ]
 
         if capacity_paths:

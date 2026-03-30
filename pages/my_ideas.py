@@ -176,13 +176,11 @@ def render_edit_form(idea):
     st.markdown("### ✏️ Edit Idea")
 
     with st.form("edit_idea_form"):
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            new_title = st.text_input("Project Title", value=idea["title"] or "")
-        with col2:
-            new_proposed_change = st.text_input(
-                "Proposed Change", value=idea["proposed_change"] or ""
-            )
+        new_title = st.text_input("Project Title", value=idea["title"] or "")
+
+        new_proposed_change = st.text_area(
+            "Proposed Change", value=idea["proposed_change"] or "", height=120
+        )
 
         col1, col2 = st.columns(2)
         with col1:
@@ -275,6 +273,10 @@ def render_edit_form(idea):
                 accept_multiple_files=True,
                 help="Optional: Upload capacity calculation files",
             )
+            if new_capacity_files:
+                st.caption(
+                    "💡 Please submit both 'Before Change' and 'After Change' files (2 files required)"
+                )
         with col_upload2:
             new_email_files = st.file_uploader(
                 "Add Email Approval Files (optional)",
@@ -342,6 +344,32 @@ def render_edit_form(idea):
                     height=60,
                 )
 
+            st.markdown("---")
+            st.markdown("**Implementation Status**")
+
+            col1, col2 = st.columns(2)
+            with col1:
+                new_solution_implemented = st.text_area(
+                    "Solution Implemented",
+                    value=idea.get("solution_implemented") or "",
+                    height=80,
+                )
+            with col2:
+                current_date_implemented = None
+                if idea.get("date_implemented"):
+                    try:
+                        current_date_implemented = datetime.strptime(
+                            str(idea["date_implemented"]), "%Y-%m-%d"
+                        ).date()
+                    except:
+                        current_date_implemented = None
+                new_date_implemented = st.date_input(
+                    "Date Implemented",
+                    value=current_date_implemented
+                    if current_date_implemented
+                    else None,
+                )
+
         col_cancel, col_spacer, col_save = st.columns([1, 4, 1])
         with col_cancel:
             cancel = st.form_submit_button("Cancel")
@@ -354,6 +382,14 @@ def render_edit_form(idea):
             effective_date_str = (
                 new_effective_date.isoformat() if new_effective_date else None
             )
+
+            # Validate capacity files if any uploaded
+            if new_capacity_files:
+                if len(new_capacity_files) < 2:
+                    st.error(
+                        "⚠️ Please upload both 'Before Change' and 'After Change' capacity files (2 files required)"
+                    )
+                    return
 
             final_drivers = new_drivers.copy()
             if new_drivers_other:
@@ -427,6 +463,12 @@ def render_edit_form(idea):
                 capacity_files=combined_capacity if combined_capacity else None,
                 planned_use=new_planned_use if new_is_implemented else None,
                 email_approval_files=combined_email if combined_email else None,
+                solution_implemented=new_solution_implemented
+                if new_is_implemented
+                else None,
+                date_implemented=new_date_implemented.isoformat()
+                if new_date_implemented
+                else None,
             )
 
             new_idea_data = {
@@ -446,7 +488,8 @@ def render_edit_form(idea):
 
             log_idea_changes(idea["id"], old_idea, new_idea_data)
 
-            st.success("Idea updated successfully!")
+            st.success("✅ Changes have been saved.")
+            st.session_state.edit_idea_id = None
             st.rerun()
 
         if cancel:

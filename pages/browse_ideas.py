@@ -117,6 +117,26 @@ st.markdown(
 
 REGION_OPTIONS = ["All", "EMEA", "NA", "AP", "Global"]
 
+BU_CL_SITE_OPTIONS = [
+    "All",
+    "ACL(CLS/PTS)",
+    "ACL(IND)",
+    "ADM",
+    "ENG",
+    "DDN",
+    "MED",
+    "ASG",
+    "AUT-AMER",
+    "AUT-EMIA",
+    "AUT-AP",
+    "ICT",
+    "SEN",
+    "ELECs",
+    "INDIRECT",
+    "METALs",
+    "RESINs",
+]
+
 
 def render():
     st.markdown("## 📋 Browse All Ideas")
@@ -124,7 +144,7 @@ def render():
 
     ideas = get_all_ideas()
 
-    col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
+    col1, col2, col3, col4, col5 = st.columns([2, 1, 1, 1, 1])
 
     with col1:
         search = st.text_input(
@@ -135,9 +155,12 @@ def render():
         region_filter = st.selectbox("Region", REGION_OPTIONS)
 
     with col3:
-        implemented_filter = st.selectbox("Implemented", ["All", "Yes", "No"])
+        bu_filter = st.selectbox("BU", BU_CL_SITE_OPTIONS)
 
     with col4:
+        implemented_filter = st.selectbox("Implemented", ["All", "Yes", "No"])
+
+    with col5:
         sort_by = st.selectbox("Sort by", ["Newest", "Most Liked", "Oldest"])
 
     if ideas:
@@ -155,6 +178,9 @@ def render():
 
         if region_filter != "All":
             filtered_ideas = [i for i in filtered_ideas if i["region"] == region_filter]
+
+        if bu_filter != "All":
+            filtered_ideas = [i for i in filtered_ideas if i["bu_cl_site"] == bu_filter]
 
         if implemented_filter != "All":
             filtered_ideas = [
