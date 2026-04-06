@@ -959,8 +959,8 @@ def login_user():
 
         with st.form("login_form"):
             email = st.text_input(
-                "Email Address",
-                placeholder="Enter your email",
+                "TE Email",
+                placeholder="Enter your @te.com email",
                 label_visibility="visible",
             )
             full_name = st.text_input(
@@ -971,21 +971,24 @@ def login_user():
             submitted = st.form_submit_button("Continue", use_container_width=True)
 
             if submitted and email:
-                user = get_user_by_email(email)
-                if user:
-                    st.session_state.user_id = user["id"]
-                    st.session_state.username = user["username"]
-                    st.session_state.email = user["email"]
-                    st.session_state.full_name = user["full_name"] or ""
+                if not email.endswith("@te.com"):
+                    st.error("Only @te.com email addresses are allowed")
                 else:
-                    username = email.split("@")[0]
-                    user_id = create_user(username, email, full_name or "")
-                    st.session_state.user_id = user_id
-                    st.session_state.username = username
-                    st.session_state.email = email
-                    st.session_state.full_name = full_name or ""
-                st.session_state.current_page = "home"
-                st.rerun()
+                    user = get_user_by_email(email)
+                    if user:
+                        st.session_state.user_id = user["id"]
+                        st.session_state.username = user["username"]
+                        st.session_state.email = user["email"]
+                        st.session_state.full_name = user["full_name"] or ""
+                    else:
+                        username = email.split("@")[0]
+                        user_id = create_user(username, email, full_name or "")
+                        st.session_state.user_id = user_id
+                        st.session_state.username = username
+                        st.session_state.email = email
+                        st.session_state.full_name = full_name or ""
+                    st.session_state.current_page = "home"
+                    st.rerun()
 
 
 def render_sidebar():
