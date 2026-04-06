@@ -305,17 +305,19 @@ def render_edit_form(idea):
         with col_upload2:
             st.markdown("**Before Implementation**")
             new_before_files = st.file_uploader(
-                "Add files (optional)",
+                "Add before implementation files",
                 type=None,
                 accept_multiple_files=True,
+                key=f"edit_before_files_{idea['id']}",
             )
 
         with col_upload3:
             st.markdown("**After Implementation**")
             new_after_files = st.file_uploader(
-                "Add files (optional)",
+                "Add after implementation files",
                 type=None,
                 accept_multiple_files=True,
+                key=f"edit_after_files_{idea['id']}",
             )
 
         # Initialize with current values or defaults
