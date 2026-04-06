@@ -713,44 +713,42 @@ def render():
             '<div class="subsection-title">Attachments</div>', unsafe_allow_html=True
         )
 
-        # Row 4: File uploads
+        # Row 4: Capacity Calculation Files with SharePoint link
+        st.markdown("**📎 Capacity Calculation File(s)**")
+        st.markdown(
+            "[📋 TEOA Capacity Calculation Template](https://te360.sharepoint.com/:x:/s/TEOAStandardDocumentation/IQCCGJzTZT9kQLvz0x0sRTReAf7WF6E7ThK_o_vWnUgIRFg?e=LOBGo7)"
+        )
+        capacity_files = st.file_uploader(
+            "Upload capacity files (Before Change & After Change - 2 files required)",
+            type=None,
+            accept_multiple_files=True,
+            key="capacity_file_input",
+        )
+        if capacity_files:
+            st.caption(
+                "💡 Please ensure you upload both 'Before Change' and 'After Change' files"
+            )
+
+        # Before and After Implementation Attachments
+        st.markdown("---")
+        st.markdown("**📎 Implementation Attachments**")
+
         col1, col2 = st.columns(2)
         with col1:
-            capacity_files = st.file_uploader(
-                "Capacity Calculation File(s)",
-                type=[
-                    "xlsx",
-                    "xls",
-                    "pdf",
-                    "doc",
-                    "docx",
-                    "csv",
-                    "txt",
-                    "png",
-                    "jpg",
-                    "jpeg",
-                ],
+            st.markdown("**Before Implementation Attachments**")
+            before_implementation_files = st.file_uploader(
+                "Upload files (optional)",
+                type=None,
                 accept_multiple_files=True,
-                key="capacity_file_input",
+                key="before_implementation_input",
             )
         with col2:
-            email_approval_files = st.file_uploader(
-                "Email Approval Attachment(s)",
-                type=[
-                    "pdf",
-                    "doc",
-                    "docx",
-                    "eml",
-                    "msg",
-                    "xlsx",
-                    "xls",
-                    "txt",
-                    "png",
-                    "jpg",
-                    "jpeg",
-                ],
+            st.markdown("**After Implementation Attachments**")
+            after_implementation_files = st.file_uploader(
+                "Upload files (optional)",
+                type=None,
                 accept_multiple_files=True,
-                key="email_approval_input",
+                key="after_implementation_input",
             )
 
         st.markdown("</div>", unsafe_allow_html=True)
@@ -762,7 +760,8 @@ def render():
         hours_saved = 0
         planned_use = None
         capacity_files = None
-        email_approval_files = None
+        before_implementation_files = None
+        after_implementation_files = None
         solution_implemented = ""
         date_implemented = None
 
@@ -829,7 +828,12 @@ def render():
                 hours_saved=hours_saved if is_implemented else None,
                 capacity_files=capacity_files if is_implemented else None,
                 planned_use=planned_use if is_implemented else None,
-                email_approval_files=email_approval_files if is_implemented else None,
+                before_implementation_files=before_implementation_files
+                if is_implemented
+                else None,
+                after_implementation_files=after_implementation_files
+                if is_implemented
+                else None,
                 submitted_by=st.session_state.user_id,
                 site_leader=final_site_leader,
                 teoa_leader=final_teoa_leader,

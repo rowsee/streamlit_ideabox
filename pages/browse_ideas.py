@@ -309,7 +309,7 @@ def render():
                 if idea["planned_use"]:
                     st.markdown(f"**Planned Use:** {idea['planned_use']}")
 
-                col1, col2 = st.columns(2)
+                col1, col2, col3 = st.columns(3)
                 with col1:
                     # Handle both single file (old) and multiple files (new)
                     capacity_files = idea.get("capacity_files")
@@ -336,27 +336,54 @@ def render():
                                         key=f"capacity_{idea['id']}_{idx}",
                                     )
                 with col2:
-                    # Handle both single file (old) and multiple files (new)
-                    email_files = idea.get("email_approval_files")
-                    if email_files:
+                    # Before Implementation files
+                    before_files = idea.get("before_implementation_files")
+                    if before_files:
                         try:
-                            files_list = json.loads(email_files)
+                            files_list = json.loads(before_files)
                         except:
-                            files_list = [email_files]  # Single file (backward compat)
+                            files_list = [before_files]
 
                         for idx, file_path in enumerate(files_list):
                             if file_path and os.path.exists(file_path):
                                 with open(file_path, "rb") as f:
                                     file_name = file_path.split("/")[-1]
-                                    label = f"📎 Download Approval Email {idx + 1}"
+                                    label = (
+                                        f"📎 Download Before Implementation {idx + 1}"
+                                    )
                                     if len(files_list) == 1:
-                                        label = "📎 Download Approval Email"
+                                        label = "📎 Download Before Implementation"
                                     st.download_button(
                                         label=label,
                                         data=f,
                                         file_name=file_name,
                                         use_container_width=True,
-                                        key=f"email_{idea['id']}_{idx}",
+                                        key=f"before_{idea['id']}_{idx}",
+                                    )
+                with col3:
+                    # After Implementation files
+                    after_files = idea.get("after_implementation_files")
+                    if after_files:
+                        try:
+                            files_list = json.loads(after_files)
+                        except:
+                            files_list = [after_files]
+
+                        for idx, file_path in enumerate(files_list):
+                            if file_path and os.path.exists(file_path):
+                                with open(file_path, "rb") as f:
+                                    file_name = file_path.split("/")[-1]
+                                    label = (
+                                        f"📎 Download After Implementation {idx + 1}"
+                                    )
+                                    if len(files_list) == 1:
+                                        label = "📎 Download After Implementation"
+                                    st.download_button(
+                                        label=label,
+                                        data=f,
+                                        file_name=file_name,
+                                        use_container_width=True,
+                                        key=f"after_{idea['id']}_{idx}",
                                     )
 
             col1, col2 = st.columns([6, 1])

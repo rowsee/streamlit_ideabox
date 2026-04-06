@@ -36,7 +36,8 @@ def force_schema_update():
 
         # Handle backward compatibility: rename old columns to new names
         column_renames = [
-            ("description", "proposed_change"),  # Old name -> new name
+            ("description", "proposed_change"),
+            ("email_approval_files", "before_implementation_files"),
         ]
 
         for old_name, new_name in column_renames:
@@ -60,7 +61,8 @@ def force_schema_update():
             ("date_implemented", "DATE"),
             ("effective_date", "DATE"),
             ("capacity_files", "TEXT"),
-            ("email_approval_files", "TEXT"),
+            ("before_implementation_files", "TEXT"),
+            ("after_implementation_files", "TEXT"),
             ("site_leader", "TEXT"),
             ("teoa_leader", "TEXT"),
         ]
@@ -177,7 +179,8 @@ def init_db():
                 hours_saved INTEGER,
                 capacity_files TEXT,
                 planned_use TEXT,
-                email_approval_files TEXT,
+                before_implementation_files TEXT,
+                after_implementation_files TEXT,
                 site_leader TEXT,
                 teoa_leader TEXT,
                 submitted_by INTEGER NOT NULL,
@@ -205,7 +208,8 @@ def init_db():
             ("hours_saved", "INTEGER"),
             ("capacity_files", "TEXT"),
             ("planned_use", "TEXT"),
-            ("email_approval_files", "TEXT"),
+            ("before_implementation_files", "TEXT"),
+            ("after_implementation_files", "TEXT"),
             ("site_leader", "TEXT"),
             ("teoa_leader", "TEXT"),
             ("status", "TEXT DEFAULT 'Pending'"),
@@ -318,7 +322,8 @@ def add_idea(
     hours_saved,
     capacity_files,
     planned_use,
-    email_approval_files,
+    before_implementation_files,
+    after_implementation_files,
     submitted_by,
     site_leader="",
     teoa_leader="",
@@ -329,9 +334,14 @@ def add_idea(
     capacity_paths = (
         save_uploaded_files(capacity_files, "capacity") if capacity_files else None
     )
-    email_paths = (
-        save_uploaded_files(email_approval_files, "approval")
-        if email_approval_files
+    before_paths = (
+        save_uploaded_files(before_implementation_files, "before_impl")
+        if before_implementation_files
+        else None
+    )
+    after_paths = (
+        save_uploaded_files(after_implementation_files, "after_impl")
+        if after_implementation_files
         else None
     )
 
@@ -342,9 +352,9 @@ def add_idea(
                 title, proposed_change, project_lead, region, bu_cl_site,
                 problem_statements, benefits, is_implemented, effective_date,
                 drivers, impact_group, hours_saved, capacity_files, planned_use,
-                email_approval_files, submitted_by, site_leader, teoa_leader,
+                before_implementation_files, after_implementation_files, submitted_by, site_leader, teoa_leader,
                 solution_implemented, date_implemented
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 title,
                 proposed_change,
@@ -360,7 +370,8 @@ def add_idea(
                 hours_saved,
                 capacity_paths,
                 planned_use,
-                email_paths,
+                before_paths,
+                after_paths,
                 submitted_by,
                 site_leader,
                 teoa_leader,
@@ -430,7 +441,8 @@ def update_idea(
     hours_saved,
     capacity_files,
     planned_use,
-    email_approval_files,
+    before_implementation_files,
+    after_implementation_files,
     solution_implemented=None,
     date_implemented=None,
 ):
@@ -438,9 +450,14 @@ def update_idea(
     capacity_paths = (
         save_uploaded_files(capacity_files, "capacity") if capacity_files else None
     )
-    email_paths = (
-        save_uploaded_files(email_approval_files, "approval")
-        if email_approval_files
+    before_paths = (
+        save_uploaded_files(before_implementation_files, "before_impl")
+        if before_implementation_files
+        else None
+    )
+    after_paths = (
+        save_uploaded_files(after_implementation_files, "after_impl")
+        if after_implementation_files
         else None
     )
 
@@ -483,9 +500,12 @@ def update_idea(
         if capacity_paths:
             updates.append("capacity_files = ?")
             values.append(capacity_paths)
-        if email_paths:
-            updates.append("email_approval_files = ?")
-            values.append(email_paths)
+        if before_paths:
+            updates.append("before_implementation_files = ?")
+            values.append(before_paths)
+        if after_paths:
+            updates.append("after_implementation_files = ?")
+            values.append(after_paths)
 
         values.append(idea_id)
 
@@ -499,14 +519,15 @@ def delete_idea(idea_id):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT capacity_files, email_approval_files FROM ideas WHERE id = ?",
+            "SELECT capacity_files, before_implementation_files, after_implementation_files FROM ideas WHERE id = ?",
             (idea_id,),
         )
         files = cursor.fetchone()
 
         # Parse JSON arrays if they exist
         capacity_files = []
-        email_files = []
+        before_files = []
+        after_files = []
 
         if files:
             try:
@@ -518,15 +539,23 @@ def delete_idea(idea_id):
             except:
                 capacity_files = []
             try:
-                email_files = (
-                    json.loads(files["email_approval_files"])
-                    if files["email_approval_files"]
+                before_files = (
+                    json.loads(files["before_implementation_files"])
+                    if files["before_implementation_files"]
                     else []
                 )
             except:
-                email_files = []
+                before_files = []
+            try:
+                after_files = (
+                    json.loads(files["after_implementation_files"])
+                    if files["after_implementation_files"]
+                    else []
+                )
+            except:
+                after_files = []
 
-        all_files = capacity_files + email_files
+        all_files = capacity_files + before_files + after_files
         for filepath in all_files:
             if filepath and os.path.exists(filepath):
                 try:
@@ -685,20 +714,30 @@ def ideas_to_dataframe(ideas):
             except:
                 capacity_files_str = ""
 
-        # Parse email approval files (JSON array -> filenames)
-        email_files_str = ""
-        email_files = idea.get("email_approval_files")
-        if email_files:
+        # Parse before implementation files (JSON array -> filenames)
+        before_files_str = ""
+        before_files = idea.get("before_implementation_files")
+        if before_files:
             try:
-                files_list = json.loads(email_files)
-                email_files_str = ", ".join([os.path.basename(f) for f in files_list])
+                files_list = json.loads(before_files)
+                before_files_str = ", ".join([os.path.basename(f) for f in files_list])
             except:
-                email_files_str = ""
+                before_files_str = ""
+
+        # Parse after implementation files (JSON array -> filenames)
+        after_files_str = ""
+        after_files = idea.get("after_implementation_files")
+        if after_files:
+            try:
+                files_list = json.loads(after_files)
+                after_files_str = ", ".join([os.path.basename(f) for f in files_list])
+            except:
+                after_files_str = ""
 
         data.append(
             {
                 "ID": idea.get("id", ""),
-                "Project Title": idea.get("title", ""),
+                "Project Title": idea.get("title", "") or "",
                 "Proposed Change": idea.get("proposed_change", "") or "",
                 "Project Lead": idea.get("project_lead", "") or "",
                 "Submitter": idea.get("full_name")
@@ -719,7 +758,8 @@ def ideas_to_dataframe(ideas):
                 "Hours Saved Annually": idea.get("hours_saved", "") or "",
                 "Planned Use": idea.get("planned_use", "") or "",
                 "Capacity Files": capacity_files_str,
-                "Email Approval Files": email_files_str,
+                "Before Implementation Files": before_files_str,
+                "After Implementation Files": after_files_str,
                 "Status": idea.get("status", "") or "",
                 "Votes": idea.get("votes", 0),
                 "Submitted Date": idea.get("submitted_at", "") or "",

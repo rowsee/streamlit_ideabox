@@ -222,7 +222,7 @@ def render_edit_form(idea):
         st.markdown("---")
         st.markdown("**📎 Current Attachments**")
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             st.markdown("*Capacity Files:*")
@@ -244,45 +244,78 @@ def render_edit_form(idea):
                 st.text("No capacity files attached")
 
         with col2:
-            st.markdown("*Email Approval Files:*")
-            existing_email = []
-            if idea.get("email_approval_files"):
+            st.markdown("*Before Implementation:*")
+            existing_before = []
+            if idea.get("before_implementation_files"):
                 try:
-                    existing_email = json.loads(idea["email_approval_files"])
+                    existing_before = json.loads(idea["before_implementation_files"])
                 except:
-                    existing_email = [idea["email_approval_files"]]
+                    existing_before = [idea["before_implementation_files"]]
 
-            if existing_email:
-                for idx, fpath in enumerate(existing_email):
+            if existing_before:
+                for idx, fpath in enumerate(existing_before):
                     col_cb, col_name = st.columns([1, 5])
                     with col_cb:
-                        st.checkbox("Remove", key=f"rem_email_{idea['id']}_{idx}")
+                        st.checkbox("Remove", key=f"rem_before_{idea['id']}_{idx}")
                     with col_name:
                         st.text(f"📄 {os.path.basename(fpath)}")
             else:
-                st.text("No email approval files attached")
+                st.text("No before implementation files")
+
+        with col3:
+            st.markdown("*After Implementation:*")
+            existing_after = []
+            if idea.get("after_implementation_files"):
+                try:
+                    existing_after = json.loads(idea["after_implementation_files"])
+                except:
+                    existing_after = [idea["after_implementation_files"]]
+
+            if existing_after:
+                for idx, fpath in enumerate(existing_after):
+                    col_cb, col_name = st.columns([1, 5])
+                    with col_cb:
+                        st.checkbox("Remove", key=f"rem_after_{idea['id']}_{idx}")
+                    with col_name:
+                        st.text(f"📄 {os.path.basename(fpath)}")
+            else:
+                st.text("No after implementation files")
 
         st.markdown("---")
         st.markdown("**➕ Add New Attachments**")
 
-        col_upload1, col_upload2 = st.columns(2)
+        col_upload1, col_upload2, col_upload3 = st.columns(3)
+
         with col_upload1:
+            st.markdown("**📎 Capacity Files**")
+            st.markdown(
+                "[📋 TEOA Capacity Calculation Template](https://te360.sharepoint.com/:x:/s/TEOAStandardDocumentation/IQCCGJzTZT9kQLvz0x0sRTReAf7WF6E7ThK_o_vWnUgIRFg?e=LOBGo7)"
+            )
             new_capacity_files = st.file_uploader(
-                "Add Capacity Files (optional)",
-                type=["xlsx", "xls", "pdf", "csv"],
+                "Add capacity files",
+                type=None,
                 accept_multiple_files=True,
-                help="Optional: Upload capacity calculation files",
+                help="Upload both Before and After Change files",
             )
             if new_capacity_files:
                 st.caption(
                     "💡 Please submit both 'Before Change' and 'After Change' files (2 files required)"
                 )
+
         with col_upload2:
-            new_email_files = st.file_uploader(
-                "Add Email Approval Files (optional)",
-                type=["xlsx", "xls", "pdf", "csv"],
+            st.markdown("**Before Implementation**")
+            new_before_files = st.file_uploader(
+                "Add files (optional)",
+                type=None,
                 accept_multiple_files=True,
-                help="Optional: Upload email approval files",
+            )
+
+        with col_upload3:
+            st.markdown("**After Implementation**")
+            new_after_files = st.file_uploader(
+                "Add files (optional)",
+                type=None,
+                accept_multiple_files=True,
             )
 
         # Initialize with current values or defaults
@@ -402,16 +435,21 @@ def render_edit_form(idea):
 
             # Handle file attachments
             files_to_remove_capacity = []
-            files_to_remove_email = []
+            files_to_remove_before = []
+            files_to_remove_after = []
 
             # Build list of files to remove based on checkboxes
             for idx in range(len(existing_capacity)):
                 if st.session_state.get(f"rem_cap_{idea['id']}_{idx}", False):
                     files_to_remove_capacity.append(existing_capacity[idx])
 
-            for idx in range(len(existing_email)):
-                if st.session_state.get(f"rem_email_{idea['id']}_{idx}", False):
-                    files_to_remove_email.append(existing_email[idx])
+            for idx in range(len(existing_before)):
+                if st.session_state.get(f"rem_before_{idea['id']}_{idx}", False):
+                    files_to_remove_before.append(existing_before[idx])
+
+            for idx in range(len(existing_after)):
+                if st.session_state.get(f"rem_after_{idea['id']}_{idx}", False):
+                    files_to_remove_after.append(existing_after[idx])
 
             # Delete removed files from filesystem
             for fpath in files_to_remove_capacity:
@@ -421,7 +459,14 @@ def render_edit_form(idea):
                     except:
                         pass
 
-            for fpath in files_to_remove_email:
+            for fpath in files_to_remove_before:
+                if os.path.exists(fpath):
+                    try:
+                        os.remove(fpath)
+                    except:
+                        pass
+
+            for fpath in files_to_remove_after:
                 if os.path.exists(fpath):
                     try:
                         os.remove(fpath)
@@ -432,7 +477,10 @@ def render_edit_form(idea):
             final_capacity = [
                 f for f in existing_capacity if f not in files_to_remove_capacity
             ]
-            final_email = [f for f in existing_email if f not in files_to_remove_email]
+            final_before = [
+                f for f in existing_before if f not in files_to_remove_before
+            ]
+            final_after = [f for f in existing_after if f not in files_to_remove_after]
 
             # Combine with new uploads
             combined_capacity = final_capacity.copy()
@@ -440,10 +488,15 @@ def render_edit_form(idea):
                 for uploaded_file in new_capacity_files:
                     combined_capacity.append(uploaded_file)
 
-            combined_email = final_email.copy()
-            if new_email_files:
-                for uploaded_file in new_email_files:
-                    combined_email.append(uploaded_file)
+            combined_before = final_before.copy()
+            if new_before_files:
+                for uploaded_file in new_before_files:
+                    combined_before.append(uploaded_file)
+
+            combined_after = final_after.copy()
+            if new_after_files:
+                for uploaded_file in new_after_files:
+                    combined_after.append(uploaded_file)
 
             old_idea = get_idea_by_id(idea["id"])
 
@@ -462,7 +515,10 @@ def render_edit_form(idea):
                 hours_saved=new_hours_saved if new_is_implemented else None,
                 capacity_files=combined_capacity if combined_capacity else None,
                 planned_use=new_planned_use if new_is_implemented else None,
-                email_approval_files=combined_email if combined_email else None,
+                before_implementation_files=combined_before
+                if combined_before
+                else None,
+                after_implementation_files=combined_after if combined_after else None,
                 solution_implemented=new_solution_implemented
                 if new_is_implemented
                 else None,
