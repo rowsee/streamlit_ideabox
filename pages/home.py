@@ -589,15 +589,6 @@ def render():
     trending_ideas = get_trending_ideas(5) or []
 
     # HIGHLIGHTS ROW - Top BU and Top Contributor (MOVED TO TOP)
-    st.markdown(
-        """
-    <div class="section-header" style="margin-top: 0 !important;">
-        <h2 class="section-title">Top Performers</h2>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-
     highlights_cols = st.columns(2, gap="medium")
 
     with highlights_cols[0]:
@@ -618,7 +609,7 @@ def render():
                 """
             <div class="highlight-card orange">
                 <div class="highlight-label">TOP BU THIS MONTH</div>
-                <h2 class="highlight-name">Be the First!</h2>
+                <div class="highlight-name">Be the First!</div>
                 <div class="highlight-count">—</div>
                 <div class="highlight-text">Submit ideas from your BU to see it here!</div>
             </div>
@@ -644,7 +635,7 @@ def render():
                 """
             <div class="highlight-card purple">
                 <div class="highlight-label">TOP CONTRIBUTOR</div>
-                <h2 class="highlight-name">Start Your Journey!</h2>
+                <div class="highlight-name">Start Your Journey!</div>
                 <div class="highlight-count">—</div>
                 <div class="highlight-text">Submit your first idea to become a top contributor!</div>
             </div>
