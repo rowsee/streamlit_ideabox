@@ -518,14 +518,12 @@ def render_sidebar():
                 unsafe_allow_html=True,
             )
 
-            # Navigation buttons with icons
+            # Navigation buttons with icons - Simplified to 4 items
             nav_items = [
                 ("Home", "🏠", "home"),
                 ("Submit Idea", "✏️", "submit_idea"),
                 ("My Ideas", "📁", "my_ideas"),
                 ("Browse Ideas", "🔍", "browse_ideas"),
-                ("Dashboard", "📊", "dashboard"),
-                ("About", "ℹ️", "about"),
             ]
 
             for label, icon, page_key in nav_items:
@@ -578,10 +576,6 @@ def main():
             my_ideas.render()
         elif current == "browse_ideas":
             browse_ideas.render()
-        elif current == "dashboard":
-            dashboard.render()
-        elif current == "about":
-            about.render()
 
 
 if __name__ == "__main__":

@@ -816,3 +816,50 @@ def log_idea_changes(idea_id, old_idea, new_data):
             old_str = str(old_value) if old_value else ""
             new_str = str(new_value) if new_value else ""
             add_audit_log(idea_id, field, old_str, new_str)
+
+
+def get_recent_ideas(limit=5):
+    """Get most recently submitted ideas"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """SELECT i.*, u.full_name as submitter_name 
+               FROM ideas i 
+               LEFT JOIN users u ON i.submitted_by = u.id 
+               ORDER BY i.submitted_at DESC 
+               LIMIT ?""",
+            (limit,),
+        )
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def get_trending_ideas(limit=5):
+    """Get ideas with most votes"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """SELECT i.*, u.full_name as submitter_name 
+               FROM ideas i 
+               LEFT JOIN users u ON i.submitted_by = u.id 
+               ORDER BY i.votes DESC, i.submitted_at DESC 
+               LIMIT ?""",
+            (limit,),
+        )
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def get_top_contributors_all(limit=5):
+    """Get users with most submissions across all time"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """SELECT u.id, u.username, u.full_name, COUNT(i.id) as idea_count 
+               FROM users u 
+               LEFT JOIN ideas i ON u.id = i.submitted_by 
+               GROUP BY u.id 
+               HAVING idea_count > 0
+               ORDER BY idea_count DESC 
+               LIMIT ?""",
+            (limit,),
+        )
+        return [dict(row) for row in cursor.fetchall()]

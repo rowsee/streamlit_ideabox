@@ -4,8 +4,10 @@ from database import (
     get_user_ideas,
     get_top_contributors_per_bu,
     get_top_contributor,
+    get_recent_ideas,
+    get_trending_ideas,
+    get_top_contributors_all,
 )
-from streamlit_extras.metric_cards import style_metric_cards
 
 st.set_page_config(layout="wide", page_icon="💡")
 
@@ -28,53 +30,186 @@ st.markdown(
         --orange-end: #fb923c;
     }
 
-    .stApp { background-color: var(--bg-white); }
+    .stApp { background-color: var(--bg-light); }
 
-    .header-card {
-        background: white;
-        border-radius: 16px;
-        padding: 28px 32px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        border: 1px solid #e2e8f0;
-        margin-bottom: 24px;
-    }
-
-    .header-badge {
-        background: linear-gradient(135deg, #FFD700, #FFA500);
-        color: #1a1a2e;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        display: inline-block;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        margin-bottom: 14px;
-    }
-
-    .header-title {
-        font-size: 32px;
-        font-weight: 900;
+    /* HERO SECTION */
+    .hero-section {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0 0 10px 0;
-        line-height: 1.2;
+        border-radius: 16px;
+        padding: 40px 32px;
+        text-align: center;
+        margin-bottom: 32px;
+        color: white;
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
     }
 
-    .header-subtitle {
-        font-size: 22px;
-        color: #64748b;
-        margin: 0;
-        line-height: 1.4;
+    .hero-icon { 
+        font-size: 48px; 
+        margin-bottom: 16px; 
     }
 
-    .header-name {
-        color: #f97316;
+    .hero-title { 
+        font-size: 28px; 
+        font-weight: 700; 
+        margin-bottom: 12px; 
+        color: white !important;
+    }
+
+    .hero-subtitle { 
+        font-size: 16px; 
+        opacity: 0.9; 
+        margin-bottom: 24px;
+        color: rgba(255,255,255,0.9) !important;
+    }
+
+    .hero-cta {
+        background: white;
+        color: #6366f1;
+        padding: 14px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .hero-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* STAT CARDS */
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+        transform: translateY(-2px);
+    }
+
+    .stat-icon { 
+        font-size: 28px; 
+        margin-bottom: 12px; 
+    }
+
+    .stat-value { 
+        font-size: 36px; 
+        font-weight: 700; 
+        color: #1e293b; 
+    }
+
+    .stat-label { 
+        font-size: 14px; 
+        color: #64748b; 
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    /* SECTION HEADERS */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        margin-top: 32px;
+    }
+
+    .section-title {
+        font-size: 20px;
         font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .section-icon {
         font-size: 24px;
     }
 
+    /* IDEA CARDS */
+    .idea-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+        height: 100%;
+    }
+
+    .idea-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        border-color: #6366f1;
+    }
+
+    .idea-card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .idea-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 12px;
+    }
+
+    .idea-card-votes {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #f1f5f9;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #6366f1;
+    }
+
+    /* EMPTY STATES */
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        background: white;
+        border-radius: 12px;
+        border: 2px dashed #e2e8f0;
+    }
+
+    .empty-state-icon { 
+        font-size: 48px; 
+        margin-bottom: 16px; 
+    }
+
+    .empty-state-title { 
+        font-size: 18px; 
+        font-weight: 600; 
+        color: #1e293b; 
+        margin-bottom: 8px; 
+    }
+
+    .empty-state-message { 
+        font-size: 14px; 
+        color: #64748b; 
+        margin-bottom: 20px; 
+    }
+
+    /* HIGHLIGHT CARDS */
     .highlight-card {
         background: white;
         border-radius: 16px;
@@ -106,6 +241,7 @@ st.markdown(
         text-transform: uppercase;
         opacity: 0.9;
         margin-bottom: 16px;
+        color: white;
     }
 
     .highlight-icon {
@@ -114,22 +250,18 @@ st.markdown(
     }
 
     .highlight-name {
-        font-size: 32px;
+        font-size: 28px;
         font-weight: 800;
-        margin-bottom: 18px;
-        background: rgba(255, 255, 255, 0.25);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: none;
+        margin-bottom: 12px;
+        color: white;
     }
 
     .highlight-count {
-        font-size: 80px;
+        font-size: 64px;
         font-weight: 800;
         line-height: 1;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        color: white;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
     .highlight-text {
@@ -137,54 +269,15 @@ st.markdown(
         opacity: 0.9;
         margin-top: 10px;
         font-weight: 600;
+        color: white;
     }
 
-    .kpi-card {
-        background: white;
-        border-radius: 14px;
-        padding: 20px 18px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-        border: 1px solid #f1f5f9;
-        border-left: 5px solid;
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-
-    .kpi-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-    }
-
-    .kpi-card.purple { border-left-color: #8b5cf6; }
-    .kpi-card.green { border-left-color: #10b981; }
-    .kpi-card.orange { border-left-color: #f97316; }
-    .kpi-card.pink { border-left-color: #ec4899; }
-
-    .kpi-number {
-        font-size: 42px;
-        font-weight: 800;
-        color: #1e293b;
-        line-height: 1;
-        margin-bottom: 8px;
-    }
-
-    .kpi-label {
-        font-size: 14px;
-        font-weight: 700;
-        color: #475569;
-        margin-bottom: 6px;
-    }
-
-    .kpi-sub {
-        font-size: 12px;
-        color: #94a3b8;
-    }
-
+    /* INFO CARDS */
     .card {
         background: white;
         border-radius: 12px;
         padding: 24px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         border: 1px solid #e2e8f0;
         height: auto;
         min-height: 200px;
@@ -195,9 +288,9 @@ st.markdown(
 
     .card-title {
         font-size: 17px;
-        font-weight: 800;
+        font-weight: 700;
         color: #1e293b;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -218,9 +311,6 @@ st.markdown(
         font-size: 15px;
         color: #475569;
         line-height: 1.4;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        flex-wrap: wrap;
     }
 
     .why-list li:last-child {
@@ -229,13 +319,14 @@ st.markdown(
 
     .why-icon {
         font-size: 20px;
+        flex-shrink: 0;
     }
 
     .benefits-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 12px;
-        margin-top: 18px;
+        margin-top: 8px;
     }
 
     .benefit-item {
@@ -248,17 +339,16 @@ st.markdown(
         font-size: 14px;
         color: #475569;
         line-height: 1.4;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        flex-wrap: wrap;
     }
 
     .benefit-check {
         color: #10b981;
         font-weight: 700;
         font-size: 18px;
+        flex-shrink: 0;
     }
 
+    /* CTA CARD */
     .cta-card {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         border-radius: 16px;
@@ -285,11 +375,97 @@ st.markdown(
         margin-top: 10px;
     }
 
-    .stDivider { margin: 24px 0; }
+    /* TOP CONTRIBUTORS */
+    .contributor-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .contributor-item:hover {
+        background: #f1f5f9;
+    }
+
+    .contributor-rank {
+        font-size: 18px;
+        font-weight: 700;
+        color: #6366f1;
+        width: 28px;
+        text-align: center;
+    }
+
+    .contributor-name {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .contributor-count {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6366f1;
+        background: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+
+    .stDivider { 
+        margin: 32px 0; 
+        border-color: #e2e8f0;
+    }
 </style>
 """,
     unsafe_allow_html=True,
 )
+
+
+def render_empty_state(icon, title, message, cta_text=None):
+    """Render an engaging empty state"""
+    html = f"""
+    <div class="empty-state">
+        <div class="empty-state-icon">{icon}</div>
+        <div class="empty-state-title">{title}</div>
+        <div class="empty-state-message">{message}</div>
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
+
+    if cta_text:
+        if st.button(
+            cta_text, key=f"empty_cta_{icon}", type="primary", use_container_width=True
+        ):
+            st.session_state.current_page = "submit_idea"
+            st.rerun()
+
+
+def render_idea_card(idea, compact=False):
+    """Render a compact idea card"""
+    votes = idea.get("votes", 0)
+    title = (
+        idea.get("title", "Untitled")[:60] + "..."
+        if len(idea.get("title", "")) > 60
+        else idea.get("title", "Untitled")
+    )
+    submitter = idea.get("submitter_name") or idea.get("username", "Anonymous")
+
+    html = f"""
+    <div class="idea-card">
+        <div class="idea-card-title">{title}</div>
+        <div class="idea-card-meta">
+            <span>by {submitter}</span>
+        </div>
+        <div class="idea-card-votes">
+            👍 {votes} likes
+        </div>
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def render():
@@ -299,128 +475,245 @@ def render():
     user_ideas = get_user_ideas(st.session_state.user_id) or []
     user_idea_count = len(user_ideas)
 
+    # Get new data
+    recent_ideas = get_recent_ideas(3) or []
+    trending_ideas = get_trending_ideas(3) or []
+    top_contributors = get_top_contributors_all(5) or []
+
     user_name = st.session_state.get("full_name") or st.session_state.get(
         "username", "User"
     )
 
-    # HEADER
-    st.markdown('<div class="header-card">', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="header-badge">✨ TEOA Initiative</div>', unsafe_allow_html=True
-    )
-    st.markdown(
-        '<h1 class="header-title">TEOA Procurement Idea Hub</h1>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f'<p class="header-subtitle">Welcome, <span class="header-name">{user_name}</span> 👋</p>',
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+    # HERO SECTION
+    if user_idea_count == 0:
+        # Show hero CTA for new users
+        st.markdown(
+            f"""
+        <div class="hero-section">
+            <div class="hero-icon">🚀</div>
+            <div class="hero-title">Welcome to TEOA Idea Hub!</div>
+            <div class="hero-subtitle">Turn your improvement ideas into impact. Share your suggestions and help drive operational excellence.</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
-    # TOP BU + TOP CONTRIBUTOR ROW
-    top_row_cols = st.columns(2, gap="medium")
+        if st.button(
+            "Submit Your First Idea ✨",
+            key="hero_cta",
+            type="primary",
+            use_container_width=True,
+        ):
+            st.session_state.current_page = "submit_idea"
+            st.rerun()
+    else:
+        # Welcome back message for returning users
+        st.markdown(
+            f"""
+        <div class="hero-section">
+            <div class="hero-icon">👋</div>
+            <div class="hero-title">Welcome back, {user_name}!</div>
+            <div class="hero-subtitle">You've submitted {user_idea_count} idea{"s" if user_idea_count != 1 else ""}. Keep the momentum going!</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
-    with top_row_cols[0]:
-        if top_bu:
-            st.markdown('<div class="highlight-card orange">', unsafe_allow_html=True)
-            st.markdown('<div class="highlight-icon">🏆</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="highlight-label">TOP BU THIS MONTH</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="highlight-name">{top_bu.get("bu_cl_site", "N/A")}</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="highlight-count">{top_bu.get("count", 0)}</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                '<div class="highlight-text">ideas submitted</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="highlight-card orange">', unsafe_allow_html=True)
-            st.markdown('<div class="highlight-icon">🏆</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="highlight-label">TOP BU THIS MONTH</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                '<div class="highlight-name">No data yet</div>', unsafe_allow_html=True
-            )
-            st.markdown('<div class="highlight-count">—</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="highlight-text">Start submitting ideas!</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
+    # STATS ROW
+    stat_cols = st.columns(4)
 
-    with top_row_cols[1]:
-        if top_contributor:
-            st.markdown('<div class="highlight-card purple">', unsafe_allow_html=True)
-            st.markdown('<div class="highlight-icon">👤</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="highlight-label">TOP CONTRIBUTOR THIS MONTH</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="highlight-name">{top_contributor.get("name", "N/A")}</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="highlight-count">{top_contributor.get("count", 0)}</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                '<div class="highlight-text">ideas submitted</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="highlight-card purple">', unsafe_allow_html=True)
-            st.markdown('<div class="highlight-icon">👤</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="highlight-label">TOP CONTRIBUTOR THIS MONTH</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                '<div class="highlight-name">No data yet</div>', unsafe_allow_html=True
-            )
-            st.markdown('<div class="highlight-count">—</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="highlight-text">Be the first to contribute!</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
+    with stat_cols[0]:
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">💡</div>
+            <div class="stat-value">{stats.get("total", 0)}</div>
+            <div class="stat-label">Total Ideas</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with stat_cols[1]:
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value">{stats.get("this_month", 0)}</div>
+            <div class="stat-label">This Month</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with stat_cols[2]:
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-value">{stats.get("this_year", 0)}</div>
+            <div class="stat-label">This Year</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with stat_cols[3]:
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">✏️</div>
+            <div class="stat-value">{user_idea_count}</div>
+            <div class="stat-label">Your Ideas</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
     st.divider()
 
-    # KPI CARDS (using st.metric with streamlit-extras styling)
-    kpi_cols = st.columns(4, gap="medium")
-
-    with kpi_cols[0]:
-        st.metric(label="Total Ideas", value=stats.get("total", 0))
-
-    with kpi_cols[1]:
-        st.metric(label="This Month", value=stats.get("this_month", 0))
-
-    with kpi_cols[2]:
-        st.metric(label="This Year", value=stats.get("this_year", 0))
-
-    with kpi_cols[3]:
-        st.metric(label="Your Ideas", value=user_idea_count)
-
-    # Apply styling to metric cards
-    style_metric_cards(
-        background_color="#ffffff",
-        border_size_px=1,
-        border_color="#e2e8f0",
-        border_radius_px=14,
+    # TRENDING IDEAS SECTION
+    st.markdown(
+        """
+    <div class="section-header">
+        <span class="section-icon">🔥</span>
+        <h2 class="section-title">Trending Ideas</h2>
+    </div>
+    """,
+        unsafe_allow_html=True,
     )
+
+    if trending_ideas:
+        trend_cols = st.columns(3)
+        for idx, idea in enumerate(trending_ideas):
+            with trend_cols[idx]:
+                render_idea_card(idea)
+    else:
+        render_empty_state(
+            "🔥",
+            "No trending ideas yet",
+            "Be the first to submit an idea and start the conversation!",
+            "Submit Your First Idea",
+        )
+
+    # RECENTLY SUBMITTED SECTION
+    st.markdown(
+        """
+    <div class="section-header">
+        <span class="section-icon">🆕</span>
+        <h2 class="section-title">Recently Submitted</h2>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    if recent_ideas:
+        recent_cols = st.columns(3)
+        for idx, idea in enumerate(recent_ideas):
+            with recent_cols[idx]:
+                render_idea_card(idea)
+    else:
+        render_empty_state(
+            "🆕",
+            "No recent submissions",
+            "Fresh ideas fuel innovation. Share yours today!",
+            "Submit an Idea",
+        )
+
+    st.divider()
+
+    # HIGHLIGHTS + TOP CONTRIBUTORS ROW
+    highlights_cols = st.columns([1, 1, 1], gap="medium")
+
+    with highlights_cols[0]:
+        if top_bu:
+            st.markdown(
+                f"""
+            <div class="highlight-card orange">
+                <div class="highlight-icon">🏆</div>
+                <div class="highlight-label">TOP BU THIS MONTH</div>
+                <div class="highlight-name">{top_bu.get("bu_cl_site", "N/A")}</div>
+                <div class="highlight-count">{top_bu.get("count", 0)}</div>
+                <div class="highlight-text">ideas submitted</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                """
+            <div class="highlight-card orange">
+                <div class="highlight-icon">🏆</div>
+                <div class="highlight-label">TOP BU THIS MONTH</div>
+                <div class="highlight-name">No data yet</div>
+                <div class="highlight-count">—</div>
+                <div class="highlight-text">Start submitting ideas!</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+    with highlights_cols[1]:
+        if top_contributor:
+            st.markdown(
+                f"""
+            <div class="highlight-card purple">
+                <div class="highlight-icon">👤</div>
+                <div class="highlight-label">TOP CONTRIBUTOR</div>
+                <div class="highlight-name">{top_contributor.get("name", "N/A")}</div>
+                <div class="highlight-count">{top_contributor.get("count", 0)}</div>
+                <div class="highlight-text">ideas submitted</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                """
+            <div class="highlight-card purple">
+                <div class="highlight-icon">👤</div>
+                <div class="highlight-label">TOP CONTRIBUTOR</div>
+                <div class="highlight-name">No data yet</div>
+                <div class="highlight-count">—</div>
+                <div class="highlight-text">Be the first!</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+    with highlights_cols[2]:
+        st.markdown(
+            """
+        <div class="section-header" style="margin-top: 0;">
+            <span class="section-icon">🏆</span>
+            <h2 class="section-title" style="font-size: 17px;">Top Contributors</h2>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        if top_contributors:
+            for idx, contributor in enumerate(top_contributors[:3]):
+                name = contributor.get("full_name") or contributor.get(
+                    "username", "Anonymous"
+                )
+                count = contributor.get("idea_count", 0)
+                st.markdown(
+                    f"""
+                <div class="contributor-item">
+                    <div class="contributor-rank">#{idx + 1}</div>
+                    <div class="contributor-name">{name}</div>
+                    <div class="contributor-count">{count} ideas</div>
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
+        else:
+            render_empty_state(
+                "🏆",
+                "No contributors yet",
+                "Join the leaderboard by submitting your ideas!",
+            )
 
     st.divider()
 
@@ -428,50 +721,45 @@ def render():
     bottom_cols = st.columns(2, gap="medium")
 
     with bottom_cols[0]:
-        # WHY SHARE CARD
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="card-title">💡 Why Share Ideas?</div>', unsafe_allow_html=True
-        )
         st.markdown(
             """
+        <div class="card">
+            <div class="card-title">💡 Why Share Ideas?</div>
             <ul class="why-list">
-                <li><span class="why-icon">🚀</span> Drive operational excellence</li>
-                <li><span class="why-icon">🎯</span> Make meaningful impact</li>
-                <li><span class="why-icon">🤝</span> Collaborate with teams</li>
-                <li><span class="why-icon">💡</span> Every idea matters</li>
+                <li><span class="why-icon">🚀</span> Drive operational excellence and process improvements</li>
+                <li><span class="why-icon">🎯</span> Make a meaningful impact across the organization</li>
+                <li><span class="why-icon">🤝</span> Collaborate with teams and share best practices</li>
+                <li><span class="why-icon">💡</span> Every idea matters - no suggestion is too small</li>
             </ul>
+        </div>
         """,
             unsafe_allow_html=True,
         )
-        st.markdown("</div>", unsafe_allow_html=True)
 
     with bottom_cols[1]:
-        # BENEFITS CARD
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">✨ Benefits</div>', unsafe_allow_html=True)
         st.markdown(
             """
+        <div class="card">
+            <div class="card-title">✨ Benefits</div>
             <div class="benefits-grid">
-                <div class="benefit-item"><span class="benefit-check">✓</span> Quick and easy submission</div>
-                <div class="benefit-item"><span class="benefit-check">✓</span> Track your idea's progress</div>
-                <div class="benefit-item"><span class="benefit-check">✓</span> Collaborate with teams</div>
+                <div class="benefit-item"><span class="benefit-check">✓</span> Quick and easy submission process</div>
+                <div class="benefit-item"><span class="benefit-check">✓</span> Track your idea's progress and status</div>
+                <div class="benefit-item"><span class="benefit-check">✓</span> Collaborate with teams and get feedback</div>
+                <div class="benefit-item"><span class="benefit-check">✓</span> Get recognized for your contributions</div>
             </div>
+        </div>
         """,
             unsafe_allow_html=True,
         )
-        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.divider()
-
-    # CTA CARD (FULL WIDTH AT BOTTOM) WITH "IDEAS REVIEWED WEEKLY"
+    # CTA CARD (FULL WIDTH AT BOTTOM)
     st.markdown(
         """
-        <div class="cta-card" style="max-width:600px;margin:0 auto;">
-            <div class="cta-title">💬 Have an idea?</div>
-            <div class="cta-text">Submit your idea and shape the future!</div>
-            <div class="cta-sub">📅 Ideas reviewed weekly</div>
-        </div>
+    <div class="cta-card">
+        <div class="cta-title">💬 Have an idea?</div>
+        <div class="cta-text">Submit your idea and help shape the future of our operations!</div>
+        <div class="cta-sub">📅 Ideas reviewed weekly by the leadership team</div>
+    </div>
     """,
         unsafe_allow_html=True,
     )
