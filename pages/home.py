@@ -667,7 +667,7 @@ def render():
             f"""
         <div class="stat-card">
             <h2 class="stat-value">{stats.get("total", 0)}</h2>
-            <div class="stat-label">Total Ideas</div>
+            <div class="stat-label">💡 Total Ideas</div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -678,7 +678,7 @@ def render():
             f"""
         <div class="stat-card">
             <h2 class="stat-value">{stats.get("this_month", 0)}</h2>
-            <div class="stat-label">This Month</div>
+            <div class="stat-label">📅 This Month</div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -689,7 +689,7 @@ def render():
             f"""
         <div class="stat-card">
             <h2 class="stat-value">{stats.get("this_year", 0)}</h2>
-            <div class="stat-label">This Year</div>
+            <div class="stat-label">🔥 This Year</div>
         </div>
         """,
             unsafe_allow_html=True,
@@ -700,7 +700,7 @@ def render():
             f"""
         <div class="stat-card">
             <h2 class="stat-value">{user_idea_count}</h2>
-            <div class="stat-label">Your Ideas</div>
+            <div class="stat-label">✏️ Your Ideas</div>
         </div>
         """,
             unsafe_allow_html=True,
