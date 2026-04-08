@@ -121,7 +121,73 @@ st.markdown(
         font-size: 24px;
     }
 
-    /* IDEA LIST STYLES (replacing cards) */
+    /* IDEA CARDS - Responsive */
+    .idea-cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .idea-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 20px;
+        transition: all 0.2s ease;
+    }
+
+    .idea-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+        transform: translateY(-2px);
+    }
+
+    .idea-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .idea-card-title {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+        line-height: 1.4;
+        flex: 1;
+        padding-right: 12px;
+    }
+
+    .idea-card-votes {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #f1f5f9;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #6366f1;
+        white-space: nowrap;
+    }
+
+    .idea-card-meta {
+        font-size: 13px;
+        color: #64748b;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .idea-card-date {
+        font-size: 12px;
+        color: #94a3b8;
+        white-space: nowrap;
+    }
+
+    /* IDEAL LIST STYLES (replacing cards) */
     .idea-list {
         background: white;
         border-radius: 12px;
@@ -467,19 +533,18 @@ def render_empty_state(icon, title, message, cta_text=None):
             st.rerun()
 
 
-def render_idea_list(ideas, show_date=False):
-    """Render a list of ideas"""
+def render_idea_cards(ideas, show_date=False):
+    """Render responsive cards for ideas"""
     if not ideas:
         return
 
-    # Start the container
-    html_parts = ['<div class="idea-list">']
+    html_parts = ['<div class="idea-cards-container">']
 
-    for idea in ideas[:5]:  # Show max 5 items
+    for idea in ideas[:5]:
         votes = idea.get("votes", 0)
         title = idea.get("title", "Untitled")
-        if len(title) > 70:
-            title = title[:67] + "..."
+        if len(title) > 60:
+            title = title[:57] + "..."
         submitter = idea.get("submitter_name") or idea.get("username", "Anonymous")
 
         date_html = ""
@@ -489,26 +554,22 @@ def render_idea_list(ideas, show_date=False):
             try:
                 date_obj = datetime.strptime(str(idea["submitted_at"])[:10], "%Y-%m-%d")
                 date_str = date_obj.strftime("%b %d, %Y")
-                date_html = f'<span class="idea-list-date">📅 {date_str}</span>'
+                date_html = f'<span class="idea-card-date">📅 {date_str}</span>'
             except:
                 pass
 
-        # Build each item with proper spacing between elements
-        html_parts.append('<div class="idea-list-item">')
-        html_parts.append('  <div class="idea-list-main">')
-        html_parts.append(f'    <div class="idea-list-title">💡 {title}</div>')
+        html_parts.append('<div class="idea-card">')
+        html_parts.append('  <div class="idea-card-header">')
+        html_parts.append(f'    <div class="idea-card-title">💡 {title}</div>')
+        html_parts.append(f'    <div class="idea-card-votes">👍 {votes}</div>')
+        html_parts.append("  </div>")
         html_parts.append(
-            f'    <div class="idea-list-meta"><span>by {submitter}</span>{date_html}</div>'
+            f'  <div class="idea-card-meta"><span>by {submitter}</span>{date_html}</div>'
         )
-        html_parts.append("  </div>")
-        html_parts.append('  <div class="idea-list-stats">')
-        html_parts.append(f'    <div class="idea-list-votes">👍 {votes}</div>')
-        html_parts.append("  </div>")
         html_parts.append("</div>")
 
     html_parts.append("</div>")
 
-    # Join and render
     full_html = "\n".join(html_parts)
     st.markdown(full_html, unsafe_allow_html=True)
 
@@ -589,7 +650,7 @@ def render():
     )
 
     if trending_ideas:
-        render_idea_list(trending_ideas, show_date=False)
+        render_idea_cards(trending_ideas, show_date=False)
     else:
         render_empty_state(
             "🔥",
@@ -610,7 +671,7 @@ def render():
     )
 
     if recent_ideas:
-        render_idea_list(recent_ideas, show_date=True)
+        render_idea_cards(recent_ideas, show_date=True)
     else:
         render_empty_state(
             "🆕",
