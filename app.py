@@ -277,6 +277,29 @@ st.markdown(
     .stButton > button:hover {
         background: var(--primary-dark) !important;
         transform: translateY(-1px);
+        color: white !important;
+    }
+
+    /* Active/pressed state */
+    .stButton > button:active {
+        background: #4338ca !important;
+        transform: translateY(0);
+        color: white !important;
+    }
+
+    /* Disabled state */
+    .stButton > button:disabled {
+        background: #94a3b8 !important;
+        color: white !important;
+        opacity: 0.8;
+        cursor: not-allowed;
+    }
+
+    /* Icons inside buttons - white */
+    .stButton > button svg,
+    .stButton > button span,
+    .stButton > button p {
+        color: white !important;
     }
 
     /* ===== FORM INPUTS ===== */
