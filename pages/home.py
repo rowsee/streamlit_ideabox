@@ -529,7 +529,10 @@ def render_empty_state(icon, title, message, cta_text=None):
         if st.button(
             cta_text, key=f"empty_cta_{icon}", type="primary", use_container_width=True
         ):
-            st.session_state.current_page = "submit_idea"
+            if cta_text == "Submit Your First Idea":
+                st.session_state.current_page = "submit_idea"
+            else:
+                st.session_state.current_page = "browse_ideas"
             st.rerun()
 
 
@@ -743,7 +746,7 @@ def render():
                 "🆕",
                 "No recent submissions",
                 "Fresh ideas fuel innovation. Share yours today!",
-                "Submit an Idea",
+                "Browse Ideas",
             )
 
     st.divider()
