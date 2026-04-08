@@ -594,6 +594,7 @@ def render_edit_form(idea):
                     index=IMPACT_GROUP_OPTIONS.index(idea["impact_group"])
                     if idea["impact_group"] in IMPACT_GROUP_OPTIONS
                     else 0,
+                    key=f"impact_group_{idea['id']}",
                 )
 
             new_drivers = st.multiselect(
@@ -619,12 +620,14 @@ def render_edit_form(idea):
                     min_value=0,
                     step=1,
                     value=int(idea["hours_saved"]) if idea["hours_saved"] else 0,
+                    key=f"hours_saved_{idea['id']}",
                 )
             with col2:
                 new_planned_use = st.text_area(
                     "Planned Use for Capacity Created",
                     value=idea["planned_use"] or "",
                     height=60,
+                    key=f"planned_use_{idea['id']}",
                 )
 
             st.markdown("---")
@@ -636,6 +639,7 @@ def render_edit_form(idea):
                     "Solution Implemented",
                     value=idea.get("solution_implemented") or "",
                     height=80,
+                    key=f"solution_implemented_{idea['id']}",
                 )
             with col2:
                 current_date_implemented = None
@@ -651,6 +655,7 @@ def render_edit_form(idea):
                     value=current_date_implemented
                     if current_date_implemented
                     else None,
+                    key=f"date_implemented_{idea['id']}",
                 )
 
         col_cancel, col_spacer, col_save = st.columns([1, 4, 1])
