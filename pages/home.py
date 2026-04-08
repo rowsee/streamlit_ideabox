@@ -54,32 +54,28 @@ st.markdown(
 
     /* STAT CARDS */
     .stat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 28px 24px;
+        background: white !important;
+        border-radius: 12px !important;
+        padding: 28px 24px !important;
         text-align: center;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
         transition: all 0.2s ease;
         cursor: default;
     }
 
     .stat-card:hover {
-        border-color: #6366f1;
-        box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+        border-color: #6366f1 !important;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.15) !important;
         transform: translateY(-2px);
     }
 
-    .stat-icon { 
-        font-size: 32px; 
-        margin-bottom: 12px; 
-    }
-
     .stat-value { 
-        font-size: 40px; 
-        font-weight: 800; 
+        font-size: 48px !important; 
+        font-weight: 900 !important; 
         color: #1e293b;
         line-height: 1;
+        margin: 0;
     }
 
     .stat-label { 
@@ -121,7 +117,7 @@ st.markdown(
         font-size: 24px;
     }
 
-    /* IDEA CARDS - Responsive */
+    /* IDEA CARDS - Responsive 2-line format */
     .idea-cards-container {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -130,37 +126,53 @@ st.markdown(
     }
 
     .idea-card {
-        background: white;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        padding: 20px;
+        background: white !important;
+        border-radius: 12px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+        padding: 16px 20px !important;
         transition: all 0.2s ease;
     }
 
     .idea-card:hover {
-        border-color: #6366f1;
-        box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+        border-color: #6366f1 !important;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.15) !important;
         transform: translateY(-2px);
     }
 
-    .idea-card-header {
+    /* LINE 1: Title | Submitter */
+    .idea-card-line1 {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 12px;
+        align-items: center;
+        margin-bottom: 10px;
     }
 
     .idea-card-title {
         font-weight: 600;
         color: #1e293b;
         font-size: 15px;
-        line-height: 1.4;
         flex: 1;
         padding-right: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .idea-card-votes {
+    .idea-card-submitter {
+        font-size: 12px;
+        color: #64748b;
+        white-space: nowrap;
+    }
+
+    /* LINE 2: Likes | Date */
+    .idea-card-line2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .idea-card-likes {
         display: inline-flex;
         align-items: center;
         gap: 4px;
@@ -170,21 +182,11 @@ st.markdown(
         font-size: 13px;
         font-weight: 500;
         color: #6366f1;
-        white-space: nowrap;
-    }
-
-    .idea-card-meta {
-        font-size: 13px;
-        color: #64748b;
-        display: flex;
-        gap: 12px;
-        align-items: center;
     }
 
     .idea-card-date {
         font-size: 12px;
         color: #94a3b8;
-        white-space: nowrap;
     }
 
     /* IDEAL LIST STYLES (replacing cards) */
@@ -287,13 +289,13 @@ st.markdown(
         margin-bottom: 20px; 
     }
 
-    /* HIGHLIGHT CARDS */
+    /* HIGHLIGHT CARDS - Top BU & Contributor */
     .highlight-card {
         background: white;
         border-radius: 16px;
         padding: 32px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        border: 1px solid #e2e8f0;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1) !important;
+        border: 1px solid #e2e8f0 !important;
         text-align: center;
         height: 100%;
         display: flex;
@@ -303,13 +305,13 @@ st.markdown(
     }
 
     .highlight-card.orange {
-        background: linear-gradient(135deg, #f97316, #fb923c);
-        border: none;
+        background: linear-gradient(135deg, #f97316, #fb923c) !important;
+        border: none !important;
     }
 
     .highlight-card.purple {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        border: none;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+        border: none !important;
     }
 
     .highlight-label {
@@ -322,16 +324,12 @@ st.markdown(
         color: white;
     }
 
-    .highlight-icon {
-        font-size: 36px;
-        margin-bottom: 14px;
-    }
-
     .highlight-name {
-        font-size: 28px;
-        font-weight: 800;
+        font-size: 32px !important;
+        font-weight: 700 !important;
         margin-bottom: 12px;
         color: white;
+        line-height: 1.2;
     }
 
     .highlight-count {
@@ -534,7 +532,7 @@ def render_empty_state(icon, title, message, cta_text=None):
 
 
 def render_idea_cards(ideas, show_date=False):
-    """Render responsive cards for ideas"""
+    """Render responsive cards for ideas - 2-line format"""
     if not ideas:
         return
 
@@ -543,29 +541,34 @@ def render_idea_cards(ideas, show_date=False):
     for idea in ideas[:5]:
         votes = idea.get("votes", 0)
         title = idea.get("title", "Untitled")
-        if len(title) > 60:
-            title = title[:57] + "..."
+        if len(title) > 50:
+            title = title[:47] + "..."
         submitter = idea.get("submitter_name") or idea.get("username", "Anonymous")
 
-        date_html = ""
+        date_str = ""
         if show_date and idea.get("submitted_at"):
             from datetime import datetime
 
             try:
                 date_obj = datetime.strptime(str(idea["submitted_at"])[:10], "%Y-%m-%d")
                 date_str = date_obj.strftime("%b %d, %Y")
-                date_html = f'<span class="idea-card-date">📅 {date_str}</span>'
             except:
                 pass
 
+        # LINE 1: Title | Submitter
+        # LINE 2: Likes | Date
         html_parts.append('<div class="idea-card">')
-        html_parts.append('  <div class="idea-card-header">')
-        html_parts.append(f'    <div class="idea-card-title">💡 {title}</div>')
-        html_parts.append(f'    <div class="idea-card-votes">👍 {votes}</div>')
-        html_parts.append("  </div>")
+        html_parts.append('  <div class="idea-card-line1">')
+        html_parts.append(f'    <span class="idea-card-title">{title}</span>')
         html_parts.append(
-            f'  <div class="idea-card-meta"><span>by {submitter}</span>{date_html}</div>'
+            f'    <span class="idea-card-submitter">by {submitter}</span>'
         )
+        html_parts.append("  </div>")
+        html_parts.append('  <div class="idea-card-line2">')
+        html_parts.append(f'    <span class="idea-card-likes">👍 {votes}</span>')
+        if date_str:
+            html_parts.append(f'    <span class="idea-card-date">📅 {date_str}</span>')
+        html_parts.append("  </div>")
         html_parts.append("</div>")
 
     html_parts.append("</div>")
@@ -585,15 +588,89 @@ def render():
     recent_ideas = get_recent_ideas(5) or []
     trending_ideas = get_trending_ideas(5) or []
 
-    # STATS ROW
+    # HIGHLIGHTS ROW - Top BU and Top Contributor (MOVED TO TOP)
+    st.markdown(
+        """
+    <div class="section-header" style="margin-top: 0 !important;">
+        <h2 class="section-title">Top Performers</h2>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    highlights_cols = st.columns(2, gap="medium")
+
+    with highlights_cols[0]:
+        if top_bu:
+            st.markdown(
+                f"""
+            <div class="highlight-card orange">
+                <div class="highlight-label">TOP BU THIS MONTH</div>
+                <h2 class="highlight-name">{top_bu.get("bu_cl_site", "N/A")}</h2>
+                <div class="highlight-count">{top_bu.get("count", 0)}</div>
+                <div class="highlight-text">ideas submitted</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                """
+            <div class="highlight-card orange">
+                <div class="highlight-label">TOP BU THIS MONTH</div>
+                <h2 class="highlight-name">Be the First!</h2>
+                <div class="highlight-count">—</div>
+                <div class="highlight-text">Submit ideas from your BU to see it here!</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+    with highlights_cols[1]:
+        if top_contributor:
+            st.markdown(
+                f"""
+            <div class="highlight-card purple">
+                <div class="highlight-label">TOP CONTRIBUTOR</div>
+                <h2 class="highlight-name">{top_contributor.get("name", "N/A")}</h2>
+                <div class="highlight-count">{top_contributor.get("count", 0)}</div>
+                <div class="highlight-text">ideas submitted</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                """
+            <div class="highlight-card purple">
+                <div class="highlight-label">TOP CONTRIBUTOR</div>
+                <h2 class="highlight-name">Start Your Journey!</h2>
+                <div class="highlight-count">—</div>
+                <div class="highlight-text">Submit your first idea to become a top contributor!</div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+    st.divider()
+
+    # STATS ROW - KPI Cards
+    st.markdown(
+        """
+    <div class="section-header">
+        <h2 class="section-title">Overview</h2>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
     stat_cols = st.columns(4)
 
     with stat_cols[0]:
         st.markdown(
             f"""
         <div class="stat-card">
-            <div class="stat-icon">💡</div>
-            <div class="stat-value">{stats.get("total", 0)}</div>
+            <h2 class="stat-value">{stats.get("total", 0)}</h2>
             <div class="stat-label">Total Ideas</div>
         </div>
         """,
@@ -604,8 +681,7 @@ def render():
         st.markdown(
             f"""
         <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-value">{stats.get("this_month", 0)}</div>
+            <h2 class="stat-value">{stats.get("this_month", 0)}</h2>
             <div class="stat-label">This Month</div>
         </div>
         """,
@@ -616,8 +692,7 @@ def render():
         st.markdown(
             f"""
         <div class="stat-card">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-value">{stats.get("this_year", 0)}</div>
+            <h2 class="stat-value">{stats.get("this_year", 0)}</h2>
             <div class="stat-label">This Year</div>
         </div>
         """,
@@ -628,8 +703,7 @@ def render():
         st.markdown(
             f"""
         <div class="stat-card">
-            <div class="stat-icon">✏️</div>
-            <div class="stat-value">{user_idea_count}</div>
+            <h2 class="stat-value">{user_idea_count}</h2>
             <div class="stat-label">Your Ideas</div>
         </div>
         """,
@@ -638,11 +712,10 @@ def render():
 
     st.divider()
 
-    # TRENDING IDEAS SECTION (List Format)
+    # TRENDING IDEAS SECTION - Remove emoji
     st.markdown(
         """
     <div class="section-header">
-        <span class="section-icon">🔥</span>
         <h2 class="section-title">Trending Ideas</h2>
     </div>
     """,
@@ -659,11 +732,10 @@ def render():
             "Submit Your First Idea",
         )
 
-    # RECENTLY SUBMITTED SECTION
+    # RECENTLY SUBMITTED SECTION - Remove emoji
     st.markdown(
         """
     <div class="section-header">
-        <span class="section-icon">🆕</span>
         <h2 class="section-title">Recently Submitted</h2>
     </div>
     """,
@@ -679,67 +751,6 @@ def render():
             "Fresh ideas fuel innovation. Share yours today!",
             "Submit an Idea",
         )
-
-    st.divider()
-
-    # HIGHLIGHTS ROW - Top BU and Top Contributor only (2 columns)
-    highlights_cols = st.columns(2, gap="medium")
-
-    with highlights_cols[0]:
-        if top_bu:
-            st.markdown(
-                f"""
-            <div class="highlight-card orange">
-                <div class="highlight-icon">🏆</div>
-                <div class="highlight-label">TOP BU THIS MONTH</div>
-                <div class="highlight-name">{top_bu.get("bu_cl_site", "N/A")}</div>
-                <div class="highlight-count">{top_bu.get("count", 0)}</div>
-                <div class="highlight-text">ideas submitted</div>
-            </div>
-            """,
-                unsafe_allow_html=True,
-            )
-        else:
-            st.markdown(
-                """
-            <div class="highlight-card orange">
-                <div class="highlight-icon">🏆</div>
-                <div class="highlight-label">TOP BU THIS MONTH</div>
-                <div class="highlight-name">🏆 Be the First!</div>
-                <div class="highlight-count">—</div>
-                <div class="highlight-text">Submit ideas from your BU to see it here!</div>
-            </div>
-            """,
-                unsafe_allow_html=True,
-            )
-
-    with highlights_cols[1]:
-        if top_contributor:
-            st.markdown(
-                f"""
-            <div class="highlight-card purple">
-                <div class="highlight-icon">⭐</div>
-                <div class="highlight-label">TOP CONTRIBUTOR</div>
-                <div class="highlight-name">{top_contributor.get("name", "N/A")}</div>
-                <div class="highlight-count">{top_contributor.get("count", 0)}</div>
-                <div class="highlight-text">ideas submitted</div>
-            </div>
-            """,
-                unsafe_allow_html=True,
-            )
-        else:
-            st.markdown(
-                """
-            <div class="highlight-card purple">
-                <div class="highlight-icon">⭐</div>
-                <div class="highlight-label">TOP CONTRIBUTOR</div>
-                <div class="highlight-name">⭐ Start Your Journey!</div>
-                <div class="highlight-count">—</div>
-                <div class="highlight-text">Submit your first idea to become a top contributor!</div>
-            </div>
-            """,
-                unsafe_allow_html=True,
-            )
 
     st.divider()
 
