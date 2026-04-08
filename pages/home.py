@@ -438,15 +438,17 @@ st.markdown(
         font-size: 18px;
         font-weight: 800;
         margin-bottom: 8px;
+        text-align: center;
     }
 
     .cta-text {
         font-size: 14px;
-        opacity: 0.95;
+        text-align: center;
     }
 
     .cta-sub {
         font-size: 12px;
+        text-align: center;
         opacity: 0.8;
         margin-top: 10px;
     }
