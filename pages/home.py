@@ -1,5 +1,4 @@
 import streamlit as st
-from streamlit_extras.card import card
 from database import (
     get_stats,
     get_user_ideas,
@@ -51,6 +50,43 @@ st.markdown(
     .section-title::selection, .section-title::-moz-selection {
         background: transparent;
         color: inherit;
+    }
+
+    /* STAT CARDS */
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 28px 24px;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+        cursor: default;
+    }
+
+    .stat-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+        transform: translateY(-2px);
+    }
+
+    .stat-icon { 
+        font-size: 32px; 
+        margin-bottom: 12px; 
+    }
+
+    .stat-value { 
+        font-size: 40px; 
+        font-weight: 800; 
+        color: #1e293b;
+        line-height: 1;
+    }
+
+    .stat-label { 
+        font-size: 14px; 
+        color: #64748b; 
+        margin-top: 8px;
+        font-weight: 500;
     }
 
     /* SECTION HEADERS - Enhanced with blue highlight fix */
@@ -488,119 +524,55 @@ def render():
     recent_ideas = get_recent_ideas(5) or []
     trending_ideas = get_trending_ideas(5) or []
 
-    # STATS ROW - Using streamlit-extras cards
+    # STATS ROW
     stat_cols = st.columns(4)
 
     with stat_cols[0]:
-        card(
-            title="💡 Total Ideas",
-            text=str(stats.get("total", 0)),
-            styles={
-                "card": {
-                    "background-color": "#ffffff",
-                    "border": "1px solid #e2e8f0",
-                    "border-radius": "12px",
-                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
-                    "padding": "20px",
-                },
-                "title": {
-                    "font-size": "14px",
-                    "color": "#64748b",
-                    "font-weight": "500",
-                    "text-align": "center",
-                },
-                "text": {
-                    "font-size": "36px",
-                    "font-weight": "800",
-                    "color": "#6366f1",
-                    "text-align": "center",
-                    "margin-top": "8px",
-                },
-            },
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">💡</div>
+            <div class="stat-value">{stats.get("total", 0)}</div>
+            <div class="stat-label">Total Ideas</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
     with stat_cols[1]:
-        card(
-            title="📅 This Month",
-            text=str(stats.get("this_month", 0)),
-            styles={
-                "card": {
-                    "background-color": "#ffffff",
-                    "border": "1px solid #e2e8f0",
-                    "border-radius": "12px",
-                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
-                    "padding": "20px",
-                },
-                "title": {
-                    "font-size": "14px",
-                    "color": "#64748b",
-                    "font-weight": "500",
-                    "text-align": "center",
-                },
-                "text": {
-                    "font-size": "36px",
-                    "font-weight": "800",
-                    "color": "#f97316",
-                    "text-align": "center",
-                    "margin-top": "8px",
-                },
-            },
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value">{stats.get("this_month", 0)}</div>
+            <div class="stat-label">This Month</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
     with stat_cols[2]:
-        card(
-            title="🔥 This Year",
-            text=str(stats.get("this_year", 0)),
-            styles={
-                "card": {
-                    "background-color": "#ffffff",
-                    "border": "1px solid #e2e8f0",
-                    "border-radius": "12px",
-                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
-                    "padding": "20px",
-                },
-                "title": {
-                    "font-size": "14px",
-                    "color": "#64748b",
-                    "font-weight": "500",
-                    "text-align": "center",
-                },
-                "text": {
-                    "font-size": "36px",
-                    "font-weight": "800",
-                    "color": "#10b981",
-                    "text-align": "center",
-                    "margin-top": "8px",
-                },
-            },
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-value">{stats.get("this_year", 0)}</div>
+            <div class="stat-label">This Year</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
     with stat_cols[3]:
-        card(
-            title="✏️ Your Ideas",
-            text=str(user_idea_count),
-            styles={
-                "card": {
-                    "background-color": "#ffffff",
-                    "border": "1px solid #e2e8f0",
-                    "border-radius": "12px",
-                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
-                    "padding": "20px",
-                },
-                "title": {
-                    "font-size": "14px",
-                    "color": "#64748b",
-                    "font-weight": "500",
-                    "text-align": "center",
-                },
-                "text": {
-                    "font-size": "36px",
-                    "font-weight": "800",
-                    "color": "#8b5cf6",
-                    "text-align": "center",
-                    "margin-top": "8px",
-                },
-            },
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <div class="stat-icon">✏️</div>
+            <div class="stat-value">{user_idea_count}</div>
+            <div class="stat-label">Your Ideas</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
     st.divider()
