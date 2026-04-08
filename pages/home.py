@@ -19,12 +19,12 @@ st.markdown(
         --text-primary: #1e293b;
         --text-muted: #64748b;
         --border-light: #e2e8f0;
-        --indigo: #6366f1;
+        --indigo: #FFA500;
         --orange: #f97316;
         --green: #10b981;
         --pink: #ec4899;
-        --purple-start: #6366f1;
-        --purple-end: #8b5cf6;
+        --purple-start: #FFA500;
+        --purple-end: #FFA500;
         --orange-start: #f97316;
         --orange-end: #fb923c;
     }
@@ -65,7 +65,7 @@ st.markdown(
     }
 
     .stat-card:hover {
-        border-color: #6366f1 !important;
+        border-color: #FFA500 !important;
         box-shadow: 0 4px 12px rgba(99,102,241,0.15) !important;
         transform: translateY(-2px);
     }
@@ -135,7 +135,7 @@ st.markdown(
     }
 
     .idea-card:hover {
-        border-color: #6366f1 !important;
+        border-color: #FFA500 !important;
         box-shadow: 0 4px 12px rgba(99,102,241,0.15) !important;
         transform: translateY(-2px);
     }
@@ -181,7 +181,7 @@ st.markdown(
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        color: #6366f1;
+        color: #FFA500;
     }
 
     .idea-card-date {
@@ -253,7 +253,7 @@ st.markdown(
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        color: #6366f1;
+        color: #FFA500;
     }
 
     .idea-list-date {
@@ -310,7 +310,7 @@ st.markdown(
     }
 
     .highlight-card.purple {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+        background: linear-gradient(135deg, #FFA500, #FFA500) !important;
         border: none !important;
     }
 
@@ -426,7 +426,7 @@ st.markdown(
 
     /* CTA CARD */
     .cta-card {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        background: linear-gradient(135deg, #FFA500, #FFA500);
         border-radius: 16px;
         padding: 28px;
         color: white;
@@ -472,7 +472,7 @@ st.markdown(
     .contributor-rank {
         font-size: 18px;
         font-weight: 700;
-        color: #6366f1;
+        color: #FFA500;
         width: 28px;
         text-align: center;
     }
@@ -487,7 +487,7 @@ st.markdown(
     .contributor-count {
         font-size: 14px;
         font-weight: 600;
-        color: #6366f1;
+        color: #FFA500;
         background: white;
         padding: 4px 10px;
         border-radius: 20px;

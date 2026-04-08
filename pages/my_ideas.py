@@ -151,7 +151,7 @@ st.markdown(
     }
     
     .section-title .number {
-        background: #6366f1;
+        background: #FFA500;
         color: white;
         width: 24px;
         height: 24px;

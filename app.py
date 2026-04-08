@@ -28,10 +28,10 @@ st.markdown(
 <style>
     /* ===== COLOR PALETTE ===== */
     :root {
-        --primary: #6366f1;
+        --primary: #FFA500;
         --primary-light: #818cf8;
         --primary-dark: #4f46e5;
-        --secondary: #8b5cf6;
+        --secondary: #FFA500;
         --accent: #f97316;
         --accent-light: #fb923c;
         --bg-main: #f8fafc;
@@ -68,7 +68,7 @@ st.markdown(
 
     /* ===== SIDEBAR - PURPLE BACKGROUND ===== */
     section[data-testid="stSidebar"] {
-        background: #6366f1 !important;
+        background: #FFA500 !important;
         border-right: none !important;
     }
     
