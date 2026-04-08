@@ -2,4 +2,4 @@ streamlit
 pandas
 openpyxl
 plotly
-streamlit-extras
+streamlit-extras>=0.6.0
