@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_extras.card import card
 from database import (
     get_stats,
     get_user_ideas,
@@ -50,94 +51,6 @@ st.markdown(
     .section-title::selection, .section-title::-moz-selection {
         background: transparent;
         color: inherit;
-    }
-
-    /* HERO SECTION - Enhanced */
-    .hero-section {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        border-radius: 16px;
-        padding: 48px 40px;
-        text-align: center;
-        margin-bottom: 40px;
-        color: white;
-        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
-    }
-
-    .hero-icon { 
-        font-size: 64px; 
-        margin-bottom: 20px; 
-    }
-
-    .hero-title { 
-        font-size: 32px; 
-        font-weight: 700; 
-        margin-bottom: 16px; 
-        color: white !important;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .hero-subtitle { 
-        font-size: 18px; 
-        opacity: 0.95; 
-        margin-bottom: 28px;
-        color: rgba(255,255,255,0.95) !important;
-        font-weight: 400;
-    }
-
-    .hero-cta {
-        background: white;
-        color: #6366f1;
-        padding: 14px 28px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-block;
-        text-decoration: none;
-    }
-
-    .hero-cta:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    /* STAT CARDS - Enhanced */
-    .stat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 28px 24px;
-        text-align: center;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        transition: all 0.2s ease;
-        cursor: default;
-    }
-
-    .stat-card:hover {
-        border-color: #6366f1;
-        box-shadow: 0 4px 12px rgba(99,102,241,0.15);
-        transform: translateY(-2px);
-    }
-
-    .stat-icon { 
-        font-size: 32px; 
-        margin-bottom: 12px; 
-    }
-
-    .stat-value { 
-        font-size: 40px; 
-        font-weight: 800; 
-        color: #1e293b;
-        line-height: 1;
-    }
-
-    .stat-label { 
-        font-size: 14px; 
-        color: #64748b; 
-        margin-top: 8px;
-        font-weight: 500;
     }
 
     /* SECTION HEADERS - Enhanced with blue highlight fix */
@@ -518,48 +431,14 @@ def render_empty_state(icon, title, message, cta_text=None):
             st.rerun()
 
 
-def render_idea_list_item(idea, show_date=False):
-    """Render an idea as a list item"""
-    votes = idea.get("votes", 0)
-    title = idea.get("title", "Untitled")
-    if len(title) > 70:
-        title = title[:67] + "..."
-    submitter = idea.get("submitter_name") or idea.get("username", "Anonymous")
-
-    date_html = ""
-    if show_date and idea.get("submitted_at"):
-        from datetime import datetime
-
-        try:
-            date_obj = datetime.strptime(str(idea["submitted_at"])[:10], "%Y-%m-%d")
-            date_str = date_obj.strftime("%b %d, %Y")
-            date_html = f'<span class="idea-list-date">📅 {date_str}</span>'
-        except:
-            pass
-
-    html = f"""
-    <div class="idea-list-item">
-        <div class="idea-list-main">
-            <div class="idea-list-title">💡 {title}</div>
-            <div class="idea-list-meta">
-                <span>by {submitter}</span>
-                {date_html}
-            </div>
-        </div>
-        <div class="idea-list-stats">
-            <div class="idea-list-votes">👍 {votes}</div>
-        </div>
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
-
-
 def render_idea_list(ideas, show_date=False):
     """Render a list of ideas"""
     if not ideas:
         return
 
-    html_items = []
+    # Start the container
+    html_parts = ['<div class="idea-list">']
+
     for idea in ideas[:5]:  # Show max 5 items
         votes = idea.get("votes", 0)
         title = idea.get("title", "Untitled")
@@ -578,23 +457,24 @@ def render_idea_list(ideas, show_date=False):
             except:
                 pass
 
-        html_items.append(f"""
-        <div class="idea-list-item">
-            <div class="idea-list-main">
-                <div class="idea-list-title">💡 {title}</div>
-                <div class="idea-list-meta">
-                    <span>by {submitter}</span>
-                    {date_html}
-                </div>
-            </div>
-            <div class="idea-list-stats">
-                <div class="idea-list-votes">👍 {votes}</div>
-            </div>
-        </div>
-        """)
+        # Build each item with proper spacing between elements
+        html_parts.append('<div class="idea-list-item">')
+        html_parts.append('  <div class="idea-list-main">')
+        html_parts.append(f'    <div class="idea-list-title">💡 {title}</div>')
+        html_parts.append(
+            f'    <div class="idea-list-meta"><span>by {submitter}</span>{date_html}</div>'
+        )
+        html_parts.append("  </div>")
+        html_parts.append('  <div class="idea-list-stats">')
+        html_parts.append(f'    <div class="idea-list-votes">👍 {votes}</div>')
+        html_parts.append("  </div>")
+        html_parts.append("</div>")
 
-    html = f'<div class="idea-list">{"".join(html_items)}</div>'
-    st.markdown(html, unsafe_allow_html=True)
+    html_parts.append("</div>")
+
+    # Join and render
+    full_html = "\n".join(html_parts)
+    st.markdown(full_html, unsafe_allow_html=True)
 
 
 def render():
@@ -608,94 +488,119 @@ def render():
     recent_ideas = get_recent_ideas(5) or []
     trending_ideas = get_trending_ideas(5) or []
 
-    user_name = st.session_state.get("full_name") or st.session_state.get(
-        "username", "User"
-    )
-
-    # HERO SECTION
-    if user_idea_count == 0:
-        # Show hero CTA for new users
-        st.markdown(
-            f"""
-        <div class="hero-section">
-            <div class="hero-icon">🚀</div>
-            <div class="hero-title">Welcome to TEOA Idea Hub!</div>
-            <div class="hero-subtitle">Turn your improvement ideas into impact. Share your suggestions and help drive operational excellence.</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-        if st.button(
-            "Submit Your First Idea ✨",
-            key="hero_cta",
-            type="primary",
-            use_container_width=True,
-        ):
-            st.session_state.current_page = "submit_idea"
-            st.rerun()
-    else:
-        # Welcome back message for returning users
-        st.markdown(
-            f"""
-        <div class="hero-section">
-            <div class="hero-icon">👋</div>
-            <div class="hero-title">Welcome back, {user_name}!</div>
-            <div class="hero-subtitle">You've submitted {user_idea_count} idea{"s" if user_idea_count != 1 else ""}. Keep the momentum going!</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    # STATS ROW
+    # STATS ROW - Using streamlit-extras cards
     stat_cols = st.columns(4)
 
     with stat_cols[0]:
-        st.markdown(
-            f"""
-        <div class="stat-card">
-            <div class="stat-icon">💡</div>
-            <div class="stat-value">{stats.get("total", 0)}</div>
-            <div class="stat-label">Total Ideas</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
+        card(
+            title="💡 Total Ideas",
+            text=str(stats.get("total", 0)),
+            styles={
+                "card": {
+                    "background-color": "#ffffff",
+                    "border": "1px solid #e2e8f0",
+                    "border-radius": "12px",
+                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
+                    "padding": "20px",
+                },
+                "title": {
+                    "font-size": "14px",
+                    "color": "#64748b",
+                    "font-weight": "500",
+                    "text-align": "center",
+                },
+                "text": {
+                    "font-size": "36px",
+                    "font-weight": "800",
+                    "color": "#6366f1",
+                    "text-align": "center",
+                    "margin-top": "8px",
+                },
+            },
         )
 
     with stat_cols[1]:
-        st.markdown(
-            f"""
-        <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-value">{stats.get("this_month", 0)}</div>
-            <div class="stat-label">This Month</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
+        card(
+            title="📅 This Month",
+            text=str(stats.get("this_month", 0)),
+            styles={
+                "card": {
+                    "background-color": "#ffffff",
+                    "border": "1px solid #e2e8f0",
+                    "border-radius": "12px",
+                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
+                    "padding": "20px",
+                },
+                "title": {
+                    "font-size": "14px",
+                    "color": "#64748b",
+                    "font-weight": "500",
+                    "text-align": "center",
+                },
+                "text": {
+                    "font-size": "36px",
+                    "font-weight": "800",
+                    "color": "#f97316",
+                    "text-align": "center",
+                    "margin-top": "8px",
+                },
+            },
         )
 
     with stat_cols[2]:
-        st.markdown(
-            f"""
-        <div class="stat-card">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-value">{stats.get("this_year", 0)}</div>
-            <div class="stat-label">This Year</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
+        card(
+            title="🔥 This Year",
+            text=str(stats.get("this_year", 0)),
+            styles={
+                "card": {
+                    "background-color": "#ffffff",
+                    "border": "1px solid #e2e8f0",
+                    "border-radius": "12px",
+                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
+                    "padding": "20px",
+                },
+                "title": {
+                    "font-size": "14px",
+                    "color": "#64748b",
+                    "font-weight": "500",
+                    "text-align": "center",
+                },
+                "text": {
+                    "font-size": "36px",
+                    "font-weight": "800",
+                    "color": "#10b981",
+                    "text-align": "center",
+                    "margin-top": "8px",
+                },
+            },
         )
 
     with stat_cols[3]:
-        st.markdown(
-            f"""
-        <div class="stat-card">
-            <div class="stat-icon">✏️</div>
-            <div class="stat-value">{user_idea_count}</div>
-            <div class="stat-label">Your Ideas</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
+        card(
+            title="✏️ Your Ideas",
+            text=str(user_idea_count),
+            styles={
+                "card": {
+                    "background-color": "#ffffff",
+                    "border": "1px solid #e2e8f0",
+                    "border-radius": "12px",
+                    "box-shadow": "0 2px 8px rgba(0,0,0,0.04)",
+                    "padding": "20px",
+                },
+                "title": {
+                    "font-size": "14px",
+                    "color": "#64748b",
+                    "font-weight": "500",
+                    "text-align": "center",
+                },
+                "text": {
+                    "font-size": "36px",
+                    "font-weight": "800",
+                    "color": "#8b5cf6",
+                    "text-align": "center",
+                    "margin-top": "8px",
+                },
+            },
         )
 
     st.divider()
