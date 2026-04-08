@@ -182,11 +182,15 @@ st.markdown(
 
     .card {
         background: white;
-        border-radius: 14px;
+        border-radius: 12px;
         padding: 24px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         border: 1px solid #e2e8f0;
-        height: 100%;
+        height: auto;
+        min-height: 200px;
+        overflow: hidden;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     .card-title {
@@ -207,13 +211,16 @@ st.markdown(
 
     .why-list li {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
         padding: 12px 0;
         border-bottom: 1px solid #f1f5f9;
         font-size: 15px;
         color: #475569;
         line-height: 1.4;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        flex-wrap: wrap;
     }
 
     .why-list li:last-child {
@@ -233,14 +240,17 @@ st.markdown(
 
     .benefit-item {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
-        padding: 10px 14px;
+        padding: 12px 16px;
         background: #f8fafc;
         border-radius: 10px;
         font-size: 14px;
         color: #475569;
         line-height: 1.4;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        flex-wrap: wrap;
     }
 
     .benefit-check {

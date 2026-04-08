@@ -416,16 +416,6 @@ st.markdown(
         padding: 12px 24px !important;
         border-radius: var(--radius-sm) !important;
     }
-
-    /* ===== CARD COMPONENT BASE ===== */
-    .card {
-        background: var(--bg-surface);
-        border-radius: var(--radius-md);
-        padding: 24px;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-        overflow: hidden;
-    }
 </style>
 """,
     unsafe_allow_html=True,
