@@ -77,6 +77,34 @@ st.markdown(
         visibility: hidden !important;
     }
 
+    /* Navigation Buttons */
+    .nav-button {
+        width: 100%;
+        padding: 12px 16px;
+        margin: 2px 8px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: #FFFFFF !important;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .nav-button:hover {
+        background: rgba(255,255,255,0.15) !important;
+    }
+    
+    .nav-button.active {
+        background: rgba(255,255,255,0.25) !important;
+        border-left: 3px solid #FFFFFF;
+    }
+
     /* Sidebar branding */
     .sidebar-brand {
         text-align: center;
@@ -258,8 +286,17 @@ st.markdown(
         border: 1px solid var(--border) !important;
         border-radius: var(--radius-sm) !important;
         color: var(--text-primary) !important;
-        padding: 12px !important;
+        padding: 10px 12px !important;
         font-size: 14px !important;
+        white-space: normal !important;
+        overflow-wrap: break-word !important;
+    }
+    
+    .stTextInput > div > div > input {
+        min-height: 44px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
     .stTextInput > div > div > input::placeholder,
@@ -280,8 +317,9 @@ st.markdown(
         border: 1px solid var(--border) !important;
         border-radius: var(--radius-sm) !important;
         color: var(--text-primary) !important;
-        padding: 12px !important;
+        padding: 10px 12px !important;
         font-size: 14px !important;
+        min-height: 44px !important;
     }
 
     /* ===== MULTISELECT ===== */
@@ -360,9 +398,10 @@ st.markdown(
     .card {
         background: var(--bg-surface);
         border-radius: var(--radius-md);
-        padding: 20px;
+        padding: 24px;
         border: 1px solid var(--border);
         box-shadow: var(--shadow-sm);
+        overflow: hidden;
     }
 </style>
 """,

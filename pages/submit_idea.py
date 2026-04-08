@@ -680,12 +680,12 @@ def render():
             key="drivers_multiselect",
         )
 
-        # If "Other" is selected, show text input
+        # If "Other - specify in open box" is selected, show text input
         drivers_other = ""
-        if "Other" in drivers:
+        if "Other - specify in open box" in drivers:
             drivers_other = st.text_input(
-                "Other - Please Specify",
-                placeholder="Please describe other driver(s)",
+                "Please specify",
+                placeholder="Please specify...",
                 value=st.session_state.idea_form.get("drivers_other", ""),
                 key="drivers_other_input",
             )

@@ -323,6 +323,13 @@ def render_edit_form(idea):
             except:
                 current_drivers = [idea["drivers"]] if idea["drivers"] else []
 
+        # Extract existing "Other" value from drivers
+        current_drivers_other = ""
+        for d in current_drivers:
+            if d and isinstance(d, str) and d.startswith("Other: "):
+                current_drivers_other = d.replace("Other: ", "", 1)
+                break
+
         current_effective_date = None
         if idea["effective_date"]:
             try:
@@ -353,11 +360,17 @@ def render_edit_form(idea):
                 "Drivers for Capacity Creation",
                 DRIVERS_OPTIONS,
                 default=current_drivers,
+                key=f"drivers_multiselect_{idea['id']}",
             )
 
             new_drivers_other = ""
-            if "Other" in new_drivers or "Other - specify in open box" in new_drivers:
-                new_drivers_other = st.text_input("Other - Please Specify", value="")
+            if "Other - specify in open box" in new_drivers:
+                new_drivers_other = st.text_input(
+                    "Please specify",
+                    placeholder="Please specify...",
+                    value=current_drivers_other,
+                    key=f"drivers_other_{idea['id']}",
+                )
 
             col1, col2 = st.columns(2)
             with col1:
