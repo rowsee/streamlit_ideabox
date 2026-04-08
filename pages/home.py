@@ -6,7 +6,6 @@ from database import (
     get_top_contributor,
     get_recent_ideas,
     get_trending_ideas,
-    get_top_contributors_all,
 )
 
 st.set_page_config(layout="wide", page_icon="💡")
@@ -173,46 +172,62 @@ st.markdown(
         font-size: 24px;
     }
 
-    /* IDEA CARDS */
-    .idea-card {
+    /* IDEA LIST STYLES (replacing cards) */
+    .idea-list {
         background: white;
         border-radius: 12px;
-        padding: 20px;
         border: 1px solid #e2e8f0;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        transition: all 0.2s ease;
-        height: 100%;
+        overflow: hidden;
     }
 
-    .idea-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-        border-color: #6366f1;
+    .idea-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        background: white;
+        transition: background 0.2s ease;
     }
 
-    /* Ensure cards don't look clickable unless they are */
-    .idea-card {
-        cursor: default;
+    .idea-list-item:hover {
+        background: #f8fafc;
     }
 
-    .idea-card-title {
-        font-size: 16px;
+    .idea-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .idea-list-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .idea-list-title {
         font-weight: 600;
         color: #1e293b;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        font-size: 15px;
         line-height: 1.4;
     }
 
-    .idea-card-meta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .idea-list-meta {
         font-size: 13px;
         color: #64748b;
-        margin-bottom: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
-    .idea-card-votes {
+    .idea-list-stats {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .idea-list-votes {
         display: inline-flex;
         align-items: center;
         gap: 4px;
@@ -222,6 +237,12 @@ st.markdown(
         font-size: 13px;
         font-weight: 500;
         color: #6366f1;
+    }
+
+    .idea-list-date {
+        font-size: 12px;
+        color: #94a3b8;
+        white-space: nowrap;
     }
 
     /* EMPTY STATES */
@@ -497,27 +518,82 @@ def render_empty_state(icon, title, message, cta_text=None):
             st.rerun()
 
 
-def render_idea_card(idea, compact=False):
-    """Render a compact idea card"""
+def render_idea_list_item(idea, show_date=False):
+    """Render an idea as a list item"""
     votes = idea.get("votes", 0)
-    title = (
-        idea.get("title", "Untitled")[:60] + "..."
-        if len(idea.get("title", "")) > 60
-        else idea.get("title", "Untitled")
-    )
+    title = idea.get("title", "Untitled")
+    if len(title) > 70:
+        title = title[:67] + "..."
     submitter = idea.get("submitter_name") or idea.get("username", "Anonymous")
 
+    date_html = ""
+    if show_date and idea.get("submitted_at"):
+        from datetime import datetime
+
+        try:
+            date_obj = datetime.strptime(str(idea["submitted_at"])[:10], "%Y-%m-%d")
+            date_str = date_obj.strftime("%b %d, %Y")
+            date_html = f'<span class="idea-list-date">📅 {date_str}</span>'
+        except:
+            pass
+
     html = f"""
-    <div class="idea-card">
-        <div class="idea-card-title">{title}</div>
-        <div class="idea-card-meta">
-            <span>by {submitter}</span>
+    <div class="idea-list-item">
+        <div class="idea-list-main">
+            <div class="idea-list-title">💡 {title}</div>
+            <div class="idea-list-meta">
+                <span>by {submitter}</span>
+                {date_html}
+            </div>
         </div>
-        <div class="idea-card-votes">
-            👍 {votes} likes
+        <div class="idea-list-stats">
+            <div class="idea-list-votes">👍 {votes}</div>
         </div>
     </div>
     """
+    st.markdown(html, unsafe_allow_html=True)
+
+
+def render_idea_list(ideas, show_date=False):
+    """Render a list of ideas"""
+    if not ideas:
+        return
+
+    html_items = []
+    for idea in ideas[:5]:  # Show max 5 items
+        votes = idea.get("votes", 0)
+        title = idea.get("title", "Untitled")
+        if len(title) > 70:
+            title = title[:67] + "..."
+        submitter = idea.get("submitter_name") or idea.get("username", "Anonymous")
+
+        date_html = ""
+        if show_date and idea.get("submitted_at"):
+            from datetime import datetime
+
+            try:
+                date_obj = datetime.strptime(str(idea["submitted_at"])[:10], "%Y-%m-%d")
+                date_str = date_obj.strftime("%b %d, %Y")
+                date_html = f'<span class="idea-list-date">📅 {date_str}</span>'
+            except:
+                pass
+
+        html_items.append(f"""
+        <div class="idea-list-item">
+            <div class="idea-list-main">
+                <div class="idea-list-title">💡 {title}</div>
+                <div class="idea-list-meta">
+                    <span>by {submitter}</span>
+                    {date_html}
+                </div>
+            </div>
+            <div class="idea-list-stats">
+                <div class="idea-list-votes">👍 {votes}</div>
+            </div>
+        </div>
+        """)
+
+    html = f'<div class="idea-list">{"".join(html_items)}</div>'
     st.markdown(html, unsafe_allow_html=True)
 
 
@@ -529,9 +605,8 @@ def render():
     user_idea_count = len(user_ideas)
 
     # Get new data
-    recent_ideas = get_recent_ideas(3) or []
-    trending_ideas = get_trending_ideas(3) or []
-    top_contributors = get_top_contributors_all(5) or []
+    recent_ideas = get_recent_ideas(5) or []
+    trending_ideas = get_trending_ideas(5) or []
 
     user_name = st.session_state.get("full_name") or st.session_state.get(
         "username", "User"
@@ -625,7 +700,7 @@ def render():
 
     st.divider()
 
-    # TRENDING IDEAS SECTION
+    # TRENDING IDEAS SECTION (List Format)
     st.markdown(
         """
     <div class="section-header">
@@ -637,10 +712,7 @@ def render():
     )
 
     if trending_ideas:
-        trend_cols = st.columns(3)
-        for idx, idea in enumerate(trending_ideas):
-            with trend_cols[idx]:
-                render_idea_card(idea)
+        render_idea_list(trending_ideas, show_date=False)
     else:
         render_empty_state(
             "🔥",
@@ -661,10 +733,7 @@ def render():
     )
 
     if recent_ideas:
-        recent_cols = st.columns(3)
-        for idx, idea in enumerate(recent_ideas):
-            with recent_cols[idx]:
-                render_idea_card(idea)
+        render_idea_list(recent_ideas, show_date=True)
     else:
         render_empty_state(
             "🆕",
@@ -675,8 +744,8 @@ def render():
 
     st.divider()
 
-    # HIGHLIGHTS + TOP CONTRIBUTORS ROW
-    highlights_cols = st.columns([1, 1, 1], gap="medium")
+    # HIGHLIGHTS ROW - Top BU and Top Contributor only (2 columns)
+    highlights_cols = st.columns(2, gap="medium")
 
     with highlights_cols[0]:
         if top_bu:
@@ -698,9 +767,9 @@ def render():
             <div class="highlight-card orange">
                 <div class="highlight-icon">🏆</div>
                 <div class="highlight-label">TOP BU THIS MONTH</div>
-                <div class="highlight-name">No data yet</div>
+                <div class="highlight-name">🏆 Be the First!</div>
                 <div class="highlight-count">—</div>
-                <div class="highlight-text">Start submitting ideas!</div>
+                <div class="highlight-text">Submit ideas from your BU to see it here!</div>
             </div>
             """,
                 unsafe_allow_html=True,
@@ -711,7 +780,7 @@ def render():
             st.markdown(
                 f"""
             <div class="highlight-card purple">
-                <div class="highlight-icon">👤</div>
+                <div class="highlight-icon">⭐</div>
                 <div class="highlight-label">TOP CONTRIBUTOR</div>
                 <div class="highlight-name">{top_contributor.get("name", "N/A")}</div>
                 <div class="highlight-count">{top_contributor.get("count", 0)}</div>
@@ -724,48 +793,14 @@ def render():
             st.markdown(
                 """
             <div class="highlight-card purple">
-                <div class="highlight-icon">👤</div>
+                <div class="highlight-icon">⭐</div>
                 <div class="highlight-label">TOP CONTRIBUTOR</div>
-                <div class="highlight-name">No data yet</div>
+                <div class="highlight-name">⭐ Start Your Journey!</div>
                 <div class="highlight-count">—</div>
-                <div class="highlight-text">Be the first!</div>
+                <div class="highlight-text">Submit your first idea to become a top contributor!</div>
             </div>
             """,
                 unsafe_allow_html=True,
-            )
-
-    with highlights_cols[2]:
-        st.markdown(
-            """
-        <div class="section-header" style="margin-top: 0;">
-            <span class="section-icon">🏆</span>
-            <h2 class="section-title" style="font-size: 17px;">Top Contributors</h2>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-        if top_contributors:
-            for idx, contributor in enumerate(top_contributors[:3]):
-                name = contributor.get("full_name") or contributor.get(
-                    "username", "Anonymous"
-                )
-                count = contributor.get("idea_count", 0)
-                st.markdown(
-                    f"""
-                <div class="contributor-item">
-                    <div class="contributor-rank">#{idx + 1}</div>
-                    <div class="contributor-name">{name}</div>
-                    <div class="contributor-count">{count} ideas</div>
-                </div>
-                """,
-                    unsafe_allow_html=True,
-                )
-        else:
-            render_empty_state(
-                "🏆",
-                "No contributors yet",
-                "Join the leaderboard by submitting your ideas!",
             )
 
     st.divider()
