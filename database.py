@@ -305,6 +305,10 @@ def save_uploaded_files(uploaded_files, prefix="file"):
     saved_paths = []
     for uploaded_file in uploaded_files:
         if uploaded_file is not None:
+            # Skip if it's a string (file path) rather than an UploadedFile object
+            if isinstance(uploaded_file, str):
+                saved_paths.append(uploaded_file)
+                continue
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"{prefix}_{timestamp}_{uploaded_file.name}"
             filepath = os.path.join(UPLOAD_FOLDER, filename)
