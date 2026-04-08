@@ -949,6 +949,6 @@ def render():
             unsafe_allow_html=True,
         )
 
-        st.page_link(
-            "pages/submit_idea.py", label="✏️ Submit Your First Idea", icon="💡"
-        )
+        if st.button("Submit Your First Idea", type="primary"):
+            st.session_state.current_page = "submit_idea"
+            st.rerun()

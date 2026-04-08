@@ -399,6 +399,6 @@ def render():
             st.markdown("---")
     else:
         st.info("No ideas have been submitted yet. Be the first to share an idea!")
-        st.page_link(
-            "pages/submit_idea.py", label="💡 Submit the First Idea", icon="💡"
-        )
+        if st.button("Submit the First Idea", type="primary"):
+            st.session_state.current_page = "submit_idea"
+            st.rerun()
