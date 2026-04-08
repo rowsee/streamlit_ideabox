@@ -32,34 +32,57 @@ st.markdown(
 
     .stApp { background-color: var(--bg-light); }
 
-    /* HERO SECTION */
+    /* Remove focus/selection highlighting from all elements */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    *:focus {
+        outline: none !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        outline: none !important;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    h2::selection, h2::-moz-selection,
+    .section-title::selection, .section-title::-moz-selection {
+        background: transparent;
+        color: inherit;
+    }
+
+    /* HERO SECTION - Enhanced */
     .hero-section {
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         border-radius: 16px;
-        padding: 40px 32px;
+        padding: 48px 40px;
         text-align: center;
-        margin-bottom: 32px;
+        margin-bottom: 40px;
         color: white;
         box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
     }
 
     .hero-icon { 
-        font-size: 48px; 
-        margin-bottom: 16px; 
+        font-size: 64px; 
+        margin-bottom: 20px; 
     }
 
     .hero-title { 
-        font-size: 28px; 
+        font-size: 32px; 
         font-weight: 700; 
-        margin-bottom: 12px; 
+        margin-bottom: 16px; 
         color: white !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .hero-subtitle { 
-        font-size: 16px; 
-        opacity: 0.9; 
-        margin-bottom: 24px;
-        color: rgba(255,255,255,0.9) !important;
+        font-size: 18px; 
+        opacity: 0.95; 
+        margin-bottom: 28px;
+        color: rgba(255,255,255,0.95) !important;
+        font-weight: 400;
     }
 
     .hero-cta {
@@ -81,15 +104,16 @@ st.markdown(
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    /* STAT CARDS */
+    /* STAT CARDS - Enhanced */
     .stat-card {
         background: white;
         border-radius: 12px;
-        padding: 24px;
+        padding: 28px 24px;
         text-align: center;
         border: 1px solid #e2e8f0;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         transition: all 0.2s ease;
+        cursor: default;
     }
 
     .stat-card:hover {
@@ -99,37 +123,50 @@ st.markdown(
     }
 
     .stat-icon { 
-        font-size: 28px; 
+        font-size: 32px; 
         margin-bottom: 12px; 
     }
 
     .stat-value { 
-        font-size: 36px; 
-        font-weight: 700; 
-        color: #1e293b; 
+        font-size: 40px; 
+        font-weight: 800; 
+        color: #1e293b;
+        line-height: 1;
     }
 
     .stat-label { 
         font-size: 14px; 
         color: #64748b; 
-        margin-top: 4px;
+        margin-top: 8px;
         font-weight: 500;
     }
 
-    /* SECTION HEADERS */
+    /* SECTION HEADERS - Enhanced with blue highlight fix */
     .section-header {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 20px;
-        margin-top: 32px;
+        margin-bottom: 24px;
+        margin-top: 40px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e2e8f0;
     }
 
     .section-title {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 700;
         color: #1e293b;
         margin: 0;
+        user-select: none;
+        -webkit-user-select: none;
+        outline: none !important;
+        background: transparent !important;
+    }
+
+    .section-title:focus,
+    .section-title:active {
+        outline: none !important;
+        background: transparent !important;
     }
 
     .section-icon {
@@ -151,6 +188,11 @@ st.markdown(
         transform: translateY(-2px);
         box-shadow: 0 8px 16px rgba(0,0,0,0.08);
         border-color: #6366f1;
+    }
+
+    /* Ensure cards don't look clickable unless they are */
+    .idea-card {
+        cursor: default;
     }
 
     .idea-card-title {
@@ -416,8 +458,19 @@ st.markdown(
     }
 
     .stDivider { 
-        margin: 32px 0; 
+        margin: 40px 0; 
         border-color: #e2e8f0;
+    }
+
+    /* Additional spacing and polish */
+    .main > div {
+        padding-top: 8px;
+    }
+
+    /* Remove default Streamlit focus styles on headings */
+    h1:focus, h2:focus, h3:focus {
+        outline: none !important;
+        box-shadow: none !important;
     }
 </style>
 """,
