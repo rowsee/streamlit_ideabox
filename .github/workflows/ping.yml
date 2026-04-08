@@ -2,12 +2,46 @@ name: Keep App Awake
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
-  workflow_dispatch:         # Manual trigger
+    - cron: '*/3 * * * *'  # Every 3 minutes (more frequent)
+  workflow_dispatch:       # Manual trigger
+  push:                    # Also run on push to ensure it's working
+    branches: [main]
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Streamlit App
-        run: curl -s -o /dev/null -w "%{http_code}" https://procurementideabox.streamlit.app
+      - name: Ping Streamlit App - Attempt 1
+        run: |
+          echo "⏰ Pinging at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+            -H "Accept-Language: en-US,en;q=0.5" \
+            -H "Cache-Control: no-cache" \
+            --max-time 30 \
+            "https://procurementideabox.streamlit.app")
+          echo "📊 Response code: $response"
+          if [ "$response" = "200" ] || [ "$response" = "308" ] || [ "$response" = "307" ]; then
+            echo "✅ App is awake!"
+          else
+            echo "⚠️ Warning: App returned HTTP $response"
+          fi
+
+      - name: Wait 30 seconds
+        run: sleep 30
+
+      - name: Ping Streamlit App - Attempt 2
+        run: |
+          echo "⏰ Second ping at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+            --max-time 30 \
+            "https://procurementideabox.streamlit.app?_=${RANDOM}")
+          echo "📊 Response code: $response"
+          if [ "$response" = "200" ] || [ "$response" = "308" ] || [ "$response" = "307" ]; then
+            echo "✅ App is still awake!"
+          else
+            echo "⚠️ Warning: Second ping returned HTTP $response"
+          fi
