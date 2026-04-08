@@ -563,7 +563,7 @@ def render():
             render_edit_form(idea)
         return
 
-    st.markdown("## 🏆 My Ideas")
+    st.markdown("### 📁 My Ideas")
     st.markdown("View and manage your submitted ideas.")
 
     ideas = get_user_ideas(st.session_state.user_id)
@@ -590,7 +590,7 @@ def render():
             df.to_excel(buffer, index=False, engine="openpyxl")
             buffer.seek(0)
             st.download_button(
-                label="📥 Export My Ideas to Excel",
+                label="📥 Export",
                 data=buffer,
                 file_name=f"my_ideabox_ideas_{export_date}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -685,8 +685,17 @@ def render():
 
             st.markdown("---")
     else:
-        st.info("You haven't submitted any ideas yet.")
+        st.markdown(
+            """
+        <div style="text-align: center; padding: 60px 20px; background: #ffffff; border-radius: 12px; border: 2px dashed #e2e8f0;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📭</div>
+            <h3 style="color: #1e293b; margin-bottom: 8px;">No ideas yet</h3>
+            <p style="color: #64748b; margin-bottom: 20px;">You haven't submitted any ideas yet.<br>Start sharing your improvement suggestions!</p>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
         st.page_link(
-            "pages/submit_idea.py", label="💡 Submit Your First Idea", icon="💡"
+            "pages/submit_idea.py", label="✏️ Submit Your First Idea", icon="💡"
         )

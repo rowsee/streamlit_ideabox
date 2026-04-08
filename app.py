@@ -15,80 +15,120 @@ st.set_page_config(
     menu_items=None,
 )
 
-# Force light mode - hide dark mode toggle
+# Modern color palette CSS
 st.markdown(
     """
 <style>
-    /* Hide the default theme toggle in Streamlit */
-    [data-testid="stThemeSelector"] {
-        display: none !important;
+    /* ===== COLOR PALETTE ===== */
+    :root {
+        --primary: #6366f1;
+        --primary-light: #818cf8;
+        --primary-dark: #4f46e5;
+        --secondary: #8b5cf6;
+        --accent: #f97316;
+        --accent-light: #fb923c;
+        --bg-main: #f8fafc;
+        --bg-surface: #ffffff;
+        --bg-sidebar: #f1f5f9;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --text-muted: #94a3b8;
+        --border: #e2e8f0;
+        --border-light: #f1f5f9;
+        --success: #10b981;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
     }
-    
-    /* Force light theme colors */
-    .stApp {
-        background: #F9FAFB !important;
-        color: #111827 !important;
-    }
-    
-    /* Force light colors on all elements */
-    html, body, div, span, p, label {
-        background-color: transparent !important;
-    }
-    
-    /* Remove dark backgrounds anywhere they might appear */
-    [class*="dark"], [style*="dark"], [style*="#1E1E1E"], [style*="#262626"] {
-        background: #FFFFFF !important;
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
 
-st.markdown(
-    """
-<style>
-    /* Modern Clean Theme - Like Stripe/Notion/Linear */
-    
-    /* Main Background - Very Light Gray */
-    .stApp {
-        background: #F9FAFB;
-    }
+    /* Hide dark mode toggle */
+    [data-testid="stThemeSelector"] { display: none !important; }
+
+    /* Main Background */
+    .stApp { background: var(--bg-main) !important; }
     
     /* Text Styling */
     h1, h2, h3, h4, h5, h6 {
-        color: #111827 !important;
+        color: var(--text-primary) !important;
         font-weight: 600 !important;
         letter-spacing: -0.02em;
     }
     
-    p, span, div, label {
-        color: #374151 !important;
-    }
-    
-    /* Sidebar - Soft Blue-Gray */
+    p, span, div, label { color: var(--text-secondary) !important; }
+
+    /* ===== SIDEBAR - LIGHT GRAY ===== */
     section[data-testid="stSidebar"] {
-        background: #1E293B !important;
+        background: var(--bg-sidebar) !important;
+        border-right: 1px solid var(--border) !important;
     }
     
     section[data-testid="stSidebar"] * {
-        color: #E2E8F0 !important;
+        color: var(--text-secondary) !important;
+    }
+
+    /* Sidebar branding */
+    .sidebar-brand {
+        text-align: center;
+        padding: 24px 16px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 8px;
     }
     
-    /* Hide default navigation */
-    [data-testid="stSidebarNavItems"] {
-        display: none !important;
+    .sidebar-brand .logo {
+        font-size: 32px;
+        margin-bottom: 8px;
     }
     
-    /* Navigation Buttons - Clean Style */
+    .sidebar-brand .brand-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary) !important;
+    }
+    
+    .sidebar-brand .brand-tagline {
+        font-size: 11px;
+        color: var(--text-muted) !important;
+        margin-top: 2px;
+    }
+
+    /* Sidebar user welcome */
+    .sidebar-welcome {
+        background: var(--bg-surface);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        margin: 12px 16px;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .sidebar-welcome .greeting {
+        font-size: 11px;
+        color: var(--text-muted) !important;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .sidebar-welcome .user-name {
+        font-size: 14px;
+        color: var(--text-primary) !important;
+        margin-top: 4px;
+        font-weight: 600;
+    }
+
+    /* Navigation Buttons */
     .nav-button {
         width: 100%;
         padding: 12px 16px;
-        margin: 4px 0;
+        margin: 2px 8px;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--radius-sm);
         background: transparent;
-        color: #94A3B8 !important;
-        font-size: 13px;
+        color: var(--text-secondary) !important;
+        font-size: 14px;
         font-weight: 500;
         text-align: left;
         cursor: pointer;
@@ -99,202 +139,183 @@ st.markdown(
     }
     
     .nav-button:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: #F1F5F9 !important;
+        background: var(--bg-surface) !important;
+        color: var(--text-primary) !important;
     }
     
     .nav-button.active {
-        background: #FF6B35;
+        background: var(--primary) !important;
         color: white !important;
     }
     
-    .nav-button span {
-        font-size: 16px;
+    .nav-button.active:hover {
+        background: var(--primary-dark) !important;
     }
-    
-    /* Sidebar Branding */
-    .sidebar-brand {
-        text-align: center;
-        padding: 24px 0 32px 0;
-    }
-    
-    .sidebar-brand .logo {
-        font-size: 40px;
-        margin-bottom: 8px;
-    }
-    
-    .sidebar-brand .brand-name {
-        font-size: 18px;
-        font-weight: 600;
-        color: #F1F5F9 !important;
-        margin: 0;
-    }
-    
-    .sidebar-brand .brand-tagline {
-        font-size: 11px;
-        color: #64748B !important;
-        margin: 4px 0 0 0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    /* Welcome Message */
-    .welcome-msg {
-        background: rgba(255, 107, 53, 0.1);
-        border-radius: 8px;
-        padding: 12px;
-        text-align: center;
-        margin-bottom: 24px;
-    }
-    
-    .welcome-msg .greeting {
-        font-size: 11px;
-        color: #FF6B35 !important;
-        margin: 0;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .welcome-msg .user-name {
+
+    /* Logout button */
+    .logout-btn {
+        margin: 8px 16px;
+        padding: 10px 16px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-secondary) !important;
         font-size: 13px;
-        color: #F1F5F9 !important;
-        margin: 6px 0 0 0;
-        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
     
-    /* Modern Buttons - Clean Orange */
+    .logout-btn:hover {
+        background: #fee2e2 !important;
+        color: #dc2626 !important;
+        border-color: #fecaca !important;
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+# Additional modern styles
+st.markdown(
+    """
+<style>
+    /* ===== GLOBAL BUTTONS ===== */
     .stButton > button {
-        background: #FF6B35 !important;
+        background: var(--primary) !important;
         border: none !important;
-        border-radius: 8px !important;
+        border-radius: var(--radius-sm) !important;
         color: white !important;
         font-weight: 500 !important;
-        font-size: 13px !important;
+        font-size: 14px !important;
         padding: 10px 20px !important;
         transition: all 0.2s ease;
     }
     
     .stButton > button:hover {
-        background: #E55A2B !important;
+        background: var(--primary-dark) !important;
+        transform: translateY(-1px);
     }
-    
-    /* 1. Form Inputs - Clean White Style (Like Notion/Linear) */
+
+    /* ===== FORM INPUTS ===== */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea {
-        background: #FFFFFF !important;
-        border: 1px solid #E5E7EB !important;
-        border-radius: 8px !important;
-        color: #111827 !important;
-        padding: 11px !important;
-        font-size: 13px !important;
-        box-shadow: none !important;
-    }
-    
-    .stTextInput > div > div,
-    .stTextArea > div > div {
-        background: #FFFFFF !important;
-    }
-    
-    .stTextInput > div,
-    .stTextArea > div {
-        background: #FFFFFF !important;
+        background: var(--bg-surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-sm) !important;
+        color: var(--text-primary) !important;
+        padding: 12px !important;
+        font-size: 14px !important;
     }
     
     .stTextInput > div > div > input::placeholder,
     .stTextArea > div > div > textarea::placeholder {
-        color: #9CA3AF !important;
+        color: var(--text-muted) !important;
     }
     
     .stTextInput > div > div > input:focus,
     .stTextArea > div > div > textarea:focus {
-        border-color: #FF6A3D !important;
-        box-shadow: 0 0 0 3px rgba(255, 106, 61, 0.1) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
         outline: none !important;
     }
-    
-    /* Selectbox - White background with consistent font */
+
+    /* ===== SELECTBOX ===== */
     .stSelectbox > div > div > div {
-        background: #FFFFFF !important;
-        border: 1px solid #E5E7EB !important;
-        border-radius: 8px !important;
-        color: #111827 !important;
-        padding: 11px !important;
-        font-size: 13px !important;
+        background: var(--bg-surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-sm) !important;
+        color: var(--text-primary) !important;
+        padding: 12px !important;
+        font-size: 14px !important;
     }
-    
-    .stSelectbox > div > div > div > div {
-        font-size: 13px !important;
-        color: #111827 !important;
-    }
-    
-    .stSelectbox > div > div > div span {
-        font-size: 13px !important;
-        color: #111827 !important;
-    }
-    
-    .stSelectbox > div > div > div > div > div {
-        font-size: 13px !important;
-        color: #111827 !important;
-    }
-    
-    .stSelectbox > div > div,
-    .stSelectbox > div {
-        background: #FFFFFF !important;
-        font-size: 13px !important;
-    }
-    
-    .stSelectbox > div > div > div:focus-within {
-        border-color: #FF6A3D !important;
-    }
-    
-    /* Multiselect - Consistent font */
+
+    /* ===== MULTISELECT ===== */
     .stMultiSelect > div > div > div {
-        background: #FFFFFF !important;
-        border: 1px solid #E5E7EB !important;
-        border-radius: 8px !important;
-        padding: 11px !important;
-        font-size: 13px !important;
+        background: var(--bg-surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-sm) !important;
+        padding: 12px !important;
     }
-    
-    .stMultiSelect > div > div > div > div {
-        font-size: 13px !important;
-        color: #111827 !important;
-    }
-    
-    .stMultiSelect > div > div > div span {
-        font-size: 13px !important;
-    }
-    
-    .stMultiSelect > div > div,
-    .stMultiSelect > div {
-        background: #FFFFFF !important;
-        font-size: 13px !important;
-    }
-    
-    /* Date Input - Consistent font */
+
+    /* ===== DATE INPUT ===== */
     .stDateInput > div > div > div {
-        background: #FFFFFF !important;
-        border: 1px solid #E5E7EB !important;
-        border-radius: 8px !important;
-        font-size: 13px !important;
+        background: var(--bg-surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-sm) !important;
+    }
+
+    /* ===== METRICS ===== */
+    div[data-testid="stMetric"] {
+        background: var(--bg-surface);
+        border-radius: var(--radius-md);
+        padding: 20px !important;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* ===== SUCCESS/ERROR/INFO MESSAGES ===== */
+    .stSuccess {
+        background: #ecfdf5 !important;
+        color: #065f46 !important;
+        border: 1px solid #a7f3d0 !important;
+        border-radius: var(--radius-sm) !important;
     }
     
-    .stDateInput > div > div > div input {
-        font-size: 13px !important;
-        color: #111827 !important;
+    .stError {
+        background: #fef2f2 !important;
+        color: #991b1b !important;
+        border: 1px solid #fecaca !important;
+        border-radius: var(--radius-sm) !important;
     }
     
-    .stDateInput > div > div,
-    .stDateInput > div {
-        background: #FFFFFF !important;
-        font-size: 13px !important;
+    .stInfo {
+        background: #eff6ff !important;
+        color: #1e40af !important;
+        border: 1px solid #bfdbfe !important;
+        border-radius: var(--radius-sm) !important;
+    }
+
+    /* ===== EXPANDER/CARD ===== */
+    .stExpander {
+        background: var(--bg-surface) !important;
+        border-radius: var(--radius-md) !important;
+        border: 1px solid var(--border) !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    /* ===== DOWNLOAD BUTTON ===== */
+    .stDownloadButton > button {
+        background: var(--bg-surface) !important;
+        color: var(--text-secondary) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-sm) !important;
     }
     
-    /* Date picker calendar popup - White background */
-    div[data-baseweb="popover"][aria-label="Select date"] {
-        background: #FFFFFF !important;
+    .stDownloadButton > button:hover {
+        background: var(--border-light) !important;
     }
+
+    /* ===== FORM SUBMIT BUTTON ===== */
+    button[kind="primary"] {
+        padding: 12px 24px !important;
+        border-radius: var(--radius-sm) !important;
+    }
+
+    /* ===== CARD COMPONENT BASE ===== */
+    .card {
+        background: var(--bg-surface);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+
+def init_session():
     
     div[data-baseweb="popover"][aria-label="Select date"] > div {
         background: #FFFFFF !important;
@@ -938,19 +959,14 @@ def login_user():
             }
             
             .stButton > button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3) !important;
+                transform: translateY(-1px);
+                box-shadow: var(--shadow-md) !important;
             }
             
             /* Reduce top padding for login page */
             .block-container {
-                padding-top: 1rem !important;
-                padding-bottom: 1rem !important;
-            }
-            
-            /* Remove extra space from empty elements */
-            .stMarkdown p:empty {
-                display: none;
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
             }
         </style>
         """,
@@ -958,21 +974,24 @@ def login_user():
         )
 
         with st.form("login_form"):
-            email = st.text_input(
-                "TE Email",
-                placeholder="Enter your @te.com email",
-                label_visibility="visible",
-            )
-            full_name = st.text_input(
-                "Full Name (optional)",
-                placeholder="Enter your name",
-                label_visibility="visible",
-            )
-            submitted = st.form_submit_button("Continue", use_container_width=True)
+            col_email, col_name = st.columns(2)
+            with col_email:
+                email = st.text_input(
+                    "TE Email",
+                    placeholder="your.name@te.com",
+                    label_visibility="visible",
+                )
+            with col_name:
+                full_name = st.text_input(
+                    "Your Name",
+                    placeholder="Enter your name",
+                    label_visibility="visible",
+                )
+            submitted = st.form_submit_button("Continue →", use_container_width=True)
 
             if submitted and email:
                 if not email.endswith("@te.com"):
-                    st.error("Only @te.com email addresses are allowed")
+                    st.error("🔒 Only @te.com email addresses are allowed")
                 else:
                     user = get_user_by_email(email)
                     if user:
@@ -1009,20 +1028,20 @@ def render_sidebar():
             # Welcome message
             st.markdown(
                 f"""
-            <div class="welcome-msg">
-                <p class="greeting">Welcome back!</p>
+            <div class="sidebar-welcome">
+                <p class="greeting">Welcome back</p>
                 <p class="user-name">{st.session_state.full_name or st.session_state.username}</p>
             </div>
             """,
                 unsafe_allow_html=True,
             )
 
-            # Navigation buttons
+            # Navigation buttons with icons
             nav_items = [
                 ("Home", "🏠", "home"),
-                ("Submit Ideas", "💡", "submit_idea"),
-                ("My Ideas", "👤", "my_ideas"),
-                ("Browse Ideas", "📋", "browse_ideas"),
+                ("Submit Idea", "✏️", "submit_idea"),
+                ("My Ideas", "📁", "my_ideas"),
+                ("Browse Ideas", "🔍", "browse_ideas"),
                 ("Dashboard", "📊", "dashboard"),
                 ("About", "ℹ️", "about"),
             ]
@@ -1032,18 +1051,15 @@ def render_sidebar():
                 btn_class = "nav-button active" if is_active else "nav-button"
 
                 if st.button(
-                    f"{icon} {label}", key=f"nav_{page_key}", use_container_width=True
+                    f"{icon}  {label}", key=f"nav_{page_key}", use_container_width=True
                 ):
                     st.session_state.current_page = page_key
                     st.rerun()
 
-            st.markdown(
-                "<div style='margin-top: auto; padding-top: 20px;'>",
-                unsafe_allow_html=True,
-            )
+            st.markdown("<div style='margin-top: auto; padding-top: 20px;'>", unsafe_allow_html=True)
 
             # Logout button
-            if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
+            if st.button("🚪  Sign out", key="logout_btn", use_container_width=True):
                 st.session_state.user_id = None
                 st.session_state.username = ""
                 st.session_state.email = ""
