@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from database import get_all_ideas
-from datetime import datetime
+from datetime import datetime, timedelta
 
 st.markdown(
     """
@@ -71,7 +71,51 @@ def render():
 
     st.markdown("### 🔍 Filters")
 
-    col1, col2, col3, col4 = st.columns(4)
+    # Date range filter (default: This Month)
+    from datetime import datetime, timedelta
+
+    col_date1, col_date2 = st.columns([1, 3])
+
+    with col_date1:
+        date_preset = st.selectbox(
+            "Date Range",
+            options=["This Month", "Last 30 Days", "This Year", "All Time", "Custom"],
+            index=0,
+            key="date_preset",
+        )
+
+    # Calculate date range based on preset
+    today = datetime.now().date()
+    if date_preset == "This Month":
+        default_start = today.replace(day=1)
+        default_end = today
+    elif date_preset == "Last 30 Days":
+        default_start = today - timedelta(days=30)
+        default_end = today
+    elif date_preset == "This Year":
+        default_start = today.replace(month=1, day=1)
+        default_end = today
+    elif date_preset == "All Time":
+        default_start = df["submitted_at"].min().date()
+        default_end = today
+    else:  # Custom
+        default_start = today.replace(day=1)
+        default_end = today
+
+    with col_date2:
+        if date_preset == "Custom":
+            date_range = st.date_input(
+                "Select Date Range",
+                value=[default_start, default_end],
+                key="dashboard_date_range",
+            )
+        else:
+            date_range = [default_start, default_end]
+            st.markdown(
+                f"**{default_start.strftime('%b %d, %Y')} - {default_end.strftime('%b %d, %Y')}**"
+            )
+
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         region_filter = st.multiselect(
@@ -93,6 +137,14 @@ def render():
         )
 
     filtered_df = df.copy()
+
+    # Apply date filter
+    if len(date_range) == 2:
+        start_date, end_date = date_range
+        filtered_df = filtered_df[
+            (filtered_df["submitted_at"].dt.date >= start_date)
+            & (filtered_df["submitted_at"].dt.date <= end_date)
+        ]
 
     if region_filter and "All" not in region_filter:
         filtered_df = filtered_df[filtered_df["region"].isin(region_filter)]

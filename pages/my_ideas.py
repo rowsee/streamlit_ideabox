@@ -130,6 +130,95 @@ st.markdown(
     div[data-testid="stCheckbox"] svg path {
         fill: #000000 !important;
     }
+    
+    /* Form Section Cards - Matching submit_idea.py */
+    .form-section {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-title .number {
+        background: #6366f1;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    /* Toggle section */
+    .toggle-section {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin: 24px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    /* Implementation details card */
+    .implementation-card {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 24px;
+    }
+    
+    .subsection-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6B7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 24px 0 16px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .subsection-title:first-child {
+        margin-top: 0;
+    }
+    
+    /* File attachment styling */
+    .file-section {
+        background: #F9FAFB;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 12px 0;
+    }
+    
+    .file-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .file-item:last-child {
+        border-bottom: none;
+    }
  </style>
 """,
     unsafe_allow_html=True,
@@ -174,22 +263,38 @@ BU_CL_SITE_OPTIONS = [
 def render_edit_form(idea):
     """Render edit form for an idea"""
     st.markdown("### ✏️ Edit Idea")
+    st.markdown(
+        "Update your idea details below. All fields marked with * are required."
+    )
 
     with st.form("edit_idea_form"):
-        new_title = st.text_input("Project Title", value=idea["title"] or "")
+        # Section 1: Basic Information
+        st.markdown(
+            """
+        <div class="form-section">
+            <div class="section-title">
+                <span class="number">1</span>
+                Project Details
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        new_title = st.text_input("Project Title *", value=idea["title"] or "")
 
         new_proposed_change = st.text_area(
-            "Proposed Change", value=idea["proposed_change"] or "", height=120
+            "Proposed Change *", value=idea["proposed_change"] or "", height=120
         )
 
         col1, col2 = st.columns(2)
         with col1:
             new_project_lead = st.text_input(
-                "Project Lead", value=idea["project_lead"] or ""
+                "Project Lead *", value=idea["project_lead"] or ""
             )
         with col2:
             new_region = st.selectbox(
-                "Region",
+                "Region *",
                 REGION_OPTIONS,
                 index=REGION_OPTIONS.index(idea["region"])
                 if idea["region"] in REGION_OPTIONS
@@ -197,29 +302,67 @@ def render_edit_form(idea):
             )
 
         new_bu_cl_site = st.selectbox(
-            "BU/CL Site",
+            "BU/CL Site *",
             BU_CL_SITE_OPTIONS,
             index=BU_CL_SITE_OPTIONS.index(idea["bu_cl_site"])
             if idea["bu_cl_site"] in BU_CL_SITE_OPTIONS
             else 0,
         )
 
+        # Section 2: Context & Impact
+        st.markdown(
+            """
+        <div class="form-section">
+            <div class="section-title">
+                <span class="number">2</span>
+                Context & Impact
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
         new_problem_statements = st.text_area(
-            "Problem Statements", value=idea["problem_statements"] or "", height=80
+            "Problem Statements *", value=idea["problem_statements"] or "", height=80
         )
 
         new_benefits = st.text_area(
-            "Expected Benefits", value=idea["benefits"] or "", height=80
+            "Expected Benefits *", value=idea["benefits"] or "", height=80
+        )
+
+        # Implementation Toggle
+        st.markdown(
+            """
+        <div class="toggle-section">
+            <div>
+                <div style="font-size: 15px; font-weight: 500; color: #111827;">Is this already implemented?</div>
+                <div style="font-size: 13px; color: #6B7280; margin-top: 4px;">Toggle if this idea has been put into practice</div>
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
 
         new_is_implemented = st.checkbox(
-            "Is this already implemented?",
+            "Yes, this idea is implemented",
             value=idea["is_implemented"] == "Yes",
             key="edit_is_implemented",
+            label_visibility="collapsed",
         )
 
-        # Current Attachments Section
-        st.markdown("---")
+        # Section 3: Attachments
+        st.markdown(
+            """
+        <div class="form-section">
+            <div class="section-title">
+                <span class="number">3</span>
+                Attachments
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
         st.markdown("**📎 Current Attachments**")
 
         col1, col2, col3 = st.columns(3)
@@ -241,7 +384,7 @@ def render_edit_form(idea):
                     with col_name:
                         st.text(f"📄 {os.path.basename(fpath)}")
             else:
-                st.text("No capacity files attached")
+                st.caption("No capacity files attached")
 
         with col2:
             st.markdown("*Before Implementation:*")
@@ -260,7 +403,7 @@ def render_edit_form(idea):
                     with col_name:
                         st.text(f"📄 {os.path.basename(fpath)}")
             else:
-                st.text("No before implementation files")
+                st.caption("No before implementation files")
 
         with col3:
             st.markdown("*After Implementation:*")
@@ -279,7 +422,7 @@ def render_edit_form(idea):
                     with col_name:
                         st.text(f"📄 {os.path.basename(fpath)}")
             else:
-                st.text("No after implementation files")
+                st.caption("No after implementation files")
 
         st.markdown("---")
         st.markdown("**➕ Add New Attachments**")
@@ -341,7 +484,29 @@ def render_edit_form(idea):
             except:
                 current_effective_date = None
 
-        with st.expander("📋 Implementation Details", expanded=new_is_implemented):
+        # Section 4: Implementation Details (shown only if implemented)
+        new_effective_date = None
+        new_impact_group = None
+        new_drivers = current_drivers
+        new_drivers_other = ""
+        new_hours_saved = 0
+        new_planned_use = ""
+        new_solution_implemented = ""
+        new_date_implemented = None
+
+        if new_is_implemented:
+            st.markdown(
+                """
+            <div class="form-section">
+                <div class="section-title">
+                    <span class="number">4</span>
+                    Implementation Details
+                </div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
             col1, col2 = st.columns(2)
             with col1:
                 new_effective_date = st.date_input(
