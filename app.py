@@ -1,5 +1,12 @@
 import streamlit as st
-from database import init_db, get_user_by_email, create_user, force_schema_update
+from database import (
+    init_db,
+    get_user_by_email,
+    create_user,
+    force_schema_update,
+    get_all_user_emails,
+)
+from utils import validate_email_complete, normalize_email
 import pages.home as home
 import pages.submit_idea as submit_idea
 import pages.browse_ideas as browse_ideas
@@ -447,16 +454,63 @@ def login_user():
         unsafe_allow_html=True,
     )
 
+    # Login page header with fixed title (no wrapping)
     st.markdown(
         """
     <div style="text-align: center; margin-bottom: 40px;">
         <div style="font-size: 56px; margin-bottom: 16px;">💡</div>
-        <h1 style="color: #1e293b; margin-bottom: 8px; font-weight: 700; font-size: 28px;">TEOA Procurement Idea Hub</h1>
+        <h1 style="color: #1e293b; margin-bottom: 8px; font-weight: 700; font-size: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">TEOA Procurement Idea Hub</h1>
         <p style="color: #64748b; font-size: 16px;">Sign in with your TE email to continue</p>
     </div>
     """,
         unsafe_allow_html=True,
     )
+
+    # Initialize confirmation state if not exists
+    if "confirm_account_creation" not in st.session_state:
+        st.session_state.confirm_account_creation = False
+    if "pending_email" not in st.session_state:
+        st.session_state.pending_email = None
+    if "pending_full_name" not in st.session_state:
+        st.session_state.pending_full_name = None
+
+    # Show confirmation dialog if needed
+    if st.session_state.confirm_account_creation and st.session_state.pending_email:
+        st.warning("⚠️ New Account Creation")
+        st.info(f"Creating account for: **{st.session_state.pending_email}**")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✓ Create Account", type="primary", use_container_width=True):
+                # Create the account
+                username = st.session_state.pending_email.split("@")[0]
+                user_id = create_user(
+                    username,
+                    st.session_state.pending_email,
+                    st.session_state.pending_full_name or "",
+                )
+                st.session_state.user_id = user_id
+                st.session_state.username = username
+                st.session_state.email = st.session_state.pending_email
+                st.session_state.full_name = st.session_state.pending_full_name or ""
+
+                # Clear pending state
+                st.session_state.confirm_account_creation = False
+                st.session_state.pending_email = None
+                st.session_state.pending_full_name = None
+
+                st.session_state.current_page = "home"
+                st.rerun()
+
+        with col2:
+            if st.button("✗ Cancel", use_container_width=True):
+                # Clear pending state
+                st.session_state.confirm_account_creation = False
+                st.session_state.pending_email = None
+                st.session_state.pending_full_name = None
+                st.rerun()
+
+        return
 
     with st.form("login_form"):
         email = st.text_input(
@@ -472,24 +526,47 @@ def login_user():
         submitted = st.form_submit_button("Continue →", use_container_width=True)
 
         if submitted and email:
-            if not email.endswith("@te.com"):
-                st.error("🔒 Only @te.com email addresses are allowed")
+            # Normalize email
+            email = normalize_email(email)
+
+            # Get existing emails for similarity checking
+            existing_emails = get_all_user_emails()
+
+            # Validate email
+            is_valid, error_message, suggestion = validate_email_complete(
+                email, existing_emails
+            )
+
+            if not is_valid:
+                if suggestion:
+                    # Show error with suggestion
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.error(f"{error_message}")
+                    with col2:
+                        if st.button(f"Use {suggestion}", type="primary"):
+                            # Update the email input with suggestion
+                            st.session_state.suggested_email = suggestion
+                            st.rerun()
+                else:
+                    st.error(f"🔒 {error_message}")
             else:
+                # Email is valid, check if user exists
                 user = get_user_by_email(email)
                 if user:
+                    # Existing user - log in
                     st.session_state.user_id = user["id"]
                     st.session_state.username = user["username"]
                     st.session_state.email = user["email"]
                     st.session_state.full_name = user["full_name"] or ""
+                    st.session_state.current_page = "home"
+                    st.rerun()
                 else:
-                    username = email.split("@")[0]
-                    user_id = create_user(username, email, full_name or "")
-                    st.session_state.user_id = user_id
-                    st.session_state.username = username
-                    st.session_state.email = email
-                    st.session_state.full_name = full_name or ""
-                st.session_state.current_page = "home"
-                st.rerun()
+                    # New user - show confirmation
+                    st.session_state.confirm_account_creation = True
+                    st.session_state.pending_email = email
+                    st.session_state.pending_full_name = full_name
+                    st.rerun()
 
 
 def render_sidebar():

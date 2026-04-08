@@ -273,6 +273,14 @@ def get_user_by_email(email):
         return cursor.fetchone()
 
 
+def get_all_user_emails():
+    """Fetch all user emails for similarity checking"""
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT email FROM users")
+        return [row["email"] for row in cursor.fetchall()]
+
+
 def save_uploaded_file(uploaded_file, prefix="file"):
     if uploaded_file is not None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
