@@ -583,7 +583,9 @@ def render_edit_form(idea):
             col1, col2 = st.columns(2)
             with col1:
                 new_effective_date = st.date_input(
-                    "Effective Date", value=current_effective_date
+                    "Effective Date",
+                    value=current_effective_date,
+                    key=f"effective_date_{idea['id']}",
                 )
             with col2:
                 new_impact_group = st.selectbox(
