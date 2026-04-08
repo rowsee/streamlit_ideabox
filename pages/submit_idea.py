@@ -453,23 +453,22 @@ def render():
         unsafe_allow_html=True,
     )
 
-    # Row 1: Title + Proposed Change
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        title = st.text_input(
-            "Project Title",
-            placeholder="Enter a clear, descriptive title",
-            value=st.session_state.idea_form["title"],
-            key="title_input",
-        )
-    with col2:
-        proposed_change = st.text_area(
-            "Proposed Change",
-            placeholder="Describe what change you are proposing...",
-            height=100,
-            value=st.session_state.idea_form["proposed_change"],
-            key="proposed_change_input",
-        )
+    # Row 1: Title
+    title = st.text_input(
+        "Project Title",
+        placeholder="Enter a clear, descriptive title",
+        value=st.session_state.idea_form["title"],
+        key="title_input",
+    )
+
+    # Proposed Change - Full width for better paragraph input
+    proposed_change = st.text_area(
+        "Proposed Change",
+        placeholder="Describe what change you are proposing...",
+        height=150,
+        value=st.session_state.idea_form["proposed_change"],
+        key="proposed_change_input",
+    )
 
     # Row 2: Project Lead + Region
     col1, col2 = st.columns(2)

@@ -283,8 +283,9 @@ def render_edit_form(idea):
 
         new_title = st.text_input("Project Title *", value=idea["title"] or "")
 
+        # Proposed Change - Full width for better paragraph input
         new_proposed_change = st.text_area(
-            "Proposed Change *", value=idea["proposed_change"] or "", height=120
+            "Proposed Change *", value=idea["proposed_change"] or "", height=150
         )
 
         col1, col2 = st.columns(2)
@@ -484,28 +485,100 @@ def render_edit_form(idea):
             except:
                 current_effective_date = None
 
-        # Section 4: Implementation Details (shown only if implemented)
+        # Section 4: Implementation Details
+        st.markdown(
+            """
+        <div class="form-section">
+            <div class="section-title">
+                <span class="number">4</span>
+                Implementation Details
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        # Drivers for Capacity Creation - Always visible (not conditional)
+        new_drivers = st.multiselect(
+            "Drivers for Capacity Creation",
+            DRIVERS_OPTIONS,
+            default=current_drivers,
+            key=f"drivers_multiselect_{idea['id']}",
+        )
+
+        new_drivers_other = ""
+        if "Other - specify in open box" in new_drivers:
+            new_drivers_other = st.text_input(
+                "Please specify",
+                placeholder="Please specify...",
+                value=current_drivers_other,
+                key=f"drivers_other_{idea['id']}",
+            )
+
+        # Initialize optional fields
         new_effective_date = None
         new_impact_group = None
-        new_drivers = current_drivers
-        new_drivers_other = ""
         new_hours_saved = 0
         new_planned_use = ""
         new_solution_implemented = ""
         new_date_implemented = None
 
+        # Show additional fields only if implemented
         if new_is_implemented:
-            st.markdown(
-                """
-            <div class="form-section">
-                <div class="section-title">
-                    <span class="number">4</span>
-                    Implementation Details
-                </div>
-            </div>
-            """,
-                unsafe_allow_html=True,
-            )
+            col1, col2 = st.columns(2)
+            with col1:
+                new_effective_date = st.date_input(
+                    "Effective Date", value=current_effective_date
+                )
+            with col2:
+                new_impact_group = st.selectbox(
+                    "Impact Group",
+                    IMPACT_GROUP_OPTIONS,
+                    index=IMPACT_GROUP_OPTIONS.index(idea["impact_group"])
+                    if idea["impact_group"] in IMPACT_GROUP_OPTIONS
+                    else 0,
+                )
+
+            col1, col2 = st.columns(2)
+            with col1:
+                new_hours_saved = st.number_input(
+                    "Projected Hours Saved Annually",
+                    min_value=0,
+                    step=1,
+                    value=int(idea["hours_saved"]) if idea["hours_saved"] else 0,
+                )
+            with col2:
+                new_planned_use = st.text_area(
+                    "Planned Use for Capacity Created",
+                    value=idea["planned_use"] or "",
+                    height=60,
+                )
+
+            st.markdown("---")
+            st.markdown("**Implementation Status**")
+
+            col1, col2 = st.columns(2)
+            with col1:
+                new_solution_implemented = st.text_area(
+                    "Solution Implemented",
+                    value=idea.get("solution_implemented") or "",
+                    height=80,
+                )
+            with col2:
+                current_date_implemented = None
+                if idea.get("date_implemented"):
+                    try:
+                        current_date_implemented = datetime.strptime(
+                            str(idea["date_implemented"]), "%Y-%m-%d"
+                        ).date()
+                    except:
+                        current_date_implemented = None
+                new_date_implemented = st.date_input(
+                    "Date Implemented",
+                    value=current_date_implemented
+                    if current_date_implemented
+                    else None,
+                )
 
             col1, col2 = st.columns(2)
             with col1:
