@@ -295,12 +295,7 @@ def render_edit_form(idea):
                 "Add capacity files",
                 type=None,
                 accept_multiple_files=True,
-                help="Upload both Before and After Change files",
             )
-            if new_capacity_files:
-                st.caption(
-                    "💡 Please submit both 'Before Change' and 'After Change' files (2 files required)"
-                )
 
         with col_upload2:
             st.markdown("**Before Implementation**")

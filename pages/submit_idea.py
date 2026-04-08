@@ -719,15 +719,11 @@ def render():
             "[📋 TEOA Capacity Calculation Template](https://te360.sharepoint.com/:x:/s/TEOAStandardDocumentation/IQCCGJzTZT9kQLvz0x0sRTReAf7WF6E7ThK_o_vWnUgIRFg?e=LOBGo7)"
         )
         capacity_files = st.file_uploader(
-            "Upload capacity files (Before Change & After Change - 2 files required)",
+            "Upload capacity files",
             type=None,
             accept_multiple_files=True,
             key="capacity_file_input",
         )
-        if capacity_files:
-            st.caption(
-                "💡 Please ensure you upload both 'Before Change' and 'After Change' files"
-            )
 
         # Before and After Implementation Attachments
         st.markdown("---")
