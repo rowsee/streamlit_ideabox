@@ -59,21 +59,29 @@ st.markdown(
     
     p, span, div, label { color: var(--text-secondary) !important; }
 
-    /* ===== SIDEBAR - LIGHT GRAY ===== */
+    /* ===== SIDEBAR - PURPLE BACKGROUND ===== */
     section[data-testid="stSidebar"] {
-        background: var(--bg-sidebar) !important;
-        border-right: 1px solid var(--border) !important;
+        background: #6366f1 !important;
+        border-right: none !important;
     }
     
     section[data-testid="stSidebar"] * {
-        color: var(--text-secondary) !important;
+        color: #FFFFFF !important;
+    }
+
+    /* Hide default Streamlit sidebar navigation */
+    [data-testid="stSidebarNavItems"],
+    .st-emotion-cache-1gczx66,
+    ul[data-testid="stSidebarNavItems"] {
+        display: none !important;
+        visibility: hidden !important;
     }
 
     /* Sidebar branding */
     .sidebar-brand {
         text-align: center;
         padding: 24px 16px;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid rgba(255,255,255,0.2);
         margin-bottom: 8px;
     }
     
@@ -85,28 +93,27 @@ st.markdown(
     .sidebar-brand .brand-name {
         font-size: 16px;
         font-weight: 700;
-        color: var(--text-primary) !important;
+        color: #FFFFFF !important;
     }
     
     .sidebar-brand .brand-tagline {
         font-size: 11px;
-        color: var(--text-muted) !important;
+        color: rgba(255,255,255,0.7) !important;
         margin-top: 2px;
     }
 
     /* Sidebar user welcome */
     .sidebar-welcome {
-        background: var(--bg-surface);
+        background: rgba(255,255,255,0.15);
         border-radius: var(--radius-md);
         padding: 16px;
         margin: 12px 16px;
         text-align: center;
-        box-shadow: var(--shadow-sm);
     }
     
     .sidebar-welcome .greeting {
         font-size: 11px;
-        color: var(--text-muted) !important;
+        color: rgba(255,255,255,0.7) !important;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -114,7 +121,7 @@ st.markdown(
     
     .sidebar-welcome .user-name {
         font-size: 14px;
-        color: var(--text-primary) !important;
+        color: #FFFFFF !important;
         margin-top: 4px;
         font-weight: 600;
     }
@@ -122,6 +129,54 @@ st.markdown(
     /* Navigation Buttons */
     .nav-button {
         width: 100%;
+        padding: 12px 16px;
+        margin: 2px 8px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: rgba(255,255,255,0.85) !important;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .nav-button:hover {
+        background: rgba(255,255,255,0.15) !important;
+        color: #FFFFFF !important;
+    }
+    
+    .nav-button.active {
+        background: rgba(255,255,255,0.25) !important;
+        color: #FFFFFF !important;
+        border-left: 3px solid #FFFFFF;
+    }
+    
+    .nav-button.active:hover {
+        background: rgba(255,255,255,0.3) !important;
+    }
+
+    /* Logout button */
+    .logout-btn {
+        margin: 8px 16px;
+        padding: 10px 16px;
+        border-radius: var(--radius-sm);
+        border: 1px solid rgba(255,255,255,0.3);
+        background: transparent;
+        color: rgba(255,255,255,0.85) !important;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .logout-btn:hover {
+        background: rgba(255,255,255,0.15) !important;
+        color: #FFFFFF !important;
+    }
         padding: 12px 16px;
         margin: 2px 8px;
         border: none;
@@ -329,99 +384,60 @@ def init_session():
 
 
 def login_user():
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown(
-            """
-        <div style="text-align: center; margin-bottom: 40px;">
-            <div style="font-size: 70px; margin-bottom: 20px;">💡</div>
-            <h1 style="color: #1E3A5F; margin-bottom: 10px; font-weight: 800;">Procurement Idea Hub</h1>
-            <p style="color: #64748B; font-size: 18px;">Share your ideas, drive excellence</p>
-        </div>
-        """,
-            unsafe_allow_html=True,
+    # Hide sidebar on login page
+    st.markdown(
+        """
+    <style>
+        section[data-testid="stSidebar"] { display: none !important; }
+        .block-container { max-width: 480px !important; margin: 0 auto; padding-top: 60px !important; }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+    <div style="text-align: center; margin-bottom: 40px;">
+        <div style="font-size: 56px; margin-bottom: 16px;">💡</div>
+        <h1 style="color: #1e293b; margin-bottom: 8px; font-weight: 700; font-size: 28px;">TEOA Procurement Idea Hub</h1>
+        <p style="color: #64748b; font-size: 16px;">Sign in with your TE email to continue</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    with st.form("login_form"):
+        email = st.text_input(
+            "TE Email",
+            placeholder="your.name@te.com",
+            label_visibility="visible",
         )
-
-        st.markdown(
-            """
-        <style>
-            /* Style form inputs */
-            .stTextInput > div > div > input {
-                background: #f8fafc !important;
-                border: 2px solid #e2e8f0 !important;
-                border-radius: 12px !important;
-                padding: 15px !important;
-                font-size: 16px !important;
-                transition: all 0.3s ease;
-            }
-            
-            .stTextInput > div > div > input:focus {
-                border-color: #6366f1 !important;
-                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
-            }
-            
-            /* Style form button */
-            .stButton > button {
-                background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-                border: none !important;
-                border-radius: 12px !important;
-                padding: 15px 30px !important;
-                font-size: 16px !important;
-                font-weight: 600 !important;
-                transition: all 0.3s ease;
-                width: 100%;
-            }
-            
-            .stButton > button:hover {
-                transform: translateY(-1px);
-                box-shadow: var(--shadow-md) !important;
-            }
-            
-            /* Reduce top padding for login page */
-            .block-container {
-                padding-top: 2rem !important;
-                padding-bottom: 2rem !important;
-            }
-        </style>
-        """,
-            unsafe_allow_html=True,
+        full_name = st.text_input(
+            "Your Name",
+            placeholder="Enter your name",
+            label_visibility="visible",
         )
+        submitted = st.form_submit_button("Continue →", use_container_width=True)
 
-        with st.form("login_form"):
-            col_email, col_name = st.columns(2)
-            with col_email:
-                email = st.text_input(
-                    "TE Email",
-                    placeholder="your.name@te.com",
-                    label_visibility="visible",
-                )
-            with col_name:
-                full_name = st.text_input(
-                    "Your Name",
-                    placeholder="Enter your name",
-                    label_visibility="visible",
-                )
-            submitted = st.form_submit_button("Continue →", use_container_width=True)
-
-            if submitted and email:
-                if not email.endswith("@te.com"):
-                    st.error("🔒 Only @te.com email addresses are allowed")
+        if submitted and email:
+            if not email.endswith("@te.com"):
+                st.error("🔒 Only @te.com email addresses are allowed")
+            else:
+                user = get_user_by_email(email)
+                if user:
+                    st.session_state.user_id = user["id"]
+                    st.session_state.username = user["username"]
+                    st.session_state.email = user["email"]
+                    st.session_state.full_name = user["full_name"] or ""
                 else:
-                    user = get_user_by_email(email)
-                    if user:
-                        st.session_state.user_id = user["id"]
-                        st.session_state.username = user["username"]
-                        st.session_state.email = user["email"]
-                        st.session_state.full_name = user["full_name"] or ""
-                    else:
-                        username = email.split("@")[0]
-                        user_id = create_user(username, email, full_name or "")
-                        st.session_state.user_id = user_id
-                        st.session_state.username = username
-                        st.session_state.email = email
-                        st.session_state.full_name = full_name or ""
-                    st.session_state.current_page = "home"
-                    st.rerun()
+                    username = email.split("@")[0]
+                    user_id = create_user(username, email, full_name or "")
+                    st.session_state.user_id = user_id
+                    st.session_state.username = username
+                    st.session_state.email = email
+                    st.session_state.full_name = full_name or ""
+                st.session_state.current_page = "home"
+                st.rerun()
 
 
 def render_sidebar():
@@ -494,7 +510,9 @@ def main():
     init_db()
     init_session()
 
-    selected_page = render_sidebar()
+    # Only render sidebar when user is logged in
+    if st.session_state.user_id:
+        render_sidebar()
 
     if not st.session_state.user_id:
         login_user()
