@@ -575,85 +575,8 @@ def render_edit_form(idea):
             new_date_implemented = st.date_input(
                 "Date Implemented",
                 value=current_date_implemented if current_date_implemented else None,
+                key=f"date_implemented_edit_{idea['id']}",
             )
-
-            col1, col2 = st.columns(2)
-            with col1:
-                new_effective_date = st.date_input(
-                    "Effective Date",
-                    value=current_effective_date,
-                    key=f"effective_date_{idea['id']}",
-                )
-            with col2:
-                new_impact_group = st.selectbox(
-                    "Impact Group",
-                    IMPACT_GROUP_OPTIONS,
-                    index=IMPACT_GROUP_OPTIONS.index(idea["impact_group"])
-                    if idea["impact_group"] in IMPACT_GROUP_OPTIONS
-                    else 0,
-                    key=f"impact_group_{idea['id']}",
-                )
-
-            new_drivers = st.multiselect(
-                "Drivers for Capacity Creation",
-                DRIVERS_OPTIONS,
-                default=current_drivers,
-                key=f"drivers_multiselect_{idea['id']}",
-            )
-
-            new_drivers_other = ""
-            if "Other - specify in open box" in new_drivers:
-                new_drivers_other = st.text_input(
-                    "Please specify",
-                    placeholder="Please specify...",
-                    value=current_drivers_other,
-                    key=f"drivers_other_{idea['id']}",
-                )
-
-            col1, col2 = st.columns(2)
-            with col1:
-                new_hours_saved = st.number_input(
-                    "Projected Hours Saved Annually",
-                    min_value=0,
-                    step=1,
-                    value=int(idea["hours_saved"]) if idea["hours_saved"] else 0,
-                    key=f"hours_saved_{idea['id']}",
-                )
-            with col2:
-                new_planned_use = st.text_area(
-                    "Planned Use for Capacity Created",
-                    value=idea["planned_use"] or "",
-                    height=60,
-                    key=f"planned_use_{idea['id']}",
-                )
-
-            st.markdown("---")
-            st.markdown("**Implementation Status**")
-
-            col1, col2 = st.columns(2)
-            with col1:
-                new_solution_implemented = st.text_area(
-                    "Solution Implemented",
-                    value=idea.get("solution_implemented") or "",
-                    height=80,
-                    key=f"solution_implemented_{idea['id']}",
-                )
-            with col2:
-                current_date_implemented = None
-                if idea.get("date_implemented"):
-                    try:
-                        current_date_implemented = datetime.strptime(
-                            str(idea["date_implemented"]), "%Y-%m-%d"
-                        ).date()
-                    except:
-                        current_date_implemented = None
-                new_date_implemented = st.date_input(
-                    "Date Implemented",
-                    value=current_date_implemented
-                    if current_date_implemented
-                    else None,
-                    key=f"date_implemented_{idea['id']}",
-                )
 
         col_cancel, col_spacer, col_save = st.columns([1, 4, 1])
         with col_cancel:
