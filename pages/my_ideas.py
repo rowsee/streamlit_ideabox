@@ -523,62 +523,59 @@ def render_edit_form(idea):
         new_solution_implemented = ""
         new_date_implemented = None
 
-        # Show additional fields only if implemented
-        if new_is_implemented:
-            col1, col2 = st.columns(2)
-            with col1:
-                new_effective_date = st.date_input(
-                    "Effective Date", value=current_effective_date
-                )
-            with col2:
-                new_impact_group = st.selectbox(
-                    "Impact Group",
-                    IMPACT_GROUP_OPTIONS,
-                    index=IMPACT_GROUP_OPTIONS.index(idea["impact_group"])
-                    if idea["impact_group"] in IMPACT_GROUP_OPTIONS
-                    else 0,
-                )
+        # All Implementation Details always visible (not conditional on is_implemented)
+        col1, col2 = st.columns(2)
+        with col1:
+            new_effective_date = st.date_input(
+                "Effective Date", value=current_effective_date
+            )
+        with col2:
+            new_impact_group = st.selectbox(
+                "Impact Group",
+                IMPACT_GROUP_OPTIONS,
+                index=IMPACT_GROUP_OPTIONS.index(idea["impact_group"])
+                if idea["impact_group"] in IMPACT_GROUP_OPTIONS
+                else 0,
+            )
 
-            col1, col2 = st.columns(2)
-            with col1:
-                new_hours_saved = st.number_input(
-                    "Projected Hours Saved Annually",
-                    min_value=0,
-                    step=1,
-                    value=int(idea["hours_saved"]) if idea["hours_saved"] else 0,
-                )
-            with col2:
-                new_planned_use = st.text_area(
-                    "Planned Use for Capacity Created",
-                    value=idea["planned_use"] or "",
-                    height=60,
-                )
+        col1, col2 = st.columns(2)
+        with col1:
+            new_hours_saved = st.number_input(
+                "Projected Hours Saved Annually",
+                min_value=0,
+                step=1,
+                value=int(idea["hours_saved"]) if idea["hours_saved"] else 0,
+            )
+        with col2:
+            new_planned_use = st.text_area(
+                "Planned Use for Capacity Created",
+                value=idea["planned_use"] or "",
+                height=60,
+            )
 
-            st.markdown("---")
-            st.markdown("**Implementation Status**")
+        st.markdown("---")
+        st.markdown("**Implementation Status**")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                new_solution_implemented = st.text_area(
-                    "Solution Implemented",
-                    value=idea.get("solution_implemented") or "",
-                    height=80,
-                )
-            with col2:
-                current_date_implemented = None
-                if idea.get("date_implemented"):
-                    try:
-                        current_date_implemented = datetime.strptime(
-                            str(idea["date_implemented"]), "%Y-%m-%d"
-                        ).date()
-                    except:
-                        current_date_implemented = None
-                new_date_implemented = st.date_input(
-                    "Date Implemented",
-                    value=current_date_implemented
-                    if current_date_implemented
-                    else None,
-                )
+        col1, col2 = st.columns(2)
+        with col1:
+            new_solution_implemented = st.text_area(
+                "Solution Implemented",
+                value=idea.get("solution_implemented") or "",
+                height=80,
+            )
+        with col2:
+            current_date_implemented = None
+            if idea.get("date_implemented"):
+                try:
+                    current_date_implemented = datetime.strptime(
+                        str(idea["date_implemented"]), "%Y-%m-%d"
+                    ).date()
+                except:
+                    current_date_implemented = None
+            new_date_implemented = st.date_input(
+                "Date Implemented",
+                value=current_date_implemented if current_date_implemented else None,
+            )
 
             col1, col2 = st.columns(2)
             with col1:
