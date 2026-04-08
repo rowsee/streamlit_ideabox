@@ -703,45 +703,46 @@ def render():
 
     st.divider()
 
-    # TRENDING IDEAS SECTION - Remove emoji
-    st.markdown(
-        """
-    <div class="section-header">
-        <h2 class="section-title">Trending Ideas</h2>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
+    # TRENDING IDEAS & RECENTLY SUBMITTED - Side by Side
+    idea_cols = st.columns(2, gap="medium")
 
-    if trending_ideas:
-        render_idea_cards(trending_ideas, show_date=False)
-    else:
-        render_empty_state(
-            "🔥",
-            "No trending ideas yet",
-            "Be the first to submit an idea and start the conversation!",
-            "Submit Your First Idea",
+    with idea_cols[0]:
+        st.markdown(
+            """
+        <div class="section-header" style="margin-top: 0 !important;">
+            <h2 class="section-title">Trending Ideas</h2>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
+        if trending_ideas:
+            render_idea_cards(trending_ideas, show_date=False)
+        else:
+            render_empty_state(
+                "🔥",
+                "No trending ideas yet",
+                "Be the first to submit an idea and start the conversation!",
+                "Submit Your First Idea",
+            )
 
-    # RECENTLY SUBMITTED SECTION - Remove emoji
-    st.markdown(
-        """
-    <div class="section-header">
-        <h2 class="section-title">Recently Submitted</h2>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    if recent_ideas:
-        render_idea_cards(recent_ideas, show_date=True)
-    else:
-        render_empty_state(
-            "🆕",
-            "No recent submissions",
-            "Fresh ideas fuel innovation. Share yours today!",
-            "Submit an Idea",
+    with idea_cols[1]:
+        st.markdown(
+            """
+        <div class="section-header" style="margin-top: 0 !important;">
+            <h2 class="section-title">Recently Submitted</h2>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
+        if recent_ideas:
+            render_idea_cards(recent_ideas, show_date=True)
+        else:
+            render_empty_state(
+                "🆕",
+                "No recent submissions",
+                "Fresh ideas fuel innovation. Share yours today!",
+                "Submit an Idea",
+            )
 
     st.divider()
 
