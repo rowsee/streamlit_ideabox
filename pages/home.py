@@ -528,7 +528,7 @@ st.markdown(
         font-size: 22px;
         color: #1e293b;
         font-weight: 700;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
         margin-top: 0;
         line-height: 1.2;
     }
