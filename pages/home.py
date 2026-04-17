@@ -528,7 +528,7 @@ st.markdown(
         font-size: 22px;
         color: #1e293b;
         font-weight: 700;
-        margin-bottom: 12px;
+        margin-bottom: 4px;
     }
     .hero-name {
         font-size: 32px;
@@ -626,8 +626,8 @@ def render():
     st.markdown(
         """
     <div class="hero">
-        <div class="hero-tagline">One idea. One improvement. One step better.</div>
-        <div class="hero-title">Welcome to TEOA Ideabox Hub</div>
+        <div class="hero-tagline">One Idea, One Improvement. One Step Better</div>
+        <div class="hero-title">Welcome to TEOA Ideabox Hub,</div>
         <div class="hero-name">"""
         + user_name
         + """! 👋</div>
