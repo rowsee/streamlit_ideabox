@@ -524,17 +524,21 @@ st.markdown(
         margin-bottom: 8px;
         font-style: italic;
     }
-    .hero-title {
+    .hero h2.hero-title {
         font-size: 22px;
         color: #1e293b;
         font-weight: 700;
         margin-bottom: 4px;
+        margin-top: 0;
+        line-height: 1.2;
     }
-    .hero-name {
+    .hero h2.hero-name {
         font-size: 32px;
         color: #FF8C00;
         font-weight: 800;
         margin-bottom: 0;
+        margin-top: 0;
+        line-height: 1.2;
     }
 </style>
 """,
@@ -627,10 +631,10 @@ def render():
         """
     <div class="hero">
         <div class="hero-tagline">One Idea, One Improvement. One Step Better</div>
-        <div class="hero-title">Welcome to TEOA Ideabox Hub,</div>
-        <div class="hero-name">"""
+        <h2 class="hero-title">Welcome to TEOA Ideabox Hub,</h2>
+        <h2 class="hero-name">"""
         + user_name
-        + """! 👋</div>
+        + """! 👋</h2>
     </div>
     """,
         unsafe_allow_html=True,
