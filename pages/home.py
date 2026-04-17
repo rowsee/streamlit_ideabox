@@ -518,22 +518,23 @@ st.markdown(
         margin-bottom: 40px;
         color: white;
     }
+    .hero-banner h3 {
+        font-size: 18px;
+        opacity: 0.9;
+        font-weight: 500;
+        color: white;
+        margin-bottom: 16px;
+    }
     .hero-banner h2 {
         font-size: 24px;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
         color: white;
     }
     .hero-banner h1 {
         font-size: 42px;
         font-weight: 900;
-        margin-bottom: 12px;
-        color: white;
-    }
-    .hero-banner h3 {
-        font-size: 18px;
-        opacity: 0.9;
-        font-weight: 500;
+        margin-bottom: 0;
         color: white;
     }
 </style>
@@ -626,11 +627,11 @@ def render():
     st.markdown(
         """
     <div class="hero-banner">
-        <h2>Welcome to TEOA Ideabox Hub</h2>
-        <h1>👋 """
-        + user_name
-        + """</h1>
         <h3>One idea. One Improvement. One Step Better.</h3>
+        <h2>Welcome to TEOA Ideabox Hub,</h2>
+        <h1>"""
+        + user_name
+        + """! 👋</h1>
     </div>
     """,
         unsafe_allow_html=True,
