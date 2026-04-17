@@ -28,12 +28,12 @@ st.markdown(
 <style>
     /* ===== COLOR PALETTE ===== */
     :root {
-        --primary: #FFA500;
-        --primary-light: #818cf8;
-        --primary-dark: #4f46e5;
-        --secondary: #FFA500;
-        --accent: #f97316;
-        --accent-light: #fb923c;
+        --primary: #FF8C00;
+        --primary-light: #FFA500;
+        --primary-dark: #000000;
+        --secondary: #FF8C00;
+        --accent: #FF8C00;
+        --accent-light: #FFA500;
         --bg-main: #f8fafc;
         --bg-surface: #ffffff;
         --bg-sidebar: #f1f5f9;
@@ -66,9 +66,9 @@ st.markdown(
     
     p, span, div, label { color: var(--text-secondary) !important; }
 
-    /* ===== SIDEBAR - PURPLE BACKGROUND ===== */
+    /* ===== SIDEBAR - ORANGE BACKGROUND ===== */
     section[data-testid="stSidebar"] {
-        background: #FFA500 !important;
+        background: #FF8C00 !important;
         border-right: none !important;
     }
     
@@ -282,14 +282,14 @@ st.markdown(
     }
     
     .stButton > button:hover {
-        background: var(--primary-dark) !important;
+        background: #000000 !important;
         transform: translateY(-1px);
         color: white !important;
     }
 
     /* Active/pressed state */
     .stButton > button:active {
-        background: #4338ca !important;
+        background: #000000 !important;
         transform: translateY(0);
         color: white !important;
     }

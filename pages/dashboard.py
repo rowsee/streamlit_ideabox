@@ -40,7 +40,7 @@ st.markdown(
     .metric-value {
         font-size: 32px;
         font-weight: 700;
-        color: #FF6B35;
+        color: #FF8C00;
     }
     
     .metric-label {
@@ -230,7 +230,7 @@ def render():
                 x="site_leader",
                 y="Count",
                 color="Count",
-                color_continuous_scale=["#FF6B35", "#FF8F5E", "#FFB088"],
+                color_continuous_scale=["#FF8C00", "#FFA500", "#FFB088"],
             )
             fig.update_layout(
                 plot_bgcolor="white",
@@ -298,7 +298,7 @@ def render():
                 x="bu_cl_site",
                 y="hours_saved",
                 color="hours_saved",
-                color_continuous_scale=["#FF6B35", "#FF8F5E", "#FFB088"],
+                color_continuous_scale=["#FF8C00", "#FFA500", "#FFB088"],
             )
             fig.update_layout(
                 plot_bgcolor="white",

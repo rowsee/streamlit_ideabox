@@ -34,7 +34,7 @@ st.markdown(
         color: #64748B;
     }
     .category-tag {
-        background: #FF6B35;
+        background: #FF8C00;
         color: white;
         padding: 4px 12px;
         border-radius: 20px;
@@ -90,17 +90,17 @@ st.markdown(
     }
     .vote-button {
         background: transparent !important;
-        border: 2px solid #FF6B35 !important;
-        color: #FF6B35 !important;
+        border: 2px solid #FF8C00 !important;
+        color: #FF8C00 !important;
         border-radius: 20px !important;
         padding: 8px 16px !important;
     }
     .vote-button:hover {
-        background: #FF6B35 !important;
+        background: #FF8C00 !important;
         color: white !important;
     }
     .voted {
-        background: #FF6B35 !important;
+        background: #FF8C00 !important;
         color: white !important;
     }
     .search-filter-bar {

@@ -19,14 +19,14 @@ st.markdown(
         --text-primary: #1e293b;
         --text-muted: #64748b;
         --border-light: #e2e8f0;
-        --indigo: #FFA500;
-        --orange: #f97316;
+        --indigo: #FF8C00;
+        --orange: #FF8C00;
         --green: #10b981;
         --pink: #ec4899;
-        --purple-start: #FFA500;
-        --purple-end: #FFA500;
-        --orange-start: #f97316;
-        --orange-end: #fb923c;
+        --purple-start: #FF8C00;
+        --purple-end: #FF8C00;
+        --orange-start: #FF8C00;
+        --orange-end: #FFA500;
     }
 
     .stApp { background-color: var(--bg-light); }
@@ -65,8 +65,8 @@ st.markdown(
     }
 
     .stat-card:hover {
-        border-color: #FFA500 !important;
-        box-shadow: 0 4px 12px rgba(99,102,241,0.15) !important;
+        border-color: #FF8C00 !important;
+        box-shadow: 0 4px 12px rgba(255,140,0,0.15) !important;
         transform: translateY(-2px);
     }
 
@@ -135,8 +135,8 @@ st.markdown(
     }
 
     .idea-card:hover {
-        border-color: #FFA500 !important;
-        box-shadow: 0 4px 12px rgba(99,102,241,0.15) !important;
+        border-color: #FF8C00 !important;
+        box-shadow: 0 4px 12px rgba(255,140,0,0.15) !important;
         transform: translateY(-2px);
     }
 
@@ -181,7 +181,7 @@ st.markdown(
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        color: #FFA500;
+        color: #FF8C00;
     }
 
     .idea-card-date {
@@ -253,7 +253,7 @@ st.markdown(
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        color: #FFA500;
+        color: #FF8C00;
     }
 
     .idea-list-date {
@@ -305,12 +305,12 @@ st.markdown(
     }
 
     .highlight-card.orange {
-        background: linear-gradient(135deg, #f97316, #fb923c) !important;
+        background: linear-gradient(135deg, #FF8C00, #FFA500) !important;
         border: none !important;
     }
 
     .highlight-card.purple {
-        background: linear-gradient(135deg, #FFA500, #FFA500) !important;
+        background: linear-gradient(135deg, #FF8C00, #FFA500) !important;
         border: none !important;
     }
 
@@ -426,7 +426,7 @@ st.markdown(
 
     /* CTA CARD */
     .cta-card {
-        background: linear-gradient(135deg, #FFA500, #FFA500);
+        background: linear-gradient(135deg, #FF8C00, #FFA500);
         border-radius: 16px;
         padding: 28px;
         color: white;
@@ -472,7 +472,7 @@ st.markdown(
     .contributor-rank {
         font-size: 18px;
         font-weight: 700;
-        color: #FFA500;
+        color: #FF8C00;
         width: 28px;
         text-align: center;
     }
@@ -487,7 +487,7 @@ st.markdown(
     .contributor-count {
         font-size: 14px;
         font-weight: 600;
-        color: #FFA500;
+        color: #FF8C00;
         background: white;
         padding: 4px 10px;
         border-radius: 20px;
@@ -592,6 +592,20 @@ def render():
     # Get new data
     recent_ideas = get_recent_ideas(5) or []
     trending_ideas = get_trending_ideas(5) or []
+
+    # Welcome Header
+    user_name = st.session_state.full_name or st.session_state.username
+    st.markdown(
+        """
+    <div style="margin-bottom: 24px;">
+        <h3 style="color: #64748b; font-weight: 500; margin-bottom: 4px;">Welcome to Ideabox Hub</h3>
+        <h2 style="color: #1e293b; font-weight: 700; margin-top: 0;">👋 """
+        + user_name
+        + """</h2>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
 
     # HIGHLIGHTS ROW - Top BU and Top Contributor (MOVED TO TOP)
     highlights_cols = st.columns(2, gap="medium")
@@ -758,7 +772,7 @@ def render():
         st.markdown(
             """
         <div class="card">
-            <div class="card-title">💡 Why Share Ideas?</div>
+            <h2 class="card-title">💡 Why Share Ideas?</h2>
             <ul class="why-list">
                 <li><span class="why-icon">🚀</span> Drive operational excellence and process improvements</li>
                 <li><span class="why-icon">🎯</span> Make a meaningful impact across the organization</li>
@@ -774,7 +788,7 @@ def render():
         st.markdown(
             """
         <div class="card">
-            <div class="card-title">✨ Benefits</div>
+            <h2 class="card-title">✨ Benefits</h2>
             <div class="benefits-grid">
                 <div class="benefit-item"><span class="benefit-check">✓</span> Quick and easy submission process</div>
                 <div class="benefit-item"><span class="benefit-check">✓</span> Track your idea's progress and status</div>
