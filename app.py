@@ -66,9 +66,9 @@ st.markdown(
     
     p, span, div, label { color: var(--text-secondary) !important; }
 
-    /* ===== SIDEBAR - ORANGE BACKGROUND ===== */
+    /* ===== SIDEBAR - DARK TEAL BACKGROUND ===== */
     section[data-testid="stSidebar"] {
-        background: #FF8C00 !important;
+        background: #004D4F !important;
         border-right: none !important;
     }
     
@@ -282,14 +282,14 @@ st.markdown(
     }
     
     .stButton > button:hover {
-        background: #000000 !important;
+        background: #004D4F !important;
         transform: translateY(-1px);
         color: white !important;
     }
 
     /* Active/pressed state */
     .stButton > button:active {
-        background: #000000 !important;
+        background: #004D4F !important;
         transform: translateY(0);
         color: white !important;
     }
