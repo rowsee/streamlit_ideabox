@@ -630,7 +630,7 @@ def render():
     st.markdown(
         """
     <div class="hero">
-        <div class="hero-tagline">One Idea, One Improvement. One Step Better</div>
+        <div class="hero-tagline">One Idea. One Improvement. One Step Better.</div>
         <h2 class="hero-title">Welcome to TEOA Ideabox Hub,</h2>
         <h2 class="hero-name">"""
         + user_name
