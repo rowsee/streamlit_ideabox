@@ -508,6 +508,31 @@ st.markdown(
         outline: none !important;
         box-shadow: none !important;
     }
+
+    /* HERO BANNER */
+    .hero-banner {
+        background: linear-gradient(135deg, #FF8C00, #FFA500);
+        border-radius: 16px;
+        padding: 40px 32px;
+        text-align: center;
+        margin-bottom: 32px;
+        color: white;
+    }
+    .hero-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+    .hero-username {
+        font-size: 36px;
+        font-weight: 900;
+        margin-bottom: 12px;
+    }
+    .hero-subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+        font-weight: 500;
+    }
 </style>
 """,
     unsafe_allow_html=True,
@@ -593,15 +618,16 @@ def render():
     recent_ideas = get_recent_ideas(5) or []
     trending_ideas = get_trending_ideas(5) or []
 
-    # Welcome Header
+    # Hero Banner Welcome
     user_name = st.session_state.full_name or st.session_state.username
     st.markdown(
         """
-    <div style="margin-bottom: 24px;">
-        <h3 style="color: #64748b; font-weight: 500; margin-bottom: 4px;">Welcome to Ideabox Hub</h3>
-        <h2 style="color: #1e293b; font-weight: 700; margin-top: 0;">👋 """
+    <div class="hero-banner">
+        <div class="hero-title">Welcome to TEOA Ideabox Hub</div>
+        <div class="hero-username">👋 """
         + user_name
-        + """</h2>
+        + """</div>
+        <div class="hero-subtitle">One Idea. One Improvement. One step better.</div>
     </div>
     """,
         unsafe_allow_html=True,
