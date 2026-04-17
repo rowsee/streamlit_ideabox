@@ -509,33 +509,32 @@ st.markdown(
         box-shadow: none !important;
     }
 
-    /* HERO BANNER */
-    .hero-banner {
-        background: linear-gradient(135deg, #FF8C00, #FFA500);
-        border-radius: 16px;
-        padding: 40px 32px;
-        text-align: center;
+    /* HERO SECTION */
+    .hero {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         margin-bottom: 40px;
-        color: white;
+        text-align: left;
     }
-    .hero-banner h3 {
-        font-size: 18px;
-        opacity: 0.9;
-        font-weight: 500;
-        color: white;
-        margin-bottom: 16px;
+    .hero-tagline {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 8px;
+        font-style: italic;
     }
-    .hero-banner h2 {
-        font-size: 24px;
+    .hero-title {
+        font-size: 22px;
+        color: #1e293b;
         font-weight: 700;
-        margin-bottom: 4px;
-        color: white;
+        margin-bottom: 12px;
     }
-    .hero-banner h1 {
-        font-size: 42px;
-        font-weight: 900;
+    .hero-name {
+        font-size: 32px;
+        color: #FF8C00;
+        font-weight: 800;
         margin-bottom: 0;
-        color: white;
     }
 </style>
 """,
@@ -622,22 +621,20 @@ def render():
     recent_ideas = get_recent_ideas(5) or []
     trending_ideas = get_trending_ideas(5) or []
 
-    # Hero Banner Welcome
+    # Hero Section Welcome
     user_name = st.session_state.full_name or st.session_state.username
     st.markdown(
         """
-    <div class="hero-banner">
-        <h3>One idea. One Improvement. One Step Better.</h3>
-        <h2>Welcome to TEOA Ideabox Hub,</h2>
-        <h1>"""
+    <div class="hero">
+        <div class="hero-tagline">One idea. One improvement. One step better.</div>
+        <div class="hero-title">Welcome to TEOA Ideabox Hub</div>
+        <div class="hero-name">"""
         + user_name
-        + """! 👋</h1>
+        + """! 👋</div>
     </div>
     """,
         unsafe_allow_html=True,
     )
-
-    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
 
     # HIGHLIGHTS ROW - Top BU and Top Contributor (MOVED TO TOP)
     highlights_cols = st.columns(2, gap="medium")
