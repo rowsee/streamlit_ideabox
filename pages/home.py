@@ -515,23 +515,26 @@ st.markdown(
         border-radius: 16px;
         padding: 40px 32px;
         text-align: center;
-        margin-bottom: 32px;
+        margin-bottom: 40px;
         color: white;
     }
-    .hero-title {
-        font-size: 28px;
-        font-weight: 800;
+    .hero-banner h2 {
+        font-size: 24px;
+        font-weight: 700;
         margin-bottom: 8px;
+        color: white;
     }
-    .hero-username {
-        font-size: 36px;
+    .hero-banner h1 {
+        font-size: 42px;
         font-weight: 900;
         margin-bottom: 12px;
+        color: white;
     }
-    .hero-subtitle {
-        font-size: 16px;
+    .hero-banner h3 {
+        font-size: 18px;
         opacity: 0.9;
         font-weight: 500;
+        color: white;
     }
 </style>
 """,
@@ -623,15 +626,17 @@ def render():
     st.markdown(
         """
     <div class="hero-banner">
-        <div class="hero-title">Welcome to TEOA Ideabox Hub</div>
-        <div class="hero-username">👋 """
+        <h2>Welcome to TEOA Ideabox Hub</h2>
+        <h1>👋 """
         + user_name
-        + """</div>
-        <div class="hero-subtitle">One Idea. One Improvement. One step better.</div>
+        + """</h1>
+        <h3>One idea. One Improvement. One Step Better.</h3>
     </div>
     """,
         unsafe_allow_html=True,
     )
+
+    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
 
     # HIGHLIGHTS ROW - Top BU and Top Contributor (MOVED TO TOP)
     highlights_cols = st.columns(2, gap="medium")
