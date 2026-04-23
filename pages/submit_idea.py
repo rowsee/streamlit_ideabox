@@ -43,7 +43,7 @@ st.markdown(
     }
     
     .section-title .number {
-        background: #FF8C00;
+        background: #ff6b36;
         color: white;
         width: 24px;
         height: 24px;
@@ -181,7 +181,7 @@ st.markdown(
     }
 
     div[data-testid="stToggle"] div[role="switch"][aria-checked="true"] {
-        background-color: #FF8C00 !important;
+        background-color: #ff6b36 !important;
     }
     
     /* Leader fields styling */

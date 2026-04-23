@@ -19,14 +19,14 @@ st.markdown(
         --text-primary: #1e293b;
         --text-muted: #64748b;
         --border-light: #e2e8f0;
-        --indigo: #FF8C00;
-        --orange: #FF8C00;
+        --indigo: #ff6b36;
+        --orange: #ff6b36;
         --green: #10b981;
         --pink: #ec4899;
-        --purple-start: #FF8C00;
-        --purple-end: #FF8C00;
-        --orange-start: #FF8C00;
-        --orange-end: #FFA500;
+        --purple-start: #ff6b36;
+        --purple-end: #ff6b36;
+        --orange-start: #ff6b36;
+        --orange-end: #ff6b36;
     }
 
     .stApp { background-color: var(--bg-light); }
@@ -65,7 +65,7 @@ st.markdown(
     }
 
     .stat-card:hover {
-        border-color: #FF8C00 !important;
+        border-color: #ff6b36 !important;
         box-shadow: 0 4px 12px rgba(255,140,0,0.15) !important;
         transform: translateY(-2px);
     }
@@ -135,7 +135,7 @@ st.markdown(
     }
 
     .idea-card:hover {
-        border-color: #FF8C00 !important;
+        border-color: #ff6b36 !important;
         box-shadow: 0 4px 12px rgba(255,140,0,0.15) !important;
         transform: translateY(-2px);
     }
@@ -181,7 +181,7 @@ st.markdown(
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        color: #FF8C00;
+        color: #ff6b36;
     }
 
     .idea-card-date {
@@ -253,7 +253,7 @@ st.markdown(
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
-        color: #FF8C00;
+        color: #ff6b36;
     }
 
     .idea-list-date {
@@ -305,12 +305,12 @@ st.markdown(
     }
 
     .highlight-card.orange {
-        background: linear-gradient(135deg, #FF8C00, #FFA500) !important;
+        background: linear-gradient(135deg, #ff6b36, #ff6b36) !important;
         border: none !important;
     }
 
     .highlight-card.purple {
-        background: linear-gradient(135deg, #FF8C00, #FFA500) !important;
+        background: linear-gradient(135deg, #ff6b36, #ff6b36) !important;
         border: none !important;
     }
 
@@ -426,7 +426,7 @@ st.markdown(
 
     /* CTA CARD */
     .cta-card {
-        background: linear-gradient(135deg, #FF8C00, #FFA500);
+        background: linear-gradient(135deg, #ff6b36, #ff6b36);
         border-radius: 16px;
         padding: 28px;
         color: white;
@@ -472,7 +472,7 @@ st.markdown(
     .contributor-rank {
         font-size: 18px;
         font-weight: 700;
-        color: #FF8C00;
+        color: #ff6b36;
         width: 28px;
         text-align: center;
     }
@@ -487,7 +487,7 @@ st.markdown(
     .contributor-count {
         font-size: 14px;
         font-weight: 600;
-        color: #FF8C00;
+        color: #ff6b36;
         background: white;
         padding: 4px 10px;
         border-radius: 20px;
@@ -534,7 +534,7 @@ st.markdown(
     }
     .hero h2.hero-name {
         font-size: 32px;
-        color: #FF8C00;
+        color: #ff6b36;
         font-weight: 800;
         margin-bottom: 0;
         margin-top: 0;
@@ -773,8 +773,7 @@ def render():
             render_empty_state(
                 "🔥",
                 "No trending ideas yet",
-                "Be the first to submit an idea and start the conversation!",
-                "Submit Your First Idea",
+                None,
             )
 
     with idea_cols[1]:
@@ -792,8 +791,7 @@ def render():
             render_empty_state(
                 "🆕",
                 "No recent submissions",
-                "Fresh ideas fuel innovation. Share yours today!",
-                "Browse Ideas",
+                None,
             )
 
     st.divider()
@@ -837,9 +835,7 @@ def render():
     st.markdown(
         """
     <div class="cta-card">
-        <div class="cta-title">💬 Have an idea?</div>
-        <div class="cta-text">Submit your idea and help shape the future of our operations!</div>
-        <div class="cta-sub">📅 Ideas reviewed weekly by the leadership team</div>
+        <div class="cta-title">Have any question? Please reach out to Cassie Cong (cassie.cong@te.com)</div>
     </div>
     """,
         unsafe_allow_html=True,

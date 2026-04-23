@@ -50,7 +50,7 @@ st.markdown(
         color: #64748B;
     }
     .stat-pill.votes {
-        background: #FF8C00;
+        background: #ff6b36;
         color: white;
     }
     .delete-btn button {
@@ -105,7 +105,7 @@ st.markdown(
         padding: 12px;
         border-radius: 6px;
         margin-bottom: 8px;
-        border-left: 3px solid #FF8C00;
+        border-left: 3px solid #ff6b36;
     }
     .audit-field {
         font-weight: 600;
@@ -151,7 +151,7 @@ st.markdown(
     }
     
     .section-title .number {
-        background: #FF8C00;
+        background: #ff6b36;
         color: white;
         width: 24px;
         height: 24px;

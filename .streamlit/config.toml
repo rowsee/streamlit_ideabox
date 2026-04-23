@@ -6,7 +6,7 @@ showToolbarNavigation = false
 
 [theme]
 default = "light"
-primaryColor = "#FF8C00"
+primaryColor = "#ff6b36"
 backgroundColor = "#F9FAFB"
 secondaryBackgroundColor = "#FFFFFF"
 textColor = "#111827"
