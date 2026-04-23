@@ -435,15 +435,16 @@ st.markdown(
         border-radius: 16px;
         padding: 28px;
         color: white;
-        text-align: center;
-        margin-top: 24px;
+        text-align: right;
+        margin-top: 40px;
+        margin-bottom: 24px;
     }
 
     .cta-title {
         font-size: 18px;
         font-weight: 800;
         margin-bottom: 8px;
-        text-align: center;
+        text-align: right;
     }
 
     .cta-email {
@@ -454,6 +455,7 @@ st.markdown(
         font-weight: 600;
         margin-top: 8px;
         color: white;
+        text-align: right;
     }
 
     .cta-email:hover {
@@ -850,8 +852,8 @@ def render():
     st.markdown(
         """
     <div class="cta-card">
-        <div class="cta-title" style="text-align: center;">Have any question? Please reach out to Cassie Cong</div>
-        <div class="cta-email" style="text-align: center;">cassie.cong@te.com</div>
+        <div class="cta-title" style="text-align: right;">Have any question? Please reach out to Cassie Cong</div>
+        <div class="cta-email" style="text-align: right;">cassie.cong@te.com</div>
     </div>
     """,
         unsafe_allow_html=True,
