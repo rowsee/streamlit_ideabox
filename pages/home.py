@@ -314,6 +314,11 @@ st.markdown(
         border: none !important;
     }
 
+    .highlight-card.my-ideas {
+        background: linear-gradient(135deg, #1e293b, #1e293b) !important;
+        border: none !important;
+    }
+
     .highlight-label {
         font-size: 12px;
         font-weight: 700;
@@ -640,8 +645,56 @@ def render():
         unsafe_allow_html=True,
     )
 
-    # HIGHLIGHTS ROW - Top BU and Top Contributor (MOVED TO TOP)
-    highlights_cols = st.columns(2, gap="medium")
+    # OVERVIEW SECTION - All stats under one heading
+    st.markdown(
+        """
+    <div class="section-header">
+        <h2 class="section-title">Overview</h2>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+
+    # Row 1: Stats
+    stat_cols = st.columns(3, gap="medium")
+
+    with stat_cols[0]:
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <h2 class="stat-value">{stats.get("total", 0)}</h2>
+            <div class="stat-label">💡 Total Ideas</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with stat_cols[1]:
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <h2 class="stat-value">{stats.get("this_year", 0)}</h2>
+            <div class="stat-label">🔥 This Year</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with stat_cols[2]:
+        st.markdown(
+            f"""
+        <div class="stat-card">
+            <h2 class="stat-value">{stats.get("this_month", 0)}</h2>
+            <div class="stat-label">📅 This Month</div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
+
+    # Row 2: Highlights - Top BU, Top Contributor, My Ideas
+    highlights_cols = st.columns(3, gap="medium")
 
     with highlights_cols[0]:
         if top_bu:
@@ -661,9 +714,7 @@ def render():
                 """
             <div class="highlight-card orange">
                 <div class="highlight-label">TOP BU THIS MONTH</div>
-                <div class="highlight-name">Be the First!</div>
-                <div class="highlight-count">—</div>
-                <div class="highlight-text">Submit ideas from your BU to see it here!</div>
+                <div class="highlight-name">—</div>
             </div>
             """,
                 unsafe_allow_html=True,
@@ -687,67 +738,20 @@ def render():
                 """
             <div class="highlight-card purple">
                 <div class="highlight-label">TOP CONTRIBUTOR</div>
-                <div class="highlight-name">Start Your Journey!</div>
-                <div class="highlight-count">—</div>
-                <div class="highlight-text">Submit your first idea to become a top contributor!</div>
+                <div class="highlight-name">—</div>
             </div>
             """,
                 unsafe_allow_html=True,
             )
 
-    st.divider()
-
-    # STATS ROW - KPI Cards
-    st.markdown(
-        """
-    <div class="section-header">
-        <h2 class="section-title">Overview</h2>
-    </div>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    stat_cols = st.columns(4)
-
-    with stat_cols[0]:
+    with highlights_cols[2]:
         st.markdown(
             f"""
-        <div class="stat-card">
-            <h2 class="stat-value">{stats.get("total", 0)}</h2>
-            <div class="stat-label">💡 Total Ideas</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    with stat_cols[1]:
-        st.markdown(
-            f"""
-        <div class="stat-card">
-            <h2 class="stat-value">{stats.get("this_month", 0)}</h2>
-            <div class="stat-label">📅 This Month</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    with stat_cols[2]:
-        st.markdown(
-            f"""
-        <div class="stat-card">
-            <h2 class="stat-value">{stats.get("this_year", 0)}</h2>
-            <div class="stat-label">🔥 This Year</div>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    with stat_cols[3]:
-        st.markdown(
-            f"""
-        <div class="stat-card">
-            <h2 class="stat-value">{user_idea_count}</h2>
-            <div class="stat-label">✏️ Your Ideas</div>
+        <div class="highlight-card my-ideas">
+            <div class="highlight-label">MY IDEAS</div>
+            <h2 class="highlight-name">{user_idea_count}</h2>
+            <div class="highlight-count">{user_idea_count}</div>
+            <div class="highlight-text">ideas submitted</div>
         </div>
         """,
             unsafe_allow_html=True,
