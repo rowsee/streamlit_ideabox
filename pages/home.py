@@ -693,18 +693,17 @@ def render():
 
     st.markdown("<div style='margin-top: 24px;'></div>", unsafe_allow_html=True)
 
-    # Row 2: Highlights - Top BU, Top Contributor, My Ideas
-    highlights_cols = st.columns(3, gap="medium")
+    # Row 2: Stats - Top BU, Top Contributor, My Ideas
+    stats_cols = st.columns(3, gap="medium")
 
-    with highlights_cols[0]:
+    with stats_cols[0]:
         if top_bu:
             st.markdown(
                 f"""
-            <div class="highlight-card orange">
-                <div class="highlight-label">TOP BU THIS MONTH</div>
-                <h2 class="highlight-name">{top_bu.get("bu_cl_site", "N/A")}</h2>
-                <div class="highlight-count">{top_bu.get("count", 0)}</div>
-                <div class="highlight-text">ideas submitted</div>
+            <div class="stat-card">
+                <h2 class="stat-label" style="font-size: 12px;">TOP BU THIS MONTH</h2>
+                <h2 class="stat-value" style="font-size: 36px;">{top_bu.get("bu_cl_site", "N/A")}</h2>
+                <div class="stat-label">{top_bu.get("count", 0)} ideas</div>
             </div>
             """,
                 unsafe_allow_html=True,
@@ -712,23 +711,22 @@ def render():
         else:
             st.markdown(
                 """
-            <div class="highlight-card orange">
-                <div class="highlight-label">TOP BU THIS MONTH</div>
-                <div class="highlight-name">—</div>
+            <div class="stat-card">
+                <h2 class="stat-label" style="font-size: 12px;">TOP BU THIS MONTH</h2>
+                <h2 class="stat-value" style="font-size: 36px;">—</h2>
             </div>
             """,
                 unsafe_allow_html=True,
             )
 
-    with highlights_cols[1]:
+    with stats_cols[1]:
         if top_contributor:
             st.markdown(
                 f"""
-            <div class="highlight-card purple">
-                <div class="highlight-label">TOP CONTRIBUTOR</div>
-                <h2 class="highlight-name">{top_contributor.get("name", "N/A")}</h2>
-                <div class="highlight-count">{top_contributor.get("count", 0)}</div>
-                <div class="highlight-text">ideas submitted</div>
+            <div class="stat-card">
+                <h2 class="stat-label" style="font-size: 12px;">TOP CONTRIBUTOR</h2>
+                <h2 class="stat-value" style="font-size: 36px;">{top_contributor.get("name", "N/A")}</h2>
+                <div class="stat-label">{top_contributor.get("count", 0)} ideas</div>
             </div>
             """,
                 unsafe_allow_html=True,
@@ -736,22 +734,21 @@ def render():
         else:
             st.markdown(
                 """
-            <div class="highlight-card purple">
-                <div class="highlight-label">TOP CONTRIBUTOR</div>
-                <div class="highlight-name">—</div>
+            <div class="stat-card">
+                <h2 class="stat-label" style="font-size: 12px;">TOP CONTRIBUTOR</h2>
+                <h2 class="stat-value" style="font-size: 36px;">—</h2>
             </div>
             """,
                 unsafe_allow_html=True,
             )
 
-    with highlights_cols[2]:
+    with stats_cols[2]:
         st.markdown(
             f"""
-        <div class="highlight-card my-ideas">
-            <div class="highlight-label">MY IDEAS</div>
-            <h2 class="highlight-name">{user_idea_count}</h2>
-            <div class="highlight-count">{user_idea_count}</div>
-            <div class="highlight-text">ideas submitted</div>
+        <div class="stat-card">
+            <h2 class="stat-label" style="font-size: 12px;">MY IDEAS</h2>
+            <h2 class="stat-value" style="font-size: 36px;">{user_idea_count}</h2>
+            <div class="stat-label">ideas submitted</div>
         </div>
         """,
             unsafe_allow_html=True,
