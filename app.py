@@ -946,7 +946,7 @@ def render_sidebar():
             # Navigation buttons with icons
             nav_items = [
                 ("Home", "🏠", "home"),
-                ("Submit Idea", "✏️", "submit_idea"),
+                ("Submit Idea", "💡", "submit_idea"),
                 ("My Ideas", "📁", "my_ideas"),
                 ("Browse Ideas", "🔍", "browse_ideas"),
                 ("Dashboard", "📊", "dashboard"),

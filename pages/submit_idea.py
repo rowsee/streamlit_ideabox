@@ -762,7 +762,7 @@ def render():
 
     # Submit Button
     st.markdown('<div class="submit-container">', unsafe_allow_html=True)
-    submitted = st.button("Submit Idea", type="primary", use_container_width=False)
+    submitted = st.button("💡 Submit Idea", type="primary", use_container_width=False)
     st.markdown("</div>", unsafe_allow_html=True)
 
     if submitted:
