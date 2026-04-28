@@ -311,6 +311,59 @@ def get_logged_in_user_email() -> str:
     return ""
 
 
+def get_logged_in_user_initials(full_name: str) -> str:
+    parts = [part for part in str(full_name).strip().split() if part]
+    if len(parts) >= 2:
+        return (parts[0][0] + parts[1][0]).upper()
+    if len(parts) == 1:
+        return parts[0][:2].upper()
+    user_id = get_logged_in_user()
+    if user_id and user_id != "anonymous":
+        return user_id[:2].upper()
+    return "U"
+
+
+def render_sso_debug_info():
+    if header_user_name not in ("USER", "User", ""):
+        return
+
+    with st.expander("SSO Debug - remove before production", expanded=False):
+        st.write("**Detected user ID:**", get_logged_in_user())
+        st.write("**Detected display name:**", get_logged_in_user_name())
+
+        user_info = _get_streamlit_user_dict()
+        if user_info:
+            st.write("**st.user / experimental_user claims:**")
+            st.json({k: str(v) for k, v in user_info.items() if k != "tokens"})
+        else:
+            st.caption("No authenticated st.user claims were available.")
+
+        norm = _get_normalized_headers()
+        if norm:
+            st.write("**Request headers (normalized keys):**")
+            st.json({k: str(v) for k, v in norm.items()})
+        else:
+            st.caption("No request headers were available in st.context.headers.")
+
+        st.write("**OS environment:**")
+        st.json(
+            {
+                "USERNAME": os.environ.get("USERNAME", "not set"),
+                "USER": os.environ.get("USER", "not set"),
+                "LOGNAME": os.environ.get("LOGNAME", "not set"),
+            }
+        )
+
+
+# Resolve once at module level
+header_user_id = get_logged_in_user()
+header_user_name = get_logged_in_user_name().upper()
+header_user_initials = get_logged_in_user_initials(header_user_name)
+header_last_refreshed = datetime.now().strftime("%d-%b-%Y %I:%M %p")
+
+render_sso_debug_info()
+
+
 def render_access_denied(message: str = "Access Denied"):
     """Show access denied page and stop execution."""
     st.markdown(
@@ -755,11 +808,16 @@ def init_session():
 
 
 def login_user():
-    """Disabled - SSO-only deployment. Manual login no longer available."""
-    render_access_denied("SSO Required")
-    st.write("This application requires SSO authentication.")
-    st.write("Please access through the SSO portal.")
-    st.stop()
+    st.markdown(
+        """
+    <style>
+        section[data-testid="stSidebar"] { display: none !important; }
+        .block-container { max-width: 520px !important; margin: 0 auto; padding-top: 60px !important; }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
     st.markdown(
         """
     <div style="text-align: center; margin-bottom: 40px;">
@@ -771,7 +829,126 @@ def login_user():
         unsafe_allow_html=True,
     )
 
-    # Initialize session state variables
+    if "login_email" not in st.session_state:
+        st.session_state.login_email = ""
+    if "show_name_field" not in st.session_state:
+        st.session_state.show_name_field = False
+    if "confirm_account_creation" not in st.session_state:
+        st.session_state.confirm_account_creation = False
+    if "pending_email" not in st.session_state:
+        st.session_state.pending_email = None
+    if "pending_full_name" not in st.session_state:
+        st.session_state.pending_full_name = None
+    if "email_error" not in st.session_state:
+        st.session_state.email_error = None
+    if "email_suggestion" not in st.session_state:
+        st.session_state.email_suggestion = None
+
+    if st.session_state.email_suggestion:
+        st.warning(f"Did you mean: **{st.session_state.email_suggestion}**?")
+        if st.button(
+            f"Use {st.session_state.email_suggestion}",
+            type="primary",
+            use_container_width=True,
+        ):
+            st.session_state.login_email = st.session_state.email_suggestion
+            st.session_state.email_suggestion = None
+            st.session_state.email_error = None
+            st.rerun()
+        if st.button("No, continue with current email", use_container_width=True):
+            st.session_state.email_suggestion = None
+            st.rerun()
+        st.divider()
+
+    if st.session_state.email_error and not st.session_state.email_suggestion:
+        st.error(f"{st.session_state.email_error}")
+        st.session_state.email_error = None
+
+    if st.session_state.confirm_account_creation and st.session_state.pending_email:
+        st.warning("New Account Creation")
+        st.info(f"Creating account for: **{st.session_state.pending_email}**")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Create Account", type="primary", use_container_width=True):
+                username = st.session_state.pending_email.split("@")[0]
+                user_id = create_user(
+                    username,
+                    st.session_state.pending_email,
+                    st.session_state.pending_full_name or "",
+                )
+                st.session_state.user_id = user_id
+                st.session_state.username = username
+                st.session_state.email = st.session_state.pending_email
+                st.session_state.full_name = st.session_state.pending_full_name or ""
+                st.session_state.confirm_account_creation = False
+                st.session_state.pending_email = None
+                st.session_state.pending_full_name = None
+                st.session_state.show_name_field = False
+                st.session_state.current_page = "home"
+                st.rerun()
+        with col2:
+            if st.button("Cancel", use_container_width=True):
+                st.session_state.confirm_account_creation = False
+                st.session_state.pending_email = None
+                st.session_state.pending_full_name = None
+                st.session_state.show_name_field = False
+                st.rerun()
+        return
+
+    with st.form("login_form"):
+        email = st.text_input(
+            "TE Email",
+            value=st.session_state.login_email,
+            placeholder="your.name@te.com",
+            label_visibility="visible",
+            key="email_input_field",
+        )
+
+        full_name = ""
+        if st.session_state.show_name_field:
+            full_name = st.text_input(
+                "Your Name",
+                placeholder="Enter your name",
+                label_visibility="visible",
+                key="name_input_field",
+            )
+
+        submitted = st.form_submit_button("Continue", use_container_width=True)
+
+        if submitted and email:
+            email = normalize_email(email)
+            st.session_state.login_email = email
+
+            existing_emails = get_all_user_emails()
+            is_valid, error_message, suggestion = validate_email_complete(
+                email, existing_emails
+            )
+
+            if not is_valid:
+                if suggestion:
+                    st.session_state.email_suggestion = suggestion
+                    st.session_state.email_error = error_message
+                else:
+                    st.session_state.email_error = error_message
+                st.rerun()
+            else:
+                user = get_user_by_email(email)
+                if user:
+                    st.session_state.user_id = user["id"]
+                    st.session_state.username = user["username"]
+                    st.session_state.email = user["email"]
+                    st.session_state.full_name = user["full_name"] or ""
+                    st.session_state.show_name_field = False
+                    st.session_state.current_page = "home"
+                    st.rerun()
+                else:
+                    st.session_state.show_name_field = True
+                    st.session_state.pending_email = email
+                    st.session_state.pending_full_name = full_name
+                    if full_name:
+                        st.session_state.confirm_account_creation = True
+                    st.rerun()
     if "login_email" not in st.session_state:
         st.session_state.login_email = ""
     if "show_name_field" not in st.session_state:
@@ -987,19 +1164,17 @@ def main():
     init_db()
     init_session()
 
-    # SSO Auto-Login Flow (SSO-only deployment)
+    # SSO Auto-Login Flow - try SSO first, fallback to manual login
     if not st.session_state.user_id:
         sso_user_id = get_logged_in_user()
 
         if sso_user_id and sso_user_id != "anonymous":
-            # SSO user detected - try to auto-login
             sso_email = get_logged_in_user_email()
             sso_name = get_logged_in_user_name()
 
             if sso_email and sso_email.endswith("@te.com"):
                 user = get_user_by_email(sso_email)
                 if user:
-                    # Existing user - auto-login
                     st.session_state.user_id = user["id"]
                     st.session_state.username = user["username"]
                     st.session_state.email = user["email"]
@@ -1007,24 +1182,11 @@ def main():
                     st.session_state.current_page = "home"
                     st.rerun()
                 else:
-                    # SSO user NOT in database
-                    render_access_denied("Access Denied")
-                    st.error(
-                        f"Your account ({sso_email}) is not authorized to access this application."
-                    )
-                    st.write("Please contact the administrator to request access.")
-                    st.stop()
+                    login_user()
             else:
-                # Invalid email domain
-                render_access_denied("Access Denied")
-                st.error("Invalid email domain. Only @te.com accounts are allowed.")
-                st.stop()
+                login_user()
         else:
-            # No SSO detected
-            render_access_denied("Access Denied")
-            st.write("This application requires SSO authentication.")
-            st.write("Please access this app through the SSO portal.")
-            st.stop()
+            login_user()
 
     # User is logged in - render sidebar and page
     if st.session_state.user_id:
