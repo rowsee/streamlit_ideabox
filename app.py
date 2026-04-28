@@ -1,4 +1,8 @@
 import streamlit as st
+import os
+import base64
+from datetime import datetime
+from typing import Any, Dict
 from database import (
     init_db,
     get_user_by_email,
@@ -21,6 +25,314 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     menu_items=None,
 )
+
+
+# =============================================================================
+# SSO / Windows Auth / OAuth - Auto Login Helpers
+# =============================================================================
+
+
+def _normalize_header_key(key: str) -> str:
+    return "".join(ch for ch in str(key).lower() if ch.isalnum())
+
+
+def _clean_identity_value(value: Any) -> str:
+    value = str(value).strip()
+    if not value:
+        return ""
+    if "\\" in value:
+        value = value.split("\\")[-1].strip()
+    if "/" in value and "=" in value:
+        parts = [p for p in value.replace(";", ",").split(",") if "=" in p]
+        for part in parts:
+            k, v = part.split("=", 1)
+            if (
+                k.strip().lower()
+                in {
+                    "uid",
+                    "userid",
+                    "user",
+                    "cn",
+                    "samaccountname",
+                    "preferred_username",
+                    "givenname",
+                    "sn",
+                    "surname",
+                    "name",
+                }
+                and v.strip()
+            ):
+                value = v.strip()
+                break
+    return value.strip().strip('"').strip("'").strip()
+
+
+def _extract_te_user_id(value: Any) -> str:
+    value = _clean_identity_value(value)
+    if not value:
+        return ""
+    if "@" in value:
+        value = value.split("@")[0].strip()
+    return value.lower()
+
+
+def _title_case_name(value: Any) -> str:
+    value = _clean_identity_value(value)
+    if not value:
+        return ""
+    value = value.replace(".", " ").replace("_", " ").replace("-", " ")
+    return " ".join(part.capitalize() for part in value.split() if part)
+
+
+def _get_streamlit_user_dict() -> Dict[str, Any]:
+    """Try st.user (Streamlit >=1.31 / Streamlit Cloud / OAuth)."""
+    try:
+        user_obj = getattr(st, "user", None) or getattr(st, "experimental_user", None)
+        if user_obj is None:
+            return {}
+        if hasattr(user_obj, "to_dict"):
+            data = user_obj.to_dict()
+            if isinstance(data, dict):
+                return data
+        if isinstance(user_obj, dict):
+            return dict(user_obj)
+        attrs = {}
+        for attr in [
+            "email",
+            "name",
+            "given_name",
+            "family_name",
+            "preferred_username",
+            "sub",
+            "oid",
+            "upn",
+            "display_name",
+            "givenname",
+            "surname",
+        ]:
+            val = getattr(user_obj, attr, None)
+            if val is not None:
+                attrs[attr] = val
+        return attrs
+    except Exception:
+        return {}
+
+
+def _get_normalized_headers() -> Dict[str, Any]:
+    """Return all request headers with normalized (alphanumeric-only, lowercase) keys."""
+    try:
+        raw = (
+            dict(st.context.headers)
+            if (getattr(st, "context", None) and getattr(st.context, "headers", None))
+            else {}
+        )
+        return {
+            _normalize_header_key(k): v
+            for k, v in raw.items()
+            if v is not None and str(v).strip()
+        }
+    except Exception:
+        return {}
+
+
+def get_logged_in_user() -> str:
+    """
+    Resolve the authenticated user ID using a priority chain:
+      1. Streamlit st.user / experimental_user (OAuth / Streamlit Cloud)
+      2. HTTP request headers (IIS Windows Auth, nginx, SiteMinder, ...)
+      3. OS environment variables (local Windows login / same-machine run)
+      4. st.session_state fallback
+      5. "anonymous"
+    """
+    user_info = _get_streamlit_user_dict()
+    for key in ["preferred_username", "email", "upn", "sub", "oid", "name"]:
+        value = user_info.get(key)
+        if value:
+            user_id = _extract_te_user_id(value)
+            if user_id and user_id not in ("anonymous", "test"):
+                return user_id
+
+    norm = _get_normalized_headers()
+
+    preferred_keys = [
+        "remoteuser",
+        "logonuser",
+        "authuser",
+        "windowsauthtoken",
+        "xremoteuser",
+        "xforwardeduser",
+        "smuser",
+        "userid",
+        "useridnumber",
+        "username",
+        "upn",
+        "preferredusername",
+        "samaccountname",
+        "accountname",
+        "mailnickname",
+        "emailaddress",
+        "email",
+    ]
+    for key in preferred_keys:
+        value = norm.get(key)
+        if value:
+            user_id = _extract_te_user_id(value)
+            if user_id and user_id not in ("anonymous", ""):
+                return user_id
+
+    for raw_value in norm.values():
+        user_id = _extract_te_user_id(raw_value)
+        if user_id.startswith("te") and any(ch.isdigit() for ch in user_id):
+            return user_id
+
+    try:
+        win_user = (
+            os.environ.get("USERNAME")
+            or os.environ.get("USER")
+            or os.environ.get("LOGNAME")
+        )
+        if win_user and win_user.lower() not in (
+            "system",
+            "network service",
+            "local service",
+            "",
+        ):
+            return win_user.lower()
+    except Exception:
+        pass
+
+    for key in ["user_id", "user_email", "logged_in_user", "username", "user"]:
+        value = st.session_state.get(key)
+        if value is None:
+            continue
+        user_id = _extract_te_user_id(value)
+        if user_id:
+            return user_id
+
+    return "anonymous"
+
+
+def get_logged_in_user_name() -> str:
+    """
+    Resolve a human-readable display name using the same priority chain.
+    """
+    user_info = _get_streamlit_user_dict()
+
+    given = (
+        user_info.get("given_name")
+        or user_info.get("givenname")
+        or user_info.get("first_name")
+        or user_info.get("firstname")
+    )
+    surname = (
+        user_info.get("family_name")
+        or user_info.get("surname")
+        or user_info.get("sn")
+        or user_info.get("last_name")
+        or user_info.get("lastname")
+    )
+    if given or surname:
+        return (
+            f"{_title_case_name(given or '')} {_title_case_name(surname or '')}".strip()
+        )
+
+    for key in ["name", "display_name", "displayname", "preferred_username", "email"]:
+        value = user_info.get(key)
+        if value:
+            candidate = (
+                str(value).split("@")[0]
+                if key in {"preferred_username", "email"}
+                else value
+            )
+            text = _title_case_name(candidate)
+            if text:
+                return text
+
+    norm = _get_normalized_headers()
+
+    header_given = norm.get("givenname") or norm.get("firstname")
+    header_surname = (
+        norm.get("surname")
+        or norm.get("sn")
+        or norm.get("lastname")
+        or norm.get("familyname")
+    )
+    if header_given or header_surname:
+        return f"{_title_case_name(header_given or '')} {_title_case_name(header_surname or '')}".strip()
+
+    for key in ["displayname", "name", "cn", "fullname"]:
+        value = norm.get(key)
+        if value:
+            text = _title_case_name(value)
+            if text:
+                return text
+
+    email_value = norm.get("emailaddress") or norm.get("email")
+    if email_value:
+        text = _title_case_name(str(email_value).split("@")[0])
+        if text:
+            return text
+
+    try:
+        win_user = (
+            os.environ.get("USERNAME")
+            or os.environ.get("USER")
+            or os.environ.get("LOGNAME")
+        )
+        if win_user and win_user.lower() not in (
+            "system",
+            "network service",
+            "local service",
+            "",
+        ):
+            return _title_case_name(win_user)
+    except Exception:
+        pass
+
+    user_id = get_logged_in_user()
+    if user_id and user_id != "anonymous":
+        return _title_case_name(user_id)
+
+    return "User"
+
+
+def get_logged_in_user_email() -> str:
+    """Get the full email address from SSO context."""
+    user_info = _get_streamlit_user_dict()
+    for key in ["email", "preferred_username", "upn"]:
+        value = user_info.get(key)
+        if value and "@" in str(value):
+            return str(value).lower()
+
+    user_id = get_logged_in_user()
+    if user_id and user_id != "anonymous":
+        return f"{user_id}@te.com"
+
+    return ""
+
+
+def render_access_denied(message: str = "Access Denied"):
+    """Show access denied page and stop execution."""
+    st.markdown(
+        """
+    <style>
+        section[data-testid="stSidebar"] { display: none !important; }
+        .block-container { max-width: 520px !important; margin: 0 auto; padding-top: 100px !important; }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"""
+    <div style="text-align: center; margin-bottom: 40px;">
+        <div style="font-size: 64px; margin-bottom: 16px;">🚫</div>
+        <h1 style="color: #dc2626; margin-bottom: 16px; font-weight: 700;">{message}</h1>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
+    st.stop()
+
 
 # Modern color palette CSS
 st.markdown(
@@ -443,18 +755,11 @@ def init_session():
 
 
 def login_user():
-    # Hide sidebar on login page
-    st.markdown(
-        """
-    <style>
-        section[data-testid="stSidebar"] { display: none !important; }
-        .block-container { max-width: 520px !important; margin: 0 auto; padding-top: 60px !important; }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
-
-    # Login page header - Option A: Smaller font, full title visible
+    """Disabled - SSO-only deployment. Manual login no longer available."""
+    render_access_denied("SSO Required")
+    st.write("This application requires SSO authentication.")
+    st.write("Please access through the SSO portal.")
+    st.stop()
     st.markdown(
         """
     <div style="text-align: center; margin-bottom: 40px;">
@@ -682,26 +987,62 @@ def main():
     init_db()
     init_session()
 
-    # Only render sidebar when user is logged in
+    # SSO Auto-Login Flow (SSO-only deployment)
+    if not st.session_state.user_id:
+        sso_user_id = get_logged_in_user()
+
+        if sso_user_id and sso_user_id != "anonymous":
+            # SSO user detected - try to auto-login
+            sso_email = get_logged_in_user_email()
+            sso_name = get_logged_in_user_name()
+
+            if sso_email and sso_email.endswith("@te.com"):
+                user = get_user_by_email(sso_email)
+                if user:
+                    # Existing user - auto-login
+                    st.session_state.user_id = user["id"]
+                    st.session_state.username = user["username"]
+                    st.session_state.email = user["email"]
+                    st.session_state.full_name = user["full_name"]
+                    st.session_state.current_page = "home"
+                    st.rerun()
+                else:
+                    # SSO user NOT in database
+                    render_access_denied("Access Denied")
+                    st.error(
+                        f"Your account ({sso_email}) is not authorized to access this application."
+                    )
+                    st.write("Please contact the administrator to request access.")
+                    st.stop()
+            else:
+                # Invalid email domain
+                render_access_denied("Access Denied")
+                st.error("Invalid email domain. Only @te.com accounts are allowed.")
+                st.stop()
+        else:
+            # No SSO detected
+            render_access_denied("Access Denied")
+            st.write("This application requires SSO authentication.")
+            st.write("Please access this app through the SSO portal.")
+            st.stop()
+
+    # User is logged in - render sidebar and page
     if st.session_state.user_id:
         render_sidebar()
 
-    if not st.session_state.user_id:
-        login_user()
-    else:
-        current = st.session_state.current_page
-        if current == "home":
-            home.render()
-        elif current == "submit_idea":
-            submit_idea.render()
-        elif current == "my_ideas":
-            my_ideas.render()
-        elif current == "browse_ideas":
-            browse_ideas.render()
-        elif current == "dashboard":
-            dashboard.render()
-        elif current == "about":
-            about.render()
+    current = st.session_state.current_page
+    if current == "home":
+        home.render()
+    elif current == "submit_idea":
+        submit_idea.render()
+    elif current == "my_ideas":
+        my_ideas.render()
+    elif current == "browse_ideas":
+        browse_ideas.render()
+    elif current == "dashboard":
+        dashboard.render()
+    elif current == "about":
+        about.render()
 
 
 if __name__ == "__main__":
